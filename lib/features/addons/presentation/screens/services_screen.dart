@@ -1,0 +1,207 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/features/addons/data/models/addon_model.dart';
+import 'package:orbit_app/features/addons/data/repositories/addons_repository.dart';
+import 'package:orbit_app/features/addons/presentation/widgets/addon_card.dart';
+import 'package:orbit_app/routing/route_names.dart';
+import 'package:orbit_app/shared/widgets/app_empty_state.dart';
+import 'package:orbit_app/shared/widgets/app_error_widget.dart';
+import 'package:orbit_app/shared/widgets/app_loading.dart';
+import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+
+/// Screen displaying all available addons/services in a grid layout.
+///
+/// Supports search filtering and toggling between all addons and
+/// active-only view.
+class ServicesScreen extends ConsumerStatefulWidget {
+  const ServicesScreen({super.key});
+
+  @override
+  ConsumerState<ServicesScreen> createState() => _ServicesScreenState();
+}
+
+class _ServicesScreenState extends ConsumerState<ServicesScreen> {
+  String _searchQuery = '';
+  bool _showActiveOnly = false;
+  List<AddonModel> _addons = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddons();
+  }
+
+  Future<void> _loadAddons({bool refresh = false}) async {
+    if (!refresh && !_isLoading) {
+      setState(() => _isLoading = true);
+    }
+
+    try {
+      final repository = ref.read(addonsRepositoryProvider);
+      final result = await repository.getAddons(
+        search: _searchQuery.isNotEmpty ? _searchQuery : null,
+      );
+
+      if (mounted) {
+        setState(() {
+          _addons = result.data;
+          _isLoading = false;
+          _errorMessage = null;
+        });
+      }
+    } on ApiException catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.message;
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  List<AddonModel> get _filteredAddons {
+    if (_showActiveOnly) {
+      return _addons.where((a) => a.isActive).toList();
+    }
+    return _addons;
+  }
+
+  void _onSearchChanged(String query) {
+    _searchQuery = query;
+    _loadAddons();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '\u0627\u0644\u062E\u062F\u0645\u0627\u062A', // الخدمات
+        ),
+      ),
+      body: Column(
+        children: [
+          // ── Search & Filter ────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: AppSearchBar(
+              hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u062E\u062F\u0645\u0627\u062A...', // بحث في الخدمات...
+              onChanged: _onSearchChanged,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _FilterChip(
+                  label: '\u0627\u0644\u0643\u0644', // الكل
+                  isSelected: !_showActiveOnly,
+                  onTap: () => setState(() => _showActiveOnly = false),
+                ),
+                const SizedBox(width: 8),
+                _FilterChip(
+                  label: '\u0627\u0644\u0645\u0641\u0639\u0644\u0629', // المفعلة
+                  isSelected: _showActiveOnly,
+                  onTap: () => setState(() => _showActiveOnly = true),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // ── Content ──────────────────────────────────────
+          Expanded(child: _buildContent()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_isLoading) {
+      return AppLoading.listShimmer();
+    }
+
+    if (_errorMessage != null) {
+      return AppErrorWidget(
+        message: _errorMessage!,
+        onRetry: () => _loadAddons(refresh: true),
+      );
+    }
+
+    final filtered = _filteredAddons;
+
+    if (filtered.isEmpty) {
+      return AppEmptyState(
+        icon: Icons.extension_outlined,
+        title: _showActiveOnly
+            ? '\u0644\u0627 \u062A\u0648\u062C\u062F \u062E\u062F\u0645\u0627\u062A \u0645\u0641\u0639\u0644\u0629' // لا توجد خدمات مفعلة
+            : '\u0644\u0627 \u062A\u0648\u062C\u062F \u062E\u062F\u0645\u0627\u062A', // لا توجد خدمات
+        description: '\u0627\u0633\u062A\u0643\u0634\u0641 \u0627\u0644\u062E\u062F\u0645\u0627\u062A \u0627\u0644\u0645\u062A\u0627\u062D\u0629 \u0644\u062A\u0648\u0633\u064A\u0639 \u0625\u0645\u0643\u0627\u0646\u064A\u0627\u062A \u062D\u0633\u0627\u0628\u0643', // استكشف الخدمات المتاحة لتوسيع إمكانيات حسابك
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => _loadAddons(refresh: true),
+      color: AppColors.primary,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.72,
+        ),
+        itemCount: filtered.length,
+        itemBuilder: (context, index) {
+          final addon = filtered[index];
+          return AddonCard(
+            addon: addon,
+            onTap: () => context.pushNamed(
+              RouteNames.addonDetail,
+              pathParameters: {'id': addon.id.toString()},
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+}

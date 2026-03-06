@@ -1,0 +1,201 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:orbit_app/core/constants/app_colors.dart';
+
+/// Tracks the currently selected bottom navigation tab index.
+final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
+
+/// Main application shell that wraps the primary screens with a
+/// persistent bottom navigation bar.
+///
+/// This widget is used inside a [ShellRoute] so that the child is
+/// swapped while the bottom bar stays mounted.
+class MainShell extends ConsumerStatefulWidget {
+  const MainShell({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  ConsumerState<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<MainShell> {
+  // Maps each tab index to its corresponding route path.
+  static const List<String> _tabPaths = [
+    '/',
+    '/messages',
+    '/groups',
+    '/balance',
+    '/more',
+  ];
+
+  /// Determines the active tab index from the current route location.
+  int _indexFromLocation(String location) {
+    if (location.startsWith('/more')) return 4;
+    if (location.startsWith('/balance')) return 3;
+    if (location.startsWith('/groups')) return 2;
+    if (location.startsWith('/messages')) return 1;
+    return 0;
+  }
+
+  void _onTabTapped(int index) {
+    final currentIndex = ref.read(bottomNavIndexProvider);
+
+    if (index == currentIndex) {
+      // If already on this tab, pop to the root of this branch.
+      return;
+    }
+
+    ref.read(bottomNavIndexProvider.notifier).state = index;
+    context.go(_tabPaths[index]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Derive the active index from the actual URL so deep links and
+    // the Android back button stay in sync.
+    final location =
+        GoRouterState.of(context).uri.toString();
+    final activeIndex = _indexFromLocation(location);
+
+    // Keep the provider in sync when navigation is driven externally
+    // (e.g. browser back button / deep links).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ref.read(bottomNavIndexProvider) != activeIndex) {
+        ref.read(bottomNavIndexProvider.notifier).state = activeIndex;
+      }
+    });
+
+    return PopScope(
+      canPop: activeIndex == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          // Navigate back to the home tab instead of exiting the app.
+          ref.read(bottomNavIndexProvider.notifier).state = 0;
+          context.go(_tabPaths[0]);
+        }
+      },
+      child: Scaffold(
+        body: widget.child,
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 8,
+                offset: Offset(0, -2),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: SizedBox(
+              height: 64,
+              child: Row(
+                children: List.generate(5, (index) {
+                  final isActive = activeIndex == index;
+                  return Expanded(
+                    child: _BottomNavItem(
+                      icon: _iconForIndex(index),
+                      activeIcon: _activeIconForIndex(index),
+                      label: _labelForIndex(index),
+                      isActive: isActive,
+                      onTap: () => _onTabTapped(index),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Icon helpers ────────────────────────────────────────────────
+
+  IconData _iconForIndex(int index) {
+    return switch (index) {
+      0 => Icons.dashboard_outlined,
+      1 => Icons.mail_outlined,
+      2 => Icons.people_outlined,
+      3 => Icons.account_balance_wallet_outlined,
+      4 => Icons.more_horiz_outlined,
+      _ => Icons.circle_outlined,
+    };
+  }
+
+  IconData _activeIconForIndex(int index) {
+    return switch (index) {
+      0 => Icons.dashboard,
+      1 => Icons.mail,
+      2 => Icons.people,
+      3 => Icons.account_balance_wallet,
+      4 => Icons.more_horiz,
+      _ => Icons.circle,
+    };
+  }
+
+  String _labelForIndex(int index) {
+    return switch (index) {
+      0 => '\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629', // الرئيسية
+      1 => '\u0627\u0644\u0631\u0633\u0627\u0626\u0644',       // الرسائل
+      2 => '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // المجموعات
+      3 => '\u0627\u0644\u0631\u0635\u064A\u062F',             // الرصيد
+      4 => '\u0627\u0644\u0645\u0632\u064A\u062F',             // المزيد
+      _ => '',
+    };
+  }
+}
+
+// ─── Bottom Navigation Item ──────────────────────────────────────
+
+class _BottomNavItem extends StatelessWidget {
+  const _BottomNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        isActive ? AppColors.bottomNavActive : AppColors.bottomNavInactive;
+
+    return InkWell(
+      onTap: onTap,
+      splashColor: AppColors.primarySurface,
+      highlightColor: Colors.transparent,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isActive ? activeIcon : icon,
+            size: 24,
+            color: color,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              color: color,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}

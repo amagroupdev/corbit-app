@@ -1,0 +1,104 @@
+name: orbit_app
+description: "ORBIT SMS V3 - Mobile Application"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Networking
+  dio: ^5.7.0
+  pretty_dio_logger: ^1.4.0
+
+  # Storage
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.3.5
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # UI
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.17
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  pin_code_fields: ^8.0.1
+  flutter_staggered_animations: ^1.1.1
+  badges: ^3.1.2
+
+  # Forms & Validation
+  reactive_forms: ^17.0.1
+
+  # File handling
+  file_picker: ^8.1.7
+  image_picker: ^1.1.2
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+  open_filex: ^4.5.0
+
+  # Utilities
+  intl: ^0.20.2
+  url_launcher: ^6.3.1
+  connectivity_plus: ^6.1.2
+  package_info_plus: ^8.1.3
+  permission_handler: ^11.3.1
+  infinite_scroll_pagination: ^4.1.0
+  pull_to_refresh_flutter3: ^2.0.2
+  webview_flutter: ^4.10.0
+  flutter_local_notifications: ^18.0.1
+  firebase_messaging: ^15.1.6
+  firebase_core: ^3.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.14
+  json_serializable: ^6.9.4
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/orbit-icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/orbit-icon.png"
+  web:
+    generate: true
+    image_path: "assets/images/orbit-icon.png"
+  windows:
+    generate: false
+  macos:
+    generate: false
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+    - assets/pdf/
+
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Cairo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Cairo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
