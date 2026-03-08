@@ -64,8 +64,15 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
+          # Extract UUID from provisioning profile and install with correct name
+          PP_UUID=$(security cms -D -i $PP_PATH | grep -A1 '<key>UUID</key>' | tail -1 | sed 's/.*<string>\(.*\)<\/string>.*/\1/')
+          echo "Provisioning Profile UUID: $PP_UUID"
+
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
+
+          # Export for later steps
+          echo "PP_UUID=$PP_UUID" >> $GITHUB_ENV
 
       - name: Build Flutter iOS
         run: flutter build ios --release --no-codesign
@@ -79,11 +86,13 @@ jobs:
             -configuration Release \
             -archivePath $RUNNER_TEMP/Runner.xcarchive \
             archive \
-            -allowProvisioningUpdates \
             DEVELOPMENT_TEAM=HT3R33ZP7W \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE="$PP_UUID"
 
-          cat > $RUNNER_TEMP/ExportOptions.plist << 'PLIST'
+          # Create ExportOptions.plist with manual signing
+          cat > $RUNNER_TEMP/ExportOptions.plist << PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -95,9 +104,12 @@ jobs:
               <key>uploadSymbols</key>
               <true/>
               <key>signingStyle</key>
-              <string>automatic</string>
-              <key>destination</key>
-              <string>export</string>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>Orbit.Technology.corbit</key>
+                  <string>$PP_UUID</string>
+              </dict>
           </dict>
           </plist>
           PLIST
@@ -105,8 +117,7 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath $RUNNER_TEMP/Runner.xcarchive \
             -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
-            -exportPath $RUNNER_TEMP/export \
-            -allowProvisioningUpdates
+            -exportPath $RUNNER_TEMP/export
 
       - name: Upload to TestFlight
         env:
@@ -119,7 +130,6 @@ jobs:
           echo "Found IPA: $IPA_FILE"
 
           if [ -n "$APP_STORE_CONNECT_API_KEY_BASE64" ]; then
-            # Use App Store Connect API key
             API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8
             echo -n "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode -o $API_KEY_PATH
 
@@ -129,7 +139,6 @@ jobs:
               --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
               --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
           else
-            # Fallback: use app-specific password
             xcrun altool --upload-app \
               -f "$IPA_FILE" \
               -t ios \
