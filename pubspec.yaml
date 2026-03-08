@@ -56,8 +56,6 @@ dependencies:
   pull_to_refresh_flutter3: any
   webview_flutter: any
   flutter_local_notifications: any
-  firebase_messaging: '>=15.0.0 <15.2.0'
-  firebase_core: '>=3.0.0 <3.7.0'
 
 dev_dependencies:
   flutter_test:
