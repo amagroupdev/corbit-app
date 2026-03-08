@@ -347,7 +347,7 @@ abstract final class AppTheme {
       ),
 
       // ── Tab Bar ──
-      tabBarTheme: TabBarThemeData(
+      tabBarTheme: TabBarTheme(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
         indicatorColor: AppColors.primary,
@@ -372,7 +372,7 @@ abstract final class AppTheme {
       ),
 
       // ── Dialog ──
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 8,
@@ -1066,7 +1066,7 @@ abstract final class AppTheme {
       ),
 
       // ── Tab Bar ──
-      tabBarTheme: TabBarThemeData(
+      tabBarTheme: TabBarTheme(
         labelColor: AppColors.primaryLight,
         unselectedLabelColor: AppColors.darkTextSecondary,
         indicatorColor: AppColors.primaryLight,
@@ -1091,7 +1091,7 @@ abstract final class AppTheme {
       ),
 
       // ── Dialog ──
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: AppColors.darkSurface,
         surfaceTintColor: Colors.transparent,
         elevation: 8,
