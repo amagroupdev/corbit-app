@@ -80,6 +80,8 @@ jobs:
       - name: Archive and export IPA
         run: |
           cd ios
+
+          # Set manual signing only for Runner target, let Pods use automatic
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
             -sdk iphoneos \
@@ -87,12 +89,13 @@ jobs:
             -archivePath $RUNNER_TEMP/Runner.xcarchive \
             archive \
             DEVELOPMENT_TEAM=HT3R33ZP7W \
-            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_STYLE="Manual" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE="$PP_UUID"
+            PROVISIONING_PROFILE_SPECIFIER="Corbit AppStore Distribution" \
+            -destination "generic/platform=iOS"
 
           # Create ExportOptions.plist with manual signing
-          cat > $RUNNER_TEMP/ExportOptions.plist << PLIST
+          cat > $RUNNER_TEMP/ExportOptions.plist << 'PLIST'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -108,7 +111,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>Orbit.Technology.corbit</key>
-                  <string>$PP_UUID</string>
+                  <string>Corbit AppStore Distribution</string>
               </dict>
           </dict>
           </plist>
