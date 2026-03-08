@@ -72,6 +72,11 @@ ios/Runner/GeneratedPluginRegistrant.*
 .env.*
 token.txt
 login_resp.json
+*.cer
+*.p12
+*.p8
+*.mobileprovision
+*.key
 
 # API collections (Postman) - not needed in repo
 apis/
@@ -80,6 +85,8 @@ apis/
 nul
 test_photo.*
 *.pdf
+*.jpeg
+*.jpg
 
 # Windows
 Thumbs.db
