@@ -242,7 +242,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
                 Container(
                   width: 40, height: 40,
                   decoration: BoxDecoration(
-                    color: _statusColor(record.status).withValues(alpha: 0.1),
+                    color: _statusColor(record.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -275,7 +275,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _statusColor(record.status).withValues(alpha: 0.1),
+                    color: _statusColor(record.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(

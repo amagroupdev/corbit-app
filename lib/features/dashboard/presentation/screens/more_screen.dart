@@ -353,7 +353,7 @@ class _UserInfoCard extends ConsumerWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: photoUrl.isNotEmpty
@@ -485,7 +485,7 @@ class _MenuItemTile extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color:
-                      (item.iconColor ?? AppColors.primary).withValues(alpha: 0.1),
+                      (item.iconColor ?? AppColors.primary).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

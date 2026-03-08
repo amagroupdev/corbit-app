@@ -112,13 +112,13 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                 end: Alignment.bottomRight,
                 colors: [
                   currentLevel.color,
-                  currentLevel.color.withValues(alpha: 0.8),
+                  currentLevel.color.withOpacity(0.8),
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: currentLevel.color.withValues(alpha: 0.3),
+                  color: currentLevel.color.withOpacity(0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -198,7 +198,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: nextLevel.color.withValues(alpha: 0.1),
+                          color: nextLevel.color.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -307,7 +307,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isCurrentLevel
-                    ? level.color.withValues(alpha: 0.05)
+                    ? level.color.withOpacity(0.05)
                     : AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
@@ -323,7 +323,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                     height: 44,
                     decoration: BoxDecoration(
                       color: isCompleted || isCurrentLevel
-                          ? level.color.withValues(alpha: 0.15)
+                          ? level.color.withOpacity(0.15)
                           : AppColors.surfaceVariant,
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -385,7 +385,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                           style: TextStyle(
                             fontSize: 12,
                             color: isCurrentLevel
-                                ? level.color.withValues(alpha: 0.7)
+                                ? level.color.withOpacity(0.7)
                                 : AppColors.textSecondary,
                           ),
                         ),

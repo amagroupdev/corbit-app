@@ -176,7 +176,7 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: _surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _statusColor.withValues(alpha: 0.3)),
+        border: Border.all(color: _statusColor.withOpacity(0.3)),
       ),
       child: Text(
         status.arabicLabel,

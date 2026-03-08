@@ -205,7 +205,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       disabledBackgroundColor:
-                          AppColors.primary.withValues(alpha: 0.6),
+                          AppColors.primary.withOpacity(0.6),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(

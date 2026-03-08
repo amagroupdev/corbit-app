@@ -135,8 +135,8 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textOnPrimary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
-          disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.6),
+          disabledBackgroundColor: AppColors.primary.withOpacity(0.4),
+          disabledForegroundColor: AppColors.textOnPrimary.withOpacity(0.6),
           elevation: 0,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -367,7 +367,7 @@ abstract final class AppTheme {
           height: 1.4,
         ),
         overlayColor: WidgetStateProperty.all(
-          AppColors.primary.withValues(alpha: 0.08),
+          AppColors.primary.withOpacity(0.08),
         ),
       ),
 
@@ -753,10 +753,10 @@ abstract final class AppTheme {
 
       // ── Misc ──
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      splashColor: AppColors.primary.withValues(alpha: 0.08),
-      highlightColor: AppColors.primary.withValues(alpha: 0.04),
-      hoverColor: AppColors.primary.withValues(alpha: 0.04),
-      focusColor: AppColors.primary.withValues(alpha: 0.08),
+      splashColor: AppColors.primary.withOpacity(0.08),
+      highlightColor: AppColors.primary.withOpacity(0.04),
+      hoverColor: AppColors.primary.withOpacity(0.04),
+      focusColor: AppColors.primary.withOpacity(0.08),
     );
   }
 
@@ -854,8 +854,8 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textOnPrimary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
-          disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.5),
+          disabledBackgroundColor: AppColors.primary.withOpacity(0.3),
+          disabledForegroundColor: AppColors.textOnPrimary.withOpacity(0.5),
           elevation: 0,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -999,7 +999,7 @@ abstract final class AppTheme {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: AppColors.darkBorder.withValues(alpha: 0.5), width: 1),
+          borderSide: BorderSide(color: AppColors.darkBorder.withOpacity(0.5), width: 1),
         ),
       ),
 
@@ -1031,7 +1031,7 @@ abstract final class AppTheme {
       // ── Navigation Bar (Material 3) ──
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
-        indicatorColor: AppColors.primaryDark.withValues(alpha: 0.3),
+        indicatorColor: AppColors.primaryDark.withOpacity(0.3),
         surfaceTintColor: Colors.transparent,
         elevation: 8,
         height: 64,
@@ -1086,7 +1086,7 @@ abstract final class AppTheme {
           height: 1.4,
         ),
         overlayColor: WidgetStateProperty.all(
-          AppColors.primaryLight.withValues(alpha: 0.08),
+          AppColors.primaryLight.withOpacity(0.08),
         ),
       ),
 
@@ -1156,7 +1156,7 @@ abstract final class AppTheme {
       // ── Chip ──
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.darkSurfaceVariant,
-        selectedColor: AppColors.primaryDark.withValues(alpha: 0.3),
+        selectedColor: AppColors.primaryDark.withOpacity(0.3),
         disabledColor: AppColors.darkSurfaceVariant,
         labelStyle: const TextStyle(
           fontFamily: _fontFamily,
@@ -1256,8 +1256,8 @@ abstract final class AppTheme {
       // ── Progress Indicator ──
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
-        linearTrackColor: AppColors.primaryDark.withValues(alpha: 0.3),
-        circularTrackColor: AppColors.primaryDark.withValues(alpha: 0.3),
+        linearTrackColor: AppColors.primaryDark.withOpacity(0.3),
+        circularTrackColor: AppColors.primaryDark.withOpacity(0.3),
       ),
 
       // ── Tooltip ──
@@ -1434,10 +1434,10 @@ abstract final class AppTheme {
 
       // ── Misc ──
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      splashColor: AppColors.primaryLight.withValues(alpha: 0.08),
-      highlightColor: AppColors.primaryLight.withValues(alpha: 0.04),
-      hoverColor: AppColors.primaryLight.withValues(alpha: 0.04),
-      focusColor: AppColors.primaryLight.withValues(alpha: 0.08),
+      splashColor: AppColors.primaryLight.withOpacity(0.08),
+      highlightColor: AppColors.primaryLight.withOpacity(0.04),
+      hoverColor: AppColors.primaryLight.withOpacity(0.04),
+      focusColor: AppColors.primaryLight.withOpacity(0.08),
     );
   }
 }

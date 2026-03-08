@@ -87,7 +87,7 @@ class PaymentMethodSelector extends StatelessWidget {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -124,7 +124,7 @@ class PaymentMethodSelector extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.7)
+                            ? AppColors.primary.withOpacity(0.7)
                             : AppColors.textHint,
                       ),
                       textAlign: TextAlign.center,

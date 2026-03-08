@@ -43,7 +43,7 @@ class QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor =
-        iconBackgroundColor ?? iconColor.withValues(alpha: 0.12);
+        iconBackgroundColor ?? iconColor.withOpacity(0.12);
 
     return Material(
       color: AppColors.surface,

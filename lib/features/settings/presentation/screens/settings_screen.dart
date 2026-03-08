@@ -149,7 +149,7 @@ class SettingsScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -161,7 +161,7 @@ class SettingsScreen extends ConsumerWidget {
             // Avatar
             CircleAvatar(
               radius: 30,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              backgroundColor: Colors.white.withOpacity(0.2),
               backgroundImage: profile['profile_photo_url'] != null &&
                       (profile['profile_photo_url'] as String).isNotEmpty
                   ? NetworkImage(profile['profile_photo_url'] as String)
@@ -192,7 +192,7 @@ class SettingsScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: Colors.white.withOpacity(0.8),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -223,7 +223,7 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              backgroundColor: Colors.white.withOpacity(0.2),
               child: const Icon(Icons.person, size: 32, color: Colors.white),
             ),
             const SizedBox(width: 16),

@@ -118,7 +118,7 @@ class AppCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius),
           splashColor: AppColors.primarySurface,
-          highlightColor: AppColors.primarySurface.withValues(alpha: 0.3),
+          highlightColor: AppColors.primarySurface.withOpacity(0.3),
           child: card,
         ),
       );

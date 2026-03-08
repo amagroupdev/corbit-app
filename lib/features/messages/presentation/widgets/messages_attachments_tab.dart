@@ -22,7 +22,7 @@ class _MessagesAttachmentsTabState
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.attach_file_rounded,
-              size: 64, color: AppColors.textHint.withValues(alpha: 0.5)),
+              size: 64, color: AppColors.textHint.withOpacity(0.5)),
           const SizedBox(height: 16),
           const Text(
             'المرفقات',

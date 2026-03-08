@@ -67,7 +67,7 @@ class StatsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           boxShadow: [
             BoxShadow(
-              color: gradient.colors.first.withValues(alpha: 0.35),
+              color: gradient.colors.first.withOpacity(0.35),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -79,7 +79,7 @@ class StatsCard extends StatelessWidget {
             Positioned.fill(
               child: CustomPaint(
                 painter: _WavePatternPainter(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: Colors.white.withOpacity(0.08),
                 ),
               ),
             ),
@@ -94,7 +94,7 @@ class StatsCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                   child: Icon(
@@ -112,7 +112,7 @@ class StatsCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.white.withOpacity(0.85),
                     fontFamily: 'Cairo',
                   ),
                   maxLines: 1,
@@ -147,7 +147,7 @@ class StatsCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: Colors.white.withOpacity(0.8),
                           fontFamily: 'Cairo',
                         ),
                       ),
@@ -169,17 +169,17 @@ class StatsCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withOpacity(0.9),
                             fontFamily: 'Cairo',
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white.withValues(alpha: 0.5),
+                            decorationColor: Colors.white.withOpacity(0.5),
                           ),
                         ),
                         const SizedBox(width: 2),
                         Icon(
                           Icons.arrow_forward_ios,
                           size: 10,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white.withOpacity(0.9),
                         ),
                       ],
                     ),
@@ -265,7 +265,7 @@ class _WavePatternPainter extends CustomPainter {
       final strokeWidth = (3.5 - i * 0.35).clamp(1.2, 3.5);
 
       final paint = Paint()
-        ..color = color.withValues(alpha: opacity)
+        ..color = color.withOpacity(opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;
@@ -281,7 +281,7 @@ class _WavePatternPainter extends CustomPainter {
       final opacity = (0.12 - i * 0.025).clamp(0.03, 0.14);
 
       final paint = Paint()
-        ..color = color.withValues(alpha: opacity)
+        ..color = color.withOpacity(opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0
         ..strokeCap = StrokeCap.round;

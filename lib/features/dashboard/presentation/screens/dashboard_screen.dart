@@ -443,7 +443,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+              border: Border.all(color: AppColors.border.withOpacity(0.5)),
             ),
             child: Column(
               children: [
@@ -548,14 +548,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+              border: Border.all(color: AppColors.border.withOpacity(0.5)),
             ),
             child: Column(
               children: [
                 for (int i = 0; i < stats.recentMessages.length; i++) ...[
                   _RecentMessageRow(message: stats.recentMessages[i]),
                   if (i < stats.recentMessages.length - 1)
-                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.3)),
+                    Divider(height: 1, color: AppColors.border.withOpacity(0.3)),
                 ],
               ],
             ),
@@ -582,12 +582,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.08),
-                  AppColors.primary.withValues(alpha: 0.02),
+                  AppColors.primary.withOpacity(0.08),
+                  AppColors.primary.withOpacity(0.02),
                 ],
               ),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              border: Border.all(color: AppColors.primary.withOpacity(0.2)),
             ),
             child: Column(
               children: [
@@ -596,7 +596,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -915,7 +915,7 @@ class _BannerCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.25),
+              color: AppColors.primary.withOpacity(0.25),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -968,7 +968,7 @@ class _BannerCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white.withOpacity(0.9),
                           fontFamily: 'Cairo',
                           height: 1.4,
                         ),
@@ -995,7 +995,7 @@ class _BannerPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.06)
+      ..color = Colors.white.withOpacity(0.06)
       ..style = PaintingStyle.fill;
 
     // Large circle bottom-right
@@ -1009,7 +1009,7 @@ class _BannerPatternPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(size.width * 0.75, -size.height * 0.1),
       size.height * 0.35,
-      Paint()..color = Colors.white.withValues(alpha: 0.04),
+      Paint()..color = Colors.white.withOpacity(0.04),
     );
   }
 
@@ -1037,9 +1037,9 @@ class _BalanceMetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Column(
         children: [
@@ -1047,7 +1047,7 @@ class _BalanceMetricCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
+              color: color.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -1133,9 +1133,9 @@ class _BalanceCountdownTimerState extends State<_BalanceCountdownTimer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
+        color: AppColors.primary.withOpacity(0.06),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
       ),
       child: Column(
         children: [

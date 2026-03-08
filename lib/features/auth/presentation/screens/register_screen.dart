@@ -303,7 +303,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.6),
+                        AppColors.primary.withOpacity(0.6),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -461,7 +461,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         height: 44,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.1)
+                              ? AppColors.primary.withOpacity(0.1)
                               : AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -1066,7 +1066,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,

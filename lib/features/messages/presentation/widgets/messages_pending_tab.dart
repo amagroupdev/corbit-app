@@ -62,7 +62,7 @@ class MessagesPendingTab extends ConsumerWidget {
               children: [
                 Icon(Icons.pending_outlined,
                     size: 64,
-                    color: AppColors.textHint.withValues(alpha: 0.5)),
+                    color: AppColors.textHint.withOpacity(0.5)),
                 const SizedBox(height: 16),
                 const Text(
                   'لا توجد رسائل معلقة',
