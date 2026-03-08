@@ -69,7 +69,7 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     return PopScope(
       canPop: activeIndex == 0,
-      onPopInvokedWithResult: (didPop, _) {
+      onPopInvoked: (didPop) {
         if (!didPop) {
           // Navigate back to the home tab instead of exiting the app.
           ref.read(bottomNavIndexProvider.notifier).state = 0;
