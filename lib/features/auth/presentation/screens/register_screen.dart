@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,23 +59,68 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _AccountTypeOption(id: 2, label: '\u0645\u062f\u0631\u0633\u0629', icon: Icons.school_outlined),
     _AccountTypeOption(id: 3, label: '\u0634\u0631\u0643\u0629', icon: Icons.business_outlined),
     _AccountTypeOption(id: 4, label: '\u062c\u0647\u0629 \u062d\u0643\u0648\u0645\u064a\u0629', icon: Icons.account_balance_outlined),
+    _AccountTypeOption(id: 5, label: '\u062c\u0645\u0639\u064a\u0629 \u062e\u064a\u0631\u064a\u0629', icon: Icons.volunteer_activism_outlined),
   ];
 
-  static const List<Map<String, String>> _regions = [
-    {'id': '1', 'name': '\u0627\u0644\u0631\u064a\u0627\u0636'},
-    {'id': '2', 'name': '\u0645\u0643\u0629 \u0627\u0644\u0645\u0643\u0631\u0645\u0629'},
-    {'id': '3', 'name': '\u0627\u0644\u0645\u062f\u064a\u0646\u0629 \u0627\u0644\u0645\u0646\u0648\u0631\u0629'},
-    {'id': '4', 'name': '\u0627\u0644\u0642\u0635\u064a\u0645'},
-    {'id': '5', 'name': '\u0627\u0644\u0634\u0631\u0642\u064a\u0629'},
-    {'id': '6', 'name': '\u0639\u0633\u064a\u0631'},
-    {'id': '7', 'name': '\u062a\u0628\u0648\u0643'},
-    {'id': '8', 'name': '\u062d\u0627\u0626\u0644'},
-    {'id': '9', 'name': '\u0627\u0644\u062d\u062f\u0648\u062f \u0627\u0644\u0634\u0645\u0627\u0644\u064a\u0629'},
-    {'id': '10', 'name': '\u062c\u0627\u0632\u0627\u0646'},
-    {'id': '11', 'name': '\u0646\u062c\u0631\u0627\u0646'},
-    {'id': '12', 'name': '\u0627\u0644\u0628\u0627\u062d\u0629'},
-    {'id': '13', 'name': '\u0627\u0644\u062c\u0648\u0641'},
-  ];
+  // Dynamic regions and cities from API
+  List<Map<String, dynamic>> _regions = [];
+  List<Map<String, dynamic>> _cities = [];
+  bool _loadingRegions = true;
+  bool _loadingCities = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRegions();
+  }
+
+  Future<void> _fetchRegions() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        'https://app.mobile.net.sa/api/v3/common/regions',
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+      final data = response.data;
+      if (data['success'] == true && data['data'] is List) {
+        setState(() {
+          _regions = (data['data'] as List)
+              .map((r) => {'id': r['id'].toString(), 'name': r['name'].toString()})
+              .toList();
+          _loadingRegions = false;
+        });
+      }
+    } catch (_) {
+      setState(() => _loadingRegions = false);
+    }
+  }
+
+  Future<void> _fetchCities(String regionId) async {
+    setState(() {
+      _loadingCities = true;
+      _cities = [];
+      _selectedCity = null;
+    });
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        'https://app.mobile.net.sa/api/v3/common/cities',
+        queryParameters: {'region_id': regionId},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
+      final data = response.data;
+      if (data['success'] == true && data['data'] is List) {
+        setState(() {
+          _cities = (data['data'] as List)
+              .map((c) => {'id': c['id'].toString(), 'name': c['name'].toString()})
+              .toList();
+          _loadingCities = false;
+        });
+      }
+    } catch (_) {
+      setState(() => _loadingCities = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -141,8 +188,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       'password_confirmation': _confirmPasswordController.text,
       'user_type_id': _selectedAccountType,
       if (_selectedGender != null) 'gender': _selectedGender,
-      if (_selectedRegion != null) 'region_id': _selectedRegion,
-      if (_selectedCity != null) 'city_id': _selectedCity,
+      if (_selectedRegion != null) 'region_id': int.tryParse(_selectedRegion!) ?? _selectedRegion,
+      if (_selectedCity != null) 'city_id': int.tryParse(_selectedCity!) ?? _selectedCity,
     };
 
     // Individual-specific fields
@@ -223,22 +270,36 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final registerState = ref.watch(registerControllerProvider);
 
     ref.listen<RegisterState>(registerControllerProvider, (prev, next) {
-      if (next.error != null) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+      if (next.error != null || next.fieldErrors != null) {
+        // Build error message: show generic error + all field-specific errors
+        final parts = <String>[];
+        if (next.error != null) parts.add(next.error!);
+        if (next.fieldErrors != null) {
+          for (final entry in next.fieldErrors!.entries) {
+            for (final msg in entry.value) {
+              parts.add(msg);
+            }
+          }
+        }
+        final errorMessage = parts.join('\n');
+        if (errorMessage.isNotEmpty) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(
+                  errorMessage,
+                  style: const TextStyle(fontFamily: 'Cairo'),
+                ),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              backgroundColor: AppColors.error,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
+            );
+        }
       }
 
       final response = next.response;
@@ -642,6 +703,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               validator: (v) {
                 if (v == null || v.isEmpty) return '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629';
                 if (v.length < 8) return '8 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
+                if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(v)) {
+                  return '\u064a\u062c\u0628 \u0623\u0646 \u062a\u062d\u062a\u0648\u064a \u0639\u0644\u0649 \u0631\u0645\u0632 \u062e\u0627\u0635 (!@#\$%^&*)';
+                }
                 return null;
               },
             ),
@@ -682,38 +746,48 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             // Region
             _buildLabel('\u0627\u0644\u0645\u0646\u0637\u0642\u0629'),
             const SizedBox(height: 8),
-            _buildDropdown<String>(
-              value: _selectedRegion,
-              hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
-              items: _regions
-                  .map((r) => DropdownMenuItem(
-                        value: r['id'],
-                        child: Text(r['name']!,
-                            style: const TextStyle(fontFamily: 'Cairo')),
-                      ))
-                  .toList(),
-              onChanged: (v) => setState(() {
-                _selectedRegion = v;
-                _selectedCity = null;
-              }),
-            ),
+            _loadingRegions
+                ? const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
+                : _buildDropdown<String>(
+                    value: _selectedRegion,
+                    hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
+                    items: _regions
+                        .map((r) => DropdownMenuItem(
+                              value: r['id'] as String,
+                              child: Text(r['name'] as String,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
+                            ))
+                        .toList(),
+                    onChanged: (v) {
+                      setState(() {
+                        _selectedRegion = v;
+                        _selectedCity = null;
+                        _cities = [];
+                      });
+                      if (v != null) _fetchCities(v);
+                    },
+                  ),
             const SizedBox(height: 16),
 
             // City
             _buildLabel('\u0627\u0644\u0645\u062f\u064a\u0646\u0629'),
             const SizedBox(height: 8),
-            _buildDropdown<String>(
-              value: _selectedCity,
-              hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
-              items: const [
-                DropdownMenuItem(value: '1', child: Text('\u0627\u0644\u0631\u064a\u0627\u0636', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: '2', child: Text('\u062c\u062f\u0629', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: '3', child: Text('\u0627\u0644\u062f\u0645\u0627\u0645', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: '4', child: Text('\u0645\u0643\u0629', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: '5', child: Text('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', style: TextStyle(fontFamily: 'Cairo'))),
-              ],
-              onChanged: (v) => setState(() => _selectedCity = v),
-            ),
+            _loadingCities
+                ? const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
+                : _buildDropdown<String>(
+                    value: _selectedCity,
+                    hint: _selectedRegion == null
+                        ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
+                        : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
+                    items: _cities
+                        .map((c) => DropdownMenuItem(
+                              value: c['id'] as String,
+                              child: Text(c['name'] as String,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setState(() => _selectedCity = v),
+                  ),
             const SizedBox(height: 24),
           ],
         ),
@@ -817,7 +891,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   border: Border.all(color: AppColors.inputBorder),
                   image: _profilePhoto != null
                       ? DecorationImage(
-                          image: NetworkImage(_profilePhoto!.path),
+                          image: FileImage(File(_profilePhoto!.path)),
                           fit: BoxFit.cover,
                         )
                       : null,
