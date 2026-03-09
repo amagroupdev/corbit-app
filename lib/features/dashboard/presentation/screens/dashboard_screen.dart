@@ -117,14 +117,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 // Action buttons
                 _buildActionButtons(),
 
+                // Balance countdown timer (at top, per user request)
+                _buildBalanceSummarySection(stats),
+
                 // Banner carousel
                 _buildBannerCarousel(),
 
                 // Stats cards
                 _buildStatsRow(stats),
-
-                // Balance summary section (matching new portal)
-                _buildBalanceSummarySection(stats),
 
                 // Recent messages section (matching new portal)
                 if (stats.recentMessages.isNotEmpty)
@@ -359,9 +359,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               // Consumed points card
               StatsCard(
                 type: StatsCardType.consumedPoints,
-                title: '\u0627\u0644\u0631\u0635\u064A\u062F \u0627\u0644\u0645\u0633\u062A\u0647\u0644\u0643', // الرصيد المستهلك
+                title: '\u0627\u0644\u0646\u0642\u0627\u0637 \u0627\u0644\u0645\u0633\u062A\u0647\u0644\u0643\u0629', // النقاط المستهلكة
                 value: stats.consumedPoints,
                 unit: '\u0631\u0633\u0627\u0644\u0629', // رسالة
+              ),
+              const SizedBox(width: AppTheme.spacingMd),
+
+              // Groups card
+              StatsCard(
+                type: StatsCardType.services,
+                title: '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // المجموعات
+                value: stats.groupsCount,
+                onTap: () => context.pushNamed(RouteNames.groups),
+                onViewAll: () => context.pushNamed(RouteNames.groups),
+                viewAllLabel: '\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // إدارة المجموعات
+              ),
+              const SizedBox(width: AppTheme.spacingMd),
+
+              // Sub accounts card
+              StatsCard(
+                type: StatsCardType.consumedPoints,
+                title: '\u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u0641\u0631\u0639\u064A\u0629', // الحسابات الفرعية
+                value: stats.subAccountsCount,
+                onTap: () => context.pushNamed(RouteNames.subAccounts),
+                onViewAll: () => context.pushNamed(RouteNames.subAccounts),
+                viewAllLabel: '\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A', // إدارة الحسابات
               ),
               const SizedBox(width: AppTheme.spacingLg),
             ],
@@ -431,6 +453,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ─── Balance Summary Section ────────────────────────────────────────
 
   Widget _buildBalanceSummarySection(DashboardStats stats) {
+    // Only show countdown timer (balance cards removed per user request)
+    if (stats.balanceExpiryDate == null) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -438,64 +463,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: AppColors.border.withOpacity(0.5)),
-            ),
-            child: Column(
-              children: [
-                // 4 balance metric cards in a 2x2 grid
-                Row(
-                  children: [
-                    Expanded(
-                      child: _BalanceMetricCard(
-                        label: '\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A', // الإجمالي
-                        value: stats.totalBalance,
-                        color: const Color(0xFF4CAF50),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _BalanceMetricCard(
-                        label: '\u0627\u0644\u0645\u062A\u0628\u0642\u064A', // المتبقي
-                        value: stats.remainingBalance,
-                        color: const Color(0xFF2196F3),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _BalanceMetricCard(
-                        label: '\u0627\u0644\u0645\u0633\u062A\u0647\u0644\u0643', // المستهلك
-                        value: stats.consumedBalance,
-                        color: const Color(0xFFFF9800),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _BalanceMetricCard(
-                        label: '\u062A\u0645 \u062A\u062D\u0648\u064A\u0644\u0647', // تم تحويله
-                        value: stats.transferredBalance,
-                        color: const Color(0xFFF44336),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Countdown timer
-                if (stats.balanceExpiryDate != null) ...[
-                  const SizedBox(height: 16),
-                  _BalanceCountdownTimer(expiryDate: stats.balanceExpiryDate!),
-                ],
-              ],
-            ),
-          ),
+          child: _BalanceCountdownTimer(expiryDate: stats.balanceExpiryDate!),
         ),
       ],
     );

@@ -216,7 +216,7 @@ class MoreScreen extends ConsumerWidget {
         ),
         _MoreMenuItem(
           icon: Icons.description_outlined,
-          title: '\u0634\u0631\u0648\u0637 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645 - Corbit', // شروط الاستخدام - Corbit
+          title: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
           route: '/terms-pdf',
           iconColor: AppColors.chartTeal,
         ),

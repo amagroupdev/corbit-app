@@ -38,8 +38,10 @@ class SendersRemoteDatasource {
       return rawList
           .map((item) => SenderModel.fromJson(item as Map<String, dynamic>))
           .toList();
-    } catch (_) {
-      return [];
+    } catch (e) {
+      // Re-throw so the UI can display the actual error instead of
+      // showing an empty dropdown with no indication of what went wrong.
+      rethrow;
     }
   }
 

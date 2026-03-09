@@ -50,6 +50,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   XFile? _profilePhoto;
   final _organizationNameController = TextEditingController();
   final _ministerialNumberController = TextEditingController();
+  final _freelanceDocNumberController = TextEditingController();
 
   static const List<_AccountTypeOption> _accountTypes = [
     _AccountTypeOption(id: 1, label: '\u0641\u0631\u062f', icon: Icons.person_outline_rounded),
@@ -85,6 +86,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _confirmPasswordController.dispose();
     _organizationNameController.dispose();
     _ministerialNumberController.dispose();
+    _freelanceDocNumberController.dispose();
     super.dispose();
   }
 
@@ -123,10 +125,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // ---------------------------------------------------------------------------
 
   Future<void> _handleSubmit() async {
+    // Extract phone_without_dialcode by removing the country code prefix.
+    String phoneWithoutDialcode = _phoneController.text.trim();
+    if (phoneWithoutDialcode.startsWith('0')) {
+      phoneWithoutDialcode = phoneWithoutDialcode.substring(1);
+    }
+
     final data = <String, dynamic>{
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'phone': _fullPhoneNumber,
+      'phone_without_dialcode': phoneWithoutDialcode,
       'username': _usernameController.text.trim(),
       'password': _passwordController.text,
       'password_confirmation': _confirmPasswordController.text,
@@ -136,6 +145,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (_selectedCity != null) 'city_id': _selectedCity,
     };
 
+    // Individual-specific fields
+    if (_selectedAccountType == 1) {
+      if (_freelanceDocNumberController.text.trim().isNotEmpty) {
+        data['freelance_document_number'] =
+            _freelanceDocNumberController.text.trim();
+      }
+    }
+
+    // Organization-specific fields
     if (_selectedAccountType != 1) {
       data['organization_name'] = _organizationNameController.text.trim();
       if (_ministerialNumberController.text.trim().isNotEmpty) {
@@ -146,7 +164,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final files = <String, MultipartFile>{};
 
     if (_documentFile != null && _documentFile!.path != null) {
-      files['document'] = await MultipartFile.fromFile(
+      // Use correct file key based on account type
+      final fileKey = _selectedAccountType == 1
+          ? 'freelance_document_file'
+          : 'commercial_register_file';
+      files[fileKey] = await MultipartFile.fromFile(
         _documentFile!.path!,
         filename: _documentFile!.name,
       );
@@ -650,8 +672,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               value: _selectedGender,
               hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u062c\u0646\u0633',
               items: const [
-                DropdownMenuItem(value: 'male', child: Text('\u0630\u0643\u0631', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: 'female', child: Text('\u0623\u0646\u062b\u0649', style: TextStyle(fontFamily: 'Cairo'))),
+                DropdownMenuItem(value: 'M', child: Text('\u0630\u0643\u0631', style: TextStyle(fontFamily: 'Cairo'))),
+                DropdownMenuItem(value: 'F', child: Text('\u0623\u0646\u062b\u0649', style: TextStyle(fontFamily: 'Cairo'))),
               ],
               onChanged: (v) => setState(() => _selectedGender = v),
             ),
@@ -755,9 +777,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
           ],
 
+          // Freelance document number (for individuals)
+          if (_selectedAccountType == 1) ...[
+            _buildLabel('\u0631\u0642\u0645 \u0648\u062B\u064A\u0642\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062D\u0631'), // رقم وثيقة العمل الحر
+            const SizedBox(height: 8),
+            _buildTextFormField(
+              controller: _freelanceDocNumberController,
+              hint: '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0648\u062B\u064A\u0642\u0629', // أدخل رقم الوثيقة
+              icon: Icons.numbers_rounded,
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Document upload
           _buildLabel(_selectedAccountType == 1
-              ? '\u0648\u062b\u064a\u0642\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062d\u0631 (\u0627\u062e\u062a\u064a\u0627\u0631\u064a)'
+              ? '\u0648\u062b\u064a\u0642\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062d\u0631' // وثيقة العمل الحر
               : '\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a / \u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u0627\u0644\u0631\u0633\u0645\u064a\u0629'),
           const SizedBox(height: 8),
           _buildFileUploadArea(

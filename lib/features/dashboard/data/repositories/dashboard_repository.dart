@@ -87,6 +87,18 @@ class DashboardRepository {
             '';
         // /auth/me also has balance directly on the user object.
         currentBalance = _safeInt(inner['balance']);
+
+        // Extract account level from price_category or similar fields.
+        final priceCategory = inner['price_category'] as Map<String, dynamic>?;
+        if (priceCategory != null) {
+          accountLevel = priceCategory['name'] as String? ?? '';
+        }
+        if (accountLevel.isEmpty) {
+          accountLevel = inner['account_level'] as String? ??
+              inner['level'] as String? ??
+              inner['price_category_name'] as String? ??
+              '';
+        }
       }
     } catch (_) {
       // Silently ignore – dashboard will show default avatar.
@@ -184,17 +196,23 @@ class DashboardRepository {
     try {
       final groupsResponse = await _apiClient.post<Map<String, dynamic>>(
         '/groups/list',
-        data: {'page': 1, 'per_page': 1},
+        data: {'page': 1, 'per_page': 100},
       );
       final groupsData = groupsResponse.data;
       if (groupsData != null) {
         final dataField = groupsData['data'];
         if (dataField is Map<String, dynamic>) {
+          // API format: {data: {groups: [...], pagination: {...}}}
+          final groupsList = dataField['groups'] as List?;
           final meta = dataField['meta'] as Map<String, dynamic>?;
           final pagination = dataField['pagination'] as Map<String, dynamic>?;
           groupsCount = _safeInt(
             meta?['total'] ?? pagination?['total'] ?? dataField['total'],
           );
+          // If no pagination total, count the groups list directly
+          if (groupsCount == 0 && groupsList != null) {
+            groupsCount = groupsList.length;
+          }
           if (groupsCount == 0) {
             final list = dataField['data'] as List?;
             if (list != null && list.isNotEmpty) {
@@ -211,17 +229,24 @@ class DashboardRepository {
     try {
       final subResponse = await _apiClient.post<Map<String, dynamic>>(
         '/sub-accounts/list',
-        data: {'page': 1, 'per_page': 1},
+        data: {'page': 1, 'per_page': 100},
       );
       final subData = subResponse.data;
       if (subData != null) {
         final dataField = subData['data'];
         if (dataField is Map<String, dynamic>) {
+          // Try sub_accounts or sub-accounts key
+          final subList = dataField['sub_accounts'] as List? ??
+              dataField['sub-accounts'] as List? ??
+              dataField['subaccounts'] as List?;
           final meta = dataField['meta'] as Map<String, dynamic>?;
           final pagination = dataField['pagination'] as Map<String, dynamic>?;
           subAccountsCount = _safeInt(
             meta?['total'] ?? pagination?['total'] ?? dataField['total'],
           );
+          if (subAccountsCount == 0 && subList != null) {
+            subAccountsCount = subList.length;
+          }
           if (subAccountsCount == 0) {
             final list = dataField['data'] as List?;
             if (list != null && list.isNotEmpty) {
@@ -289,17 +314,32 @@ class DashboardRepository {
     }
 
     // Derive account level from total_purchased if API didn't provide it.
-    if (accountLevel.isEmpty && totalBalance > 0) {
-      if (totalBalance >= 3500) {
+    // Tiers: اساسي (0) → البرونزي (3,500) → الفضي (10,000) → الذهبي (50,000) → الماسي (100,000)
+    if (accountLevel.isEmpty) {
+      if (totalBalance >= 100000) {
+        accountLevel = 'الماسي';
+      } else if (totalBalance >= 50000) {
+        accountLevel = 'الذهبي';
+        nextLevelName = 'الماسي';
+        nextLevelRequirement = 100000;
+        accountLevelProgress = (totalBalance / 100000).clamp(0.0, 1.0);
+      } else if (totalBalance >= 10000) {
+        accountLevel = 'الفضي';
+        nextLevelName = 'الذهبي';
+        nextLevelRequirement = 50000;
+        accountLevelProgress = (totalBalance / 50000).clamp(0.0, 1.0);
+      } else if (totalBalance >= 3500) {
         accountLevel = 'البرونزي';
+        nextLevelName = 'الفضي';
+        nextLevelRequirement = 10000;
+        accountLevelProgress = (totalBalance / 10000).clamp(0.0, 1.0);
       } else {
         accountLevel = 'اساسي';
-      }
-      // Progress toward next tier.
-      if (totalBalance < 3500) {
         nextLevelName = 'البرونزي';
         nextLevelRequirement = 3500;
-        accountLevelProgress = (totalBalance / 3500).clamp(0.0, 1.0);
+        accountLevelProgress = totalBalance > 0
+            ? (totalBalance / 3500).clamp(0.0, 1.0)
+            : 0.0;
       }
     }
 

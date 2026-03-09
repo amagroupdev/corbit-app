@@ -211,10 +211,34 @@ class BalanceScreenController extends StateNotifier<BalanceScreenState> {
         _repository.getCurrentBalance(),
         _repository.getOffers(),
         _repository.getTransactions(perPage: 5),
+        _repository.getBalanceSummary(),
       ]);
 
+      final currentBalance = results[0] as BalanceModel;
+      final summary = results[3] as BalanceSummaryModel;
+
+      // Merge summary data (total_purchased, total_sent) into the balance model
+      // since /balance/current doesn't return those fields.
+      final mergedBalance = BalanceModel(
+        balance: currentBalance.balance > 0
+            ? currentBalance.balance
+            : summary.currentBalance,
+        formattedBalance: currentBalance.formattedBalance,
+        expiredAt: currentBalance.expiredAt ?? summary.expiredAt,
+        remainingDays: currentBalance.remainingDays > 0
+            ? currentBalance.remainingDays
+            : summary.remainingDays,
+        totalSent: currentBalance.totalSent > 0
+            ? currentBalance.totalSent
+            : summary.totalSent,
+        totalPurchased: currentBalance.totalPurchased > 0
+            ? currentBalance.totalPurchased
+            : summary.totalPurchased,
+        currency: currentBalance.currency,
+      );
+
       state = state.copyWith(
-        balance: results[0] as BalanceModel,
+        balance: mergedBalance,
         offers: results[1] as List<OfferModel>,
         recentTransactions:
             (results[2] as dynamic).data as List<TransactionModel>,

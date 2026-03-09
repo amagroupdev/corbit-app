@@ -45,6 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>يحتاج التطبيق للوصول إلى جهات الاتصال لاستيراد الأرقام إلى المجموعات</string>
 	<key>NSCameraUsageDescription</key>
 	<string>يحتاج التطبيق للوصول إلى الكاميرا لالتقاط صورة الملف الشخصي</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -199,7 +199,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/terms-pdf',
         builder: (context, state) => const PdfViewerScreen(
           assetPath: 'assets/pdf/terms_of_use_corbit.pdf',
-          title: '\u0634\u0631\u0648\u0637 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // شروط الاستخدام
+          title: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
         ),
       ),
       GoRoute(

@@ -185,8 +185,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
         queryStatus == 'paid' ||
         path.contains('success') ||
         path.contains('approved') ||
-        path.contains('completed') ||
-        path.contains('callback');
+        path.contains('completed');
 
     final bool isFailure = queryStatus == 'failed' ||
         queryStatus == 'failure' ||
@@ -197,7 +196,8 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
         path.contains('failed') ||
         path.contains('failure') ||
         path.contains('cancelled') ||
-        path.contains('declined');
+        path.contains('declined') ||
+        path.contains('error');
 
     if (isSuccess) {
       _popWithResult(
@@ -210,11 +210,11 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
         message: '\u0641\u0634\u0644\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639', // فشلت عملية الدفع
       );
     } else {
-      // Callback to our domain but unclear status - treat as success
-      // (the server will verify the actual payment status)
+      // Callback to our domain but unclear status - treat as failure
+      // to prevent showing false success when payment actually failed.
       _popWithResult(
-        isSuccess: true,
-        message: '\u062A\u0645 \u0625\u0643\u0645\u0627\u0644 \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639', // تم إكمال عملية الدفع
+        isSuccess: false,
+        message: '\u0644\u0645 \u064A\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639\u060C \u064A\u0631\u062C\u0649 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0631\u0635\u064A\u062F\u0643', // لم يتم تأكيد عملية الدفع، يرجى التحقق من رصيدك
       );
     }
   }

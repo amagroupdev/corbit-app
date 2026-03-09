@@ -98,9 +98,24 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     if (!mounted) return;
 
     if (success) {
-      _showSnackBar('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0628\u0646\u062C\u0627\u062D');
+      // Capture the messenger BEFORE popping so the snackbar survives navigation.
+      final messenger = ScaffoldMessenger.of(context);
       ref.read(messageFormProvider.notifier).resetKeepType();
       context.pop();
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text(
+            '\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0628\u0646\u062C\u0627\u062D', // تم إرسال الرسالة بنجاح
+            style: TextStyle(fontFamily: 'Cairo'),
+          ),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
     } else {
       final state = ref.read(sendMessageControllerProvider);
       final errorMessage = state.hasError

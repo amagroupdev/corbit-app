@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -507,7 +508,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         children: [
           TextSpan(
-            text: '\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0623\u062d\u0643\u0627\u0645',
+            text: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
             style: const TextStyle(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.w600,
@@ -515,17 +516,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: TextDecoration.underline,
               decorationColor: AppColors.primary,
             ),
-          ),
-          const TextSpan(text: ' \u0648 '),
-          TextSpan(
-            text: '\u0633\u064a\u0627\u0633\u0629 \u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629',
-            style: const TextStyle(
-              fontFamily: 'Cairo',
-              fontWeight: FontWeight.w600,
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primary,
-            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => context.push('/terms-pdf'),
           ),
         ],
       ),
