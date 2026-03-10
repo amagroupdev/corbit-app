@@ -31,6 +31,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _rememberMe = false;
   String _fullPhoneNumber = '';
 
+  // Server-side validation errors from API
+  Map<String, List<String>> _serverErrors = {};
+
   @override
   void dispose() {
     _phoneController.dispose();
@@ -44,6 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // ---------------------------------------------------------------------------
 
   void _handleLogin() {
+    setState(() => _serverErrors = {});
     if (!_formKey.currentState!.validate()) return;
 
     final username = _loginMode == LoginMode.phone
@@ -54,6 +58,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           username: username,
           password: _passwordController.text,
         );
+  }
+
+  void _clearFieldError(String key) {
+    if (_serverErrors.containsKey(key)) {
+      setState(() => _serverErrors.remove(key));
+    }
+  }
+
+  Widget _fieldErrorWidget(String key) {
+    final errors = _serverErrors[key];
+    if (errors == null || errors.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, right: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, size: 14, color: AppColors.error),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              errors.join('\n'),
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 12,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -74,6 +108,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     // Listen for state changes to navigate or show errors.
     ref.listen<LoginState>(loginControllerProvider, (prev, next) {
+      // Store field-specific errors for inline display
+      if (next.fieldErrors != null && next.fieldErrors!.isNotEmpty) {
+        setState(() => _serverErrors = Map.from(next.fieldErrors!));
+      }
+
+      // Show generic error in snackbar
       if (next.error != null) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
@@ -239,9 +279,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: 8),
         PhoneInputField(
           controller: _phoneController,
-          onChanged: (value) => _fullPhoneNumber = value,
+          onChanged: (value) {
+            _fullPhoneNumber = value;
+            _clearFieldError('username');
+            _clearFieldError('phone');
+          },
           hintText: '5XXXXXXXX',
         ),
+        _fieldErrorWidget('username'),
+        _fieldErrorWidget('phone'),
       ],
     );
   }
@@ -264,6 +310,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         TextFormField(
           controller: _usernameController,
           textInputAction: TextInputAction.next,
+          onChanged: (_) => _clearFieldError('username'),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return '\u0627\u0644\u0631\u062c\u0627\u0621 \u0625\u062f\u062e\u0627\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645';
@@ -314,6 +361,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
+        _fieldErrorWidget('username'),
       ],
     );
   }
@@ -337,6 +385,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _handleLogin(),
+          onChanged: (_) => _clearFieldError('password'),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return '\u0627\u0644\u0631\u062c\u0627\u0621 \u0625\u062f\u062e\u0627\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631';
@@ -401,6 +450,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
+        _fieldErrorWidget('password'),
       ],
     );
   }

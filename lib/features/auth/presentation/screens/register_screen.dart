@@ -47,6 +47,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // Server-side validation errors from API (field_name -> [errors])
+  Map<String, List<String>> _serverErrors = {};
+
   // Step 3: Documents
   PlatformFile? _documentFile;
   XFile? _profilePhoto;
@@ -67,6 +70,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   List<Map<String, dynamic>> _cities = [];
   bool _loadingRegions = true;
   bool _loadingCities = false;
+  String? _regionsError;
+  String? _citiesError;
 
   @override
   void initState() {
@@ -75,6 +80,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _fetchRegions() async {
+    setState(() {
+      _loadingRegions = true;
+      _regionsError = null;
+    });
     try {
       final dio = Dio();
       final response = await dio.get(
@@ -89,15 +98,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               .toList();
           _loadingRegions = false;
         });
+      } else {
+        setState(() {
+          _loadingRegions = false;
+          _regionsError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0646\u0627\u0637\u0642';
+        });
       }
     } catch (_) {
-      setState(() => _loadingRegions = false);
+      setState(() {
+        _loadingRegions = false;
+        _regionsError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0646\u0627\u0637\u0642';
+      });
     }
   }
 
   Future<void> _fetchCities(String regionId) async {
     setState(() {
       _loadingCities = true;
+      _citiesError = null;
       _cities = [];
       _selectedCity = null;
     });
@@ -116,9 +134,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               .toList();
           _loadingCities = false;
         });
+      } else {
+        setState(() {
+          _loadingCities = false;
+          _citiesError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u062F\u0646';
+        });
       }
     } catch (_) {
-      setState(() => _loadingCities = false);
+      setState(() {
+        _loadingCities = false;
+        _citiesError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u062F\u0646';
+      });
     }
   }
 
@@ -172,6 +198,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // ---------------------------------------------------------------------------
 
   Future<void> _handleSubmit() async {
+    // Clear previous server errors
+    setState(() => _serverErrors = {});
+
     // Extract phone_without_dialcode by removing the country code prefix.
     String phoneWithoutDialcode = _phoneController.text.trim();
     if (phoneWithoutDialcode.startsWith('0')) {
@@ -262,6 +291,46 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // Server field error helpers
+  // ---------------------------------------------------------------------------
+
+  static const _step2FieldKeys = {
+    'name', 'email', 'phone', 'phone_without_dialcode',
+    'username', 'password', 'password_confirmation',
+    'gender', 'region_id', 'city_id',
+  };
+
+  void _clearFieldError(String key) {
+    if (_serverErrors.containsKey(key)) {
+      setState(() => _serverErrors.remove(key));
+    }
+  }
+
+  Widget _fieldErrorWidget(String key) {
+    final errors = _serverErrors[key];
+    if (errors == null || errors.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, right: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, size: 14, color: AppColors.error),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              errors.join('\n'),
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 12,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
 
@@ -270,38 +339,44 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final registerState = ref.watch(registerControllerProvider);
 
     ref.listen<RegisterState>(registerControllerProvider, (prev, next) {
-      if (next.error != null || next.fieldErrors != null) {
-        // Build error message: show generic error + all field-specific errors
-        final parts = <String>[];
-        if (next.error != null) parts.add(next.error!);
-        if (next.fieldErrors != null) {
-          for (final entry in next.fieldErrors!.entries) {
-            for (final msg in entry.value) {
-              parts.add(msg);
-            }
-          }
-        }
-        final errorMessage = parts.join('\n');
-        if (errorMessage.isNotEmpty) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(
-                  errorMessage,
-                  style: const TextStyle(fontFamily: 'Cairo'),
-                ),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
+      // ── Handle field-specific errors (show inline) ──
+      if (next.fieldErrors != null && next.fieldErrors!.isNotEmpty) {
+        setState(() => _serverErrors = Map.from(next.fieldErrors!));
+
+        // Navigate to the step that contains the first error
+        final hasStep2Error =
+            next.fieldErrors!.keys.any((k) => _step2FieldKeys.contains(k));
+        if (hasStep2Error && _currentStep != 1) {
+          setState(() => _currentStep = 1);
+          _pageController.animateToPage(
+            1,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         }
       }
 
+      // ── Handle generic error (show snackbar) ──
+      if (next.error != null) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                next.error!,
+                style: const TextStyle(fontFamily: 'Cairo'),
+              ),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+      }
+
+      // ── Handle success ──
       final response = next.response;
       if (response != null) {
         if (response.isAuthenticated) {
@@ -643,9 +718,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _nameController,
               hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0643\u0627\u0645\u0644',
               icon: Icons.person_outline_rounded,
+              onChanged: (_) => _clearFieldError('name'),
               validator: (v) =>
                   v == null || v.trim().isEmpty ? '\u0627\u0644\u0627\u0633\u0645 \u0645\u0637\u0644\u0648\u0628' : null,
             ),
+            _fieldErrorWidget('name'),
             const SizedBox(height: 16),
 
             // Email
@@ -656,6 +733,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               hint: 'example@mail.com',
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
+              onChanged: (_) => _clearFieldError('email'),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0645\u0637\u0644\u0648\u0628';
                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
@@ -665,6 +743,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 return null;
               },
             ),
+            _fieldErrorWidget('email'),
             const SizedBox(height: 16),
 
             // Phone number
@@ -672,8 +751,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 8),
             PhoneInputField(
               controller: _phoneController,
-              onChanged: (value) => _fullPhoneNumber = value,
+              onChanged: (value) {
+                _fullPhoneNumber = value;
+                _clearFieldError('phone');
+                _clearFieldError('phone_without_dialcode');
+              },
             ),
+            _fieldErrorWidget('phone'),
+            _fieldErrorWidget('phone_without_dialcode'),
             const SizedBox(height: 16),
 
             // Username
@@ -683,12 +768,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _usernameController,
               hint: '\u0623\u062f\u062e\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
               icon: Icons.alternate_email_rounded,
+              onChanged: (_) => _clearFieldError('username'),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return '\u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0645\u0637\u0644\u0648\u0628';
                 if (v.trim().length < 3) return '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u062f\u0646\u0649 3 \u0623\u062d\u0631\u0641';
                 return null;
               },
             ),
+            _fieldErrorWidget('username'),
             const SizedBox(height: 16),
 
             // Password
@@ -700,6 +787,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               obscure: _obscurePassword,
               onToggle: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
+              onChanged: (_) => _clearFieldError('password'),
               validator: (v) {
                 if (v == null || v.isEmpty) return '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629';
                 if (v.length < 8) return '8 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
@@ -709,6 +797,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 return null;
               },
             ),
+            _fieldErrorWidget('password'),
             const SizedBox(height: 16),
 
             // Confirm password
@@ -720,6 +809,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               obscure: _obscureConfirmPassword,
               onToggle: () =>
                   setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+              onChanged: (_) => _clearFieldError('password_confirmation'),
               validator: (v) {
                 if (v != _passwordController.text) {
                   return '\u0643\u0644\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u0629';
@@ -727,6 +817,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 return null;
               },
             ),
+            _fieldErrorWidget('password_confirmation'),
             const SizedBox(height: 16),
 
             // Gender
@@ -739,55 +830,73 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 DropdownMenuItem(value: 'M', child: Text('\u0630\u0643\u0631', style: TextStyle(fontFamily: 'Cairo'))),
                 DropdownMenuItem(value: 'F', child: Text('\u0623\u0646\u062b\u0649', style: TextStyle(fontFamily: 'Cairo'))),
               ],
-              onChanged: (v) => setState(() => _selectedGender = v),
+              onChanged: (v) {
+                setState(() => _selectedGender = v);
+                _clearFieldError('gender');
+              },
             ),
+            _fieldErrorWidget('gender'),
             const SizedBox(height: 16),
 
             // Region
             _buildLabel('\u0627\u0644\u0645\u0646\u0637\u0642\u0629'),
             const SizedBox(height: 8),
-            _loadingRegions
-                ? const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
-                : _buildDropdown<String>(
-                    value: _selectedRegion,
-                    hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
-                    items: _regions
-                        .map((r) => DropdownMenuItem(
-                              value: r['id'] as String,
-                              child: Text(r['name'] as String,
-                                  style: const TextStyle(fontFamily: 'Cairo')),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      setState(() {
-                        _selectedRegion = v;
-                        _selectedCity = null;
-                        _cities = [];
-                      });
-                      if (v != null) _fetchCities(v);
-                    },
-                  ),
+            if (_loadingRegions)
+              const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
+            else if (_regionsError != null)
+              _buildRetryRow(_regionsError!, _fetchRegions)
+            else
+              _buildDropdown<String>(
+                value: _selectedRegion,
+                hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
+                items: _regions
+                    .map((r) => DropdownMenuItem(
+                          value: r['id'] as String,
+                          child: Text(r['name'] as String,
+                              style: const TextStyle(fontFamily: 'Cairo')),
+                        ))
+                    .toList(),
+                onChanged: (v) {
+                  setState(() {
+                    _selectedRegion = v;
+                    _selectedCity = null;
+                    _cities = [];
+                  });
+                  _clearFieldError('region_id');
+                  if (v != null) _fetchCities(v);
+                },
+              ),
+            _fieldErrorWidget('region_id'),
             const SizedBox(height: 16),
 
             // City
             _buildLabel('\u0627\u0644\u0645\u062f\u064a\u0646\u0629'),
             const SizedBox(height: 8),
-            _loadingCities
-                ? const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
-                : _buildDropdown<String>(
-                    value: _selectedCity,
-                    hint: _selectedRegion == null
-                        ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
-                        : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
-                    items: _cities
-                        .map((c) => DropdownMenuItem(
-                              value: c['id'] as String,
-                              child: Text(c['name'] as String,
-                                  style: const TextStyle(fontFamily: 'Cairo')),
-                            ))
-                        .toList(),
-                    onChanged: (v) => setState(() => _selectedCity = v),
-                  ),
+            if (_loadingCities)
+              const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
+            else if (_citiesError != null)
+              _buildRetryRow(_citiesError!, () {
+                if (_selectedRegion != null) _fetchCities(_selectedRegion!);
+              })
+            else
+              _buildDropdown<String>(
+                value: _selectedCity,
+                hint: _selectedRegion == null
+                    ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
+                    : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
+                items: _cities
+                    .map((c) => DropdownMenuItem(
+                          value: c['id'] as String,
+                          child: Text(c['name'] as String,
+                              style: const TextStyle(fontFamily: 'Cairo')),
+                        ))
+                    .toList(),
+                onChanged: (v) {
+                  setState(() => _selectedCity = v);
+                  _clearFieldError('city_id');
+                },
+              ),
+            _fieldErrorWidget('city_id'),
             const SizedBox(height: 24),
           ],
         ),
@@ -838,7 +947,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _organizationNameController,
               hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0627\u0633\u0645',
               icon: Icons.business_outlined,
+              onChanged: (_) => _clearFieldError('organization_name'),
             ),
+            _fieldErrorWidget('organization_name'),
             const SizedBox(height: 16),
 
             _buildLabel('\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u0648\u0632\u0627\u0631\u064a / \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a'),
@@ -847,7 +958,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _ministerialNumberController,
               hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0631\u0642\u0645',
               icon: Icons.numbers_rounded,
+              onChanged: (_) => _clearFieldError('ministerial_number'),
             ),
+            _fieldErrorWidget('ministerial_number'),
             const SizedBox(height: 16),
           ],
 
@@ -859,7 +972,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               controller: _freelanceDocNumberController,
               hint: '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0648\u062B\u064A\u0642\u0629', // أدخل رقم الوثيقة
               icon: Icons.numbers_rounded,
+              onChanged: (_) => _clearFieldError('freelance_document_number'),
             ),
+            _fieldErrorWidget('freelance_document_number'),
             const SizedBox(height: 16),
           ],
 
@@ -870,10 +985,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           const SizedBox(height: 8),
           _buildFileUploadArea(
             file: _documentFile,
-            onTap: _pickDocument,
+            onTap: () {
+              _pickDocument();
+              _clearFieldError('freelance_document_file');
+              _clearFieldError('commercial_register_file');
+            },
             label: '\u0627\u0636\u063a\u0637 \u0644\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f',
             sublabel: 'PDF, JPG, PNG',
           ),
+          _fieldErrorWidget('freelance_document_file'),
+          _fieldErrorWidget('commercial_register_file'),
           const SizedBox(height: 24),
 
           // Profile photo
@@ -926,6 +1047,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
           ),
+          _fieldErrorWidget('profile_photo'),
           const SizedBox(height: 24),
         ],
       ),
@@ -954,11 +1076,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     required IconData icon,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
+    ValueChanged<String>? onChanged,
   }) {
     return TextFormField(
       controller: controller,
       validator: validator,
       keyboardType: keyboardType,
+      onChanged: onChanged,
       style: const TextStyle(
         fontFamily: 'Cairo',
         fontSize: 15,
@@ -1005,11 +1129,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     required bool obscure,
     required VoidCallback onToggle,
     String? Function(String?)? validator,
+    ValueChanged<String>? onChanged,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscure,
       validator: validator,
+      onChanged: onChanged,
       style: const TextStyle(
         fontFamily: 'Cairo',
         fontSize: 15,
@@ -1107,6 +1233,45 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
+  Widget _buildRetryRow(String message, VoidCallback onRetry) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.error.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text(
+              '\u0625\u0639\u0627\u062F\u0629', // إعادة
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 13),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+          ),
+        ],
       ),
     );
   }

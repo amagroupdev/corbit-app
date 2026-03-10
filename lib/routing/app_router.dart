@@ -55,6 +55,30 @@ import 'package:orbit_app/routing/route_names.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
+/// Builds a [CustomTransitionPage] that slides in the given [direction].
+CustomTransitionPage<void> _buildShellPage(
+  GoRouterState state,
+  Widget child,
+  double direction,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (direction == 0.0) return child;
+      final begin = Offset(direction, 0.0);
+      final tween = Tween(begin: begin, end: Offset.zero)
+          .chain(CurveTween(curve: Curves.easeInOut));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -115,27 +139,47 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             name: RouteNames.dashboard,
             path: '/',
-            builder: (context, state) => const DashboardScreen(),
+            pageBuilder: (context, state) => _buildShellPage(
+              state,
+              const DashboardScreen(),
+              ref.read(navSlideDirectionProvider),
+            ),
           ),
           GoRoute(
             name: RouteNames.messageCenter,
             path: '/messages',
-            builder: (context, state) => const MessageCenterScreen(),
+            pageBuilder: (context, state) => _buildShellPage(
+              state,
+              const MessageCenterScreen(),
+              ref.read(navSlideDirectionProvider),
+            ),
           ),
           GoRoute(
             name: RouteNames.groups,
             path: '/groups',
-            builder: (context, state) => const GroupsScreen(),
+            pageBuilder: (context, state) => _buildShellPage(
+              state,
+              const GroupsScreen(),
+              ref.read(navSlideDirectionProvider),
+            ),
           ),
           GoRoute(
             name: RouteNames.balance,
             path: '/balance',
-            builder: (context, state) => const BalanceScreen(),
+            pageBuilder: (context, state) => _buildShellPage(
+              state,
+              const BalanceScreen(),
+              ref.read(navSlideDirectionProvider),
+            ),
           ),
           GoRoute(
             name: RouteNames.more,
             path: '/more',
-            builder: (context, state) => const MoreScreen(),
+            pageBuilder: (context, state) => _buildShellPage(
+              state,
+              const MoreScreen(),
+              ref.read(navSlideDirectionProvider),
+            ),
           ),
         ],
       ),

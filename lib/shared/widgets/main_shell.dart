@@ -6,6 +6,10 @@ import 'package:orbit_app/core/constants/app_colors.dart';
 /// Tracks the currently selected bottom navigation tab index.
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
+/// Slide direction for the next bottom nav transition.
+/// Positive = slide from right, negative = slide from left, 0 = no animation.
+final navSlideDirectionProvider = StateProvider<double>((ref) => 0.0);
+
 /// Main application shell that wraps the primary screens with a
 /// persistent bottom navigation bar.
 ///
@@ -47,6 +51,13 @@ class _MainShellState extends ConsumerState<MainShell> {
       return;
     }
 
+    // Calculate slide direction based on tab index difference.
+    // In RTL layouts tabs are visually reversed, so flip the direction.
+    double direction = index > currentIndex ? 1.0 : -1.0;
+    if (Directionality.of(context) == TextDirection.rtl) {
+      direction = -direction;
+    }
+    ref.read(navSlideDirectionProvider.notifier).state = direction;
     ref.read(bottomNavIndexProvider.notifier).state = index;
     context.go(_tabPaths[index]);
   }
@@ -63,6 +74,12 @@ class _MainShellState extends ConsumerState<MainShell> {
     // (e.g. browser back button / deep links).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (ref.read(bottomNavIndexProvider) != activeIndex) {
+        final oldIndex = ref.read(bottomNavIndexProvider);
+        double direction = activeIndex > oldIndex ? 1.0 : -1.0;
+        if (Directionality.of(context) == TextDirection.rtl) {
+          direction = -direction;
+        }
+        ref.read(navSlideDirectionProvider.notifier).state = direction;
         ref.read(bottomNavIndexProvider.notifier).state = activeIndex;
       }
     });
@@ -72,6 +89,12 @@ class _MainShellState extends ConsumerState<MainShell> {
       onPopInvoked: (didPop) {
         if (!didPop) {
           // Navigate back to the home tab instead of exiting the app.
+          // Going to index 0 is always a lower index, so direction = -1.0 (flipped for RTL).
+          double direction = -1.0;
+          if (Directionality.of(context) == TextDirection.rtl) {
+            direction = -direction;
+          }
+          ref.read(navSlideDirectionProvider.notifier).state = direction;
           ref.read(bottomNavIndexProvider.notifier).state = 0;
           context.go(_tabPaths[0]);
         }
