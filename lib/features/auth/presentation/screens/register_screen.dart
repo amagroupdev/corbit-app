@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/sa_regions.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
 
@@ -65,87 +66,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _AccountTypeOption(id: 5, label: '\u062c\u0645\u0639\u064a\u0629 \u062e\u064a\u0631\u064a\u0629', icon: Icons.volunteer_activism_outlined),
   ];
 
-  // Dynamic regions and cities from API
-  List<Map<String, dynamic>> _regions = [];
+  // Regions and cities – loaded from static data (no network needed)
+  late final List<Map<String, dynamic>> _regions = SaRegions.regions
+      .map((r) => {'id': r['id'].toString(), 'name': r['name'].toString()})
+      .toList();
   List<Map<String, dynamic>> _cities = [];
-  bool _loadingRegions = true;
-  bool _loadingCities = false;
-  String? _regionsError;
-  String? _citiesError;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchRegions();
-  }
-
-  Future<void> _fetchRegions() async {
+  void _loadCities(String regionId) {
+    final id = int.tryParse(regionId);
+    final raw = id != null ? SaRegions.cities[id] : null;
     setState(() {
-      _loadingRegions = true;
-      _regionsError = null;
-    });
-    try {
-      final dio = Dio();
-      final response = await dio.get(
-        'https://app.mobile.net.sa/api/v3/common/regions',
-        options: Options(headers: {'Accept': 'application/json'}),
-      );
-      final data = response.data;
-      if (data['success'] == true && data['data'] is List) {
-        setState(() {
-          _regions = (data['data'] as List)
-              .map((r) => {'id': r['id'].toString(), 'name': r['name'].toString()})
-              .toList();
-          _loadingRegions = false;
-        });
-      } else {
-        setState(() {
-          _loadingRegions = false;
-          _regionsError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0646\u0627\u0637\u0642';
-        });
-      }
-    } catch (_) {
-      setState(() {
-        _loadingRegions = false;
-        _regionsError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0646\u0627\u0637\u0642';
-      });
-    }
-  }
-
-  Future<void> _fetchCities(String regionId) async {
-    setState(() {
-      _loadingCities = true;
-      _citiesError = null;
-      _cities = [];
+      _cities = (raw ?? [])
+          .map((c) => {'id': c['id'].toString(), 'name': c['name'].toString()})
+          .toList();
       _selectedCity = null;
     });
-    try {
-      final dio = Dio();
-      final response = await dio.get(
-        'https://app.mobile.net.sa/api/v3/common/cities',
-        queryParameters: {'region_id': regionId},
-        options: Options(headers: {'Accept': 'application/json'}),
-      );
-      final data = response.data;
-      if (data['success'] == true && data['data'] is List) {
-        setState(() {
-          _cities = (data['data'] as List)
-              .map((c) => {'id': c['id'].toString(), 'name': c['name'].toString()})
-              .toList();
-          _loadingCities = false;
-        });
-      } else {
-        setState(() {
-          _loadingCities = false;
-          _citiesError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u062F\u0646';
-        });
-      }
-    } catch (_) {
-      setState(() {
-        _loadingCities = false;
-        _citiesError = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u062F\u0646';
-      });
-    }
   }
 
   @override
@@ -841,61 +776,49 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             // Region
             _buildLabel('\u0627\u0644\u0645\u0646\u0637\u0642\u0629'),
             const SizedBox(height: 8),
-            if (_loadingRegions)
-              const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
-            else if (_regionsError != null)
-              _buildRetryRow(_regionsError!, _fetchRegions)
-            else
-              _buildDropdown<String>(
-                value: _selectedRegion,
-                hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
-                items: _regions
-                    .map((r) => DropdownMenuItem(
-                          value: r['id'] as String,
-                          child: Text(r['name'] as String,
-                              style: const TextStyle(fontFamily: 'Cairo')),
-                        ))
-                    .toList(),
-                onChanged: (v) {
-                  setState(() {
-                    _selectedRegion = v;
-                    _selectedCity = null;
-                    _cities = [];
-                  });
-                  _clearFieldError('region_id');
-                  if (v != null) _fetchCities(v);
-                },
-              ),
+            _buildDropdown<String>(
+              value: _selectedRegion,
+              hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
+              items: _regions
+                  .map((r) => DropdownMenuItem(
+                        value: r['id'] as String,
+                        child: Text(r['name'] as String,
+                            style: const TextStyle(fontFamily: 'Cairo')),
+                      ))
+                  .toList(),
+              onChanged: (v) {
+                setState(() {
+                  _selectedRegion = v;
+                  _selectedCity = null;
+                  _cities = [];
+                });
+                _clearFieldError('region_id');
+                if (v != null) _loadCities(v);
+              },
+            ),
             _fieldErrorWidget('region_id'),
             const SizedBox(height: 16),
 
             // City
             _buildLabel('\u0627\u0644\u0645\u062f\u064a\u0646\u0629'),
             const SizedBox(height: 8),
-            if (_loadingCities)
-              const Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)))
-            else if (_citiesError != null)
-              _buildRetryRow(_citiesError!, () {
-                if (_selectedRegion != null) _fetchCities(_selectedRegion!);
-              })
-            else
-              _buildDropdown<String>(
-                value: _selectedCity,
-                hint: _selectedRegion == null
-                    ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
-                    : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
-                items: _cities
-                    .map((c) => DropdownMenuItem(
-                          value: c['id'] as String,
-                          child: Text(c['name'] as String,
-                              style: const TextStyle(fontFamily: 'Cairo')),
-                        ))
-                    .toList(),
-                onChanged: (v) {
-                  setState(() => _selectedCity = v);
-                  _clearFieldError('city_id');
-                },
-              ),
+            _buildDropdown<String>(
+              value: _selectedCity,
+              hint: _selectedRegion == null
+                  ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
+                  : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
+              items: _cities
+                  .map((c) => DropdownMenuItem(
+                        value: c['id'] as String,
+                        child: Text(c['name'] as String,
+                            style: const TextStyle(fontFamily: 'Cairo')),
+                      ))
+                  .toList(),
+              onChanged: (v) {
+                setState(() => _selectedCity = v);
+                _clearFieldError('city_id');
+              },
+            ),
             _fieldErrorWidget('city_id'),
             const SizedBox(height: 24),
           ],
@@ -1233,45 +1156,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      ),
-    );
-  }
-
-  Widget _buildRetryRow(String message, VoidCallback onRetry) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.error.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 13,
-                color: AppColors.error,
-              ),
-            ),
-          ),
-          TextButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 18),
-            label: const Text(
-              '\u0625\u0639\u0627\u062F\u0629', // إعادة
-              style: TextStyle(fontFamily: 'Cairo', fontSize: 13),
-            ),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-          ),
-        ],
       ),
     );
   }
