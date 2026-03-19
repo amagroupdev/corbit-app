@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/api_constants.dart';
@@ -76,8 +77,10 @@ class DashboardRepository {
         ApiConstants.me,
       );
       final meData = meResponse.data;
+      debugPrint('[DashboardRepo] /auth/me response: $meData');
       if (meData != null) {
         final inner = meData['data'] as Map<String, dynamic>? ?? meData;
+        debugPrint('[DashboardRepo] /auth/me inner data: $inner');
         userName = inner['name'] as String? ??
             inner['full_name'] as String? ??
             '';
@@ -85,6 +88,7 @@ class DashboardRepository {
             inner['avatar_url'] as String? ??
             inner['avatar'] as String? ??
             '';
+        debugPrint('[DashboardRepo] userName: $userName, userAvatar: $userAvatar');
         // /auth/me also has balance directly on the user object.
         currentBalance = _safeInt(inner['balance']);
 
@@ -100,7 +104,8 @@ class DashboardRepository {
               '';
         }
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[DashboardRepo] /auth/me error: $e');
       // Silently ignore – dashboard will show default avatar.
     }
 
@@ -199,8 +204,10 @@ class DashboardRepository {
         data: {'page': 1, 'per_page': 100},
       );
       final groupsData = groupsResponse.data;
+      debugPrint('[DashboardRepo] /groups/list response: $groupsData');
       if (groupsData != null) {
         final dataField = groupsData['data'];
+        debugPrint('[DashboardRepo] /groups/list dataField: $dataField');
         if (dataField is Map<String, dynamic>) {
           // API format: {data: {groups: [...], pagination: {...}}}
           final groupsList = dataField['groups'] as List?;
@@ -209,31 +216,39 @@ class DashboardRepository {
           groupsCount = _safeInt(
             meta?['total'] ?? pagination?['total'] ?? dataField['total'],
           );
+          debugPrint('[DashboardRepo] groups from meta/pagination: $groupsCount');
           // If no pagination total, count the groups list directly
           if (groupsCount == 0 && groupsList != null) {
             groupsCount = groupsList.length;
+            debugPrint('[DashboardRepo] groups from list length: $groupsCount');
           }
           if (groupsCount == 0) {
             final list = dataField['data'] as List?;
             if (list != null && list.isNotEmpty) {
               groupsCount = list.length;
+              debugPrint('[DashboardRepo] groups from data list: $groupsCount');
             }
           }
         } else if (dataField is List) {
           groupsCount = dataField.length;
+          debugPrint('[DashboardRepo] groups from direct list: $groupsCount');
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[DashboardRepo] /groups/list error: $e');
+    }
 
-    // ── 6. Fetch sub-accounts count from /sub-accounts/list ──
+    // ── 6. Fetch sub-accounts count from /settings/sub-accounts ──
     try {
-      final subResponse = await _apiClient.post<Map<String, dynamic>>(
-        '/sub-accounts/list',
-        data: {'page': 1, 'per_page': 100},
+      final subResponse = await _apiClient.get<Map<String, dynamic>>(
+        ApiConstants.settingsSubAccounts,
+        queryParameters: {'page': 1, 'per_page': 100},
       );
       final subData = subResponse.data;
+      debugPrint('[DashboardRepo] /settings/sub-accounts response: $subData');
       if (subData != null) {
         final dataField = subData['data'];
+        debugPrint('[DashboardRepo] /settings/sub-accounts dataField: $dataField');
         if (dataField is Map<String, dynamic>) {
           // Try sub_accounts or sub-accounts key
           final subList = dataField['sub_accounts'] as List? ??
@@ -244,45 +259,63 @@ class DashboardRepository {
           subAccountsCount = _safeInt(
             meta?['total'] ?? pagination?['total'] ?? dataField['total'],
           );
+          debugPrint('[DashboardRepo] subAccounts from meta/pagination: $subAccountsCount');
           if (subAccountsCount == 0 && subList != null) {
             subAccountsCount = subList.length;
+            debugPrint('[DashboardRepo] subAccounts from subList: $subAccountsCount');
           }
           if (subAccountsCount == 0) {
             final list = dataField['data'] as List?;
             if (list != null && list.isNotEmpty) {
               subAccountsCount = list.length;
+              debugPrint('[DashboardRepo] subAccounts from data list: $subAccountsCount');
             }
           }
         } else if (dataField is List) {
           subAccountsCount = dataField.length;
+          debugPrint('[DashboardRepo] subAccounts from direct list: $subAccountsCount');
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[DashboardRepo] /settings/sub-accounts error: $e');
+    }
 
-    // ── 7. Fetch recent transactions ──
+    // ── 7. Fetch recent messages from archive ──
     try {
-      final txResponse = await _apiClient.get<Map<String, dynamic>>(
-        ApiConstants.balanceTransactions,
-        queryParameters: {'per_page': 5, 'page': 1},
+      final archiveResponse = await _apiClient.post<Map<String, dynamic>>(
+        '/archive/list',
+        data: {
+          'archive_type': 'general',
+          'page': 1,
+          'per_page': 5,
+        },
       );
-      final txData = txResponse.data;
-      if (txData != null && txData['data'] != null) {
-        final dataField = txData['data'];
-        final List list;
-        if (dataField is List) {
-          list = dataField;
-        } else if (dataField is Map<String, dynamic> && dataField['data'] is List) {
-          list = dataField['data'] as List;
-        } else {
-          list = [];
+      final archiveData = archiveResponse.data;
+      debugPrint('[DashboardRepo] /archive/list response: $archiveData');
+      if (archiveData != null && archiveData['data'] != null) {
+        final dataField = archiveData['data'];
+        debugPrint('[DashboardRepo] /archive/list dataField type: ${dataField.runtimeType}');
+        List? messagesList;
+        
+        if (dataField is Map<String, dynamic>) {
+          // API returns {messages: [...], pagination: {...}}
+          messagesList = dataField['messages'] as List? ?? dataField['data'] as List?;
+        } else if (dataField is List) {
+          messagesList = dataField;
         }
-        for (final item in list) {
-          if (item is Map<String, dynamic>) {
-            recentMessages.add(RecentMessage.fromJson(item));
+        
+        debugPrint('[DashboardRepo] /archive/list messages count: ${messagesList?.length ?? 0}');
+        if (messagesList != null) {
+          for (final item in messagesList) {
+            if (item is Map<String, dynamic>) {
+              recentMessages.add(RecentMessage.fromArchiveJson(item));
+            }
           }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[DashboardRepo] /archive/list error: $e');
+    }
 
     // ── 8. Fetch account level/upgrades ──
     // Response: paginated {"success":true,"data":{"data":[],"links":{...},"meta":{...}}}
@@ -342,6 +375,17 @@ class DashboardRepository {
             : 0.0;
       }
     }
+
+    debugPrint('[DashboardRepo] Final stats:');
+    debugPrint('  userName: $userName');
+    debugPrint('  userAvatar: $userAvatar');
+    debugPrint('  currentBalance: $currentBalance');
+    debugPrint('  totalBalance: $totalBalance');
+    debugPrint('  consumedBalance: $consumedBalance');
+    debugPrint('  groupsCount: $groupsCount');
+    debugPrint('  subAccountsCount: $subAccountsCount');
+    debugPrint('  servicesCount: $servicesCount');
+    debugPrint('  recentMessages: ${recentMessages.length}');
 
     return DashboardStats(
       currentBalance: currentBalance,

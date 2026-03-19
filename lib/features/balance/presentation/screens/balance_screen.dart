@@ -260,7 +260,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
               Expanded(
                 child: _BalanceMiniCard(
                   title: '\u062A\u0645 \u062A\u062D\u0648\u064A\u0644\u0647',
-                  value: '0',
+                  value: numberFormat.format(balance.totalTransferred),
                   icon: Icons.swap_horiz_outlined,
                   gradient: AppColors.balanceGradient('purple'),
                 ),

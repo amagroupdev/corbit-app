@@ -132,8 +132,8 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
     try {
       // Request permission
-      final permStatus = await FlutterContacts.permissions.request(PermissionType.read);
-      if (permStatus != PermissionStatus.granted && permStatus != PermissionStatus.limited) {
+      final permGranted = await FlutterContacts.requestPermission();
+      if (!permGranted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -147,8 +147,9 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
       }
 
       // Get all contacts with phone numbers
-      final contacts = await FlutterContacts.getAll(
-        properties: {ContactProperty.name, ContactProperty.phone},
+      final contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withPhoto: false,
       );
 
       // Filter contacts that have at least one phone number

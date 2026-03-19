@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
@@ -217,23 +218,46 @@ class BalanceScreenController extends StateNotifier<BalanceScreenState> {
       final currentBalance = results[0] as BalanceModel;
       final summary = results[3] as BalanceSummaryModel;
 
-      // Merge summary data (total_purchased, total_sent) into the balance model
+      // Merge summary data (total_purchased, total_sent, total_transferred) into the balance model
       // since /balance/current doesn't return those fields.
+      
+      debugPrint('[BalanceController] currentBalance: ${currentBalance.balance}, totalSent: ${currentBalance.totalSent}, totalPurchased: ${currentBalance.totalPurchased}');
+      debugPrint('[BalanceController] summary: currentBalance: ${summary.currentBalance}, totalSent: ${summary.totalSent}, totalPurchased: ${summary.totalPurchased}');
+      
+      // Get the best values from both responses
+      final balanceValue = currentBalance.balance > 0
+          ? currentBalance.balance
+          : summary.currentBalance;
+      final totalPurchasedValue = currentBalance.totalPurchased > 0
+          ? currentBalance.totalPurchased
+          : summary.totalPurchased;
+      
+      debugPrint('[BalanceController] balanceValue: $balanceValue, totalPurchasedValue: $totalPurchasedValue');
+      
+      // Calculate consumed (total_sent) if API returns 0
+      // Consumed = Total Purchased - Current Balance
+      int totalSentValue = currentBalance.totalSent > 0
+          ? currentBalance.totalSent
+          : summary.totalSent;
+      debugPrint('[BalanceController] totalSentValue before calc: $totalSentValue');
+      if (totalSentValue == 0 && totalPurchasedValue > 0 && balanceValue > 0) {
+        totalSentValue = (totalPurchasedValue - balanceValue).toInt();
+        if (totalSentValue < 0) totalSentValue = 0;
+        debugPrint('[BalanceController] totalSentValue after calc: $totalSentValue');
+      }
+      
       final mergedBalance = BalanceModel(
-        balance: currentBalance.balance > 0
-            ? currentBalance.balance
-            : summary.currentBalance,
+        balance: balanceValue,
         formattedBalance: currentBalance.formattedBalance,
         expiredAt: currentBalance.expiredAt ?? summary.expiredAt,
         remainingDays: currentBalance.remainingDays > 0
             ? currentBalance.remainingDays
             : summary.remainingDays,
-        totalSent: currentBalance.totalSent > 0
-            ? currentBalance.totalSent
-            : summary.totalSent,
-        totalPurchased: currentBalance.totalPurchased > 0
-            ? currentBalance.totalPurchased
-            : summary.totalPurchased,
+        totalSent: totalSentValue,
+        totalPurchased: totalPurchasedValue,
+        totalTransferred: currentBalance.totalTransferred > 0
+            ? currentBalance.totalTransferred
+            : summary.totalTransferred,
         currency: currentBalance.currency,
       );
 

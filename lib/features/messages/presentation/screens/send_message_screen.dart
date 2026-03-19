@@ -98,31 +98,109 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Capture the messenger BEFORE popping so the snackbar survives navigation.
-      final messenger = ScaffoldMessenger.of(context);
+      final sendData = controller.lastSendData;
+      final totalNumbers = sendData?['total_numbers'] ?? form.numbers.length + form.groupIds.length;
+      final totalSms = sendData?['total_sms'] ?? '-';
+      await _showResultDialog(
+        isSuccess: true,
+        title: '\u062A\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644 \u0628\u0646\u062C\u0627\u062D',
+        message: '\u0639\u062F\u062F \u0627\u0644\u0623\u0631\u0642\u0627\u0645: $totalNumbers\n\u0639\u062F\u062F \u0627\u0644\u0631\u0633\u0627\u0626\u0644: $totalSms',
+      );
+      if (!mounted) return;
       ref.read(messageFormProvider.notifier).resetKeepType();
       context.pop();
-      messenger.showSnackBar(
-        SnackBar(
-          content: const Text(
-            '\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0628\u0646\u062C\u0627\u062D', // تم إرسال الرسالة بنجاح
-            style: TextStyle(fontFamily: 'Cairo'),
-          ),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
     } else {
       final state = ref.read(sendMessageControllerProvider);
       final errorMessage = state.hasError
           ? state.error.toString()
           : '\u0641\u0634\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629';
-      _showSnackBar(errorMessage, isError: true);
+      await _showResultDialog(
+        isSuccess: false,
+        title: '\u0641\u0634\u0644 \u0627\u0644\u0625\u0631\u0633\u0627\u0644',
+        message: errorMessage,
+      );
     }
+  }
+
+  Future<void> _showResultDialog({
+    required bool isSuccess,
+    required String title,
+    required String message,
+  }) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: AppColors.surface,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: isSuccess
+                    ? AppColors.success.withOpacity(0.1)
+                    : AppColors.error.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+                color: isSuccess ? AppColors.success : AppColors.error,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                fontFamily: 'Cairo',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                fontFamily: 'Cairo',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isSuccess ? AppColors.success : AppColors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  isSuccess ? '\u062A\u0645' : '\u062D\u0633\u0646\u0627\u064B',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Cairo',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showSnackBar(String message, {bool isError = false}) {

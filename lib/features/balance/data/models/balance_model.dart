@@ -10,6 +10,7 @@ class BalanceModel {
     this.remainingDays = 0,
     this.totalSent = 0,
     this.totalPurchased = 0,
+    this.totalTransferred = 0,
     this.currency = 'SAR',
   });
 
@@ -25,11 +26,14 @@ class BalanceModel {
   /// Number of days remaining until expiry.
   final int remainingDays;
 
-  /// Total messages sent.
+  /// Total messages sent (consumed).
   final int totalSent;
 
   /// Total amount purchased.
   final double totalPurchased;
+
+  /// Total balance transferred to others.
+  final int totalTransferred;
 
   /// Currency code.
   final String currency;
@@ -37,16 +41,24 @@ class BalanceModel {
   /// Deserializes a JSON map into a [BalanceModel].
   factory BalanceModel.fromJson(Map<String, dynamic> json) {
     return BalanceModel(
-      balance: _parseDouble(json['balance']) ?? 0,
+      balance: _parseDouble(json['balance']) ?? 
+               _parseDouble(json['current_balance']) ?? 0,
       formattedBalance: json['formatted_balance']?.toString() ??
           json['balance']?.toString() ??
           '0',
       expiredAt: json['expired_at'] != null
           ? DateTime.tryParse(json['expired_at'].toString())
-          : null,
+          : (json['expiry_date'] != null
+              ? DateTime.tryParse(json['expiry_date'].toString())
+              : null),
       remainingDays: json['remaining_days'] as int? ?? 0,
-      totalSent: json['total_sent'] as int? ?? 0,
+      // API returns 'total_used' not 'total_sent'
+      totalSent: json['total_sent'] as int? ?? 
+                 json['total_used'] as int? ?? 0,
       totalPurchased: _parseDouble(json['total_purchased']) ?? 0,
+      totalTransferred: json['total_transferred'] as int? ?? 
+                        json['transferred'] as int? ?? 
+                        json['transferred_balance'] as int? ?? 0,
       currency: json['currency'] as String? ?? 'SAR',
     );
   }
@@ -59,6 +71,7 @@ class BalanceModel {
       'remaining_days': remainingDays,
       'total_sent': totalSent,
       'total_purchased': totalPurchased,
+      'total_transferred': totalTransferred,
       'currency': currency,
     };
   }
@@ -82,6 +95,7 @@ class BalanceSummaryModel {
     this.currentBalance = 0,
     this.totalSent = 0,
     this.totalPurchased = 0,
+    this.totalTransferred = 0,
     this.expiredAt,
     this.remainingDays = 0,
   });
@@ -89,15 +103,20 @@ class BalanceSummaryModel {
   final double currentBalance;
   final int totalSent;
   final double totalPurchased;
+  final int totalTransferred;
   final DateTime? expiredAt;
   final int remainingDays;
 
   factory BalanceSummaryModel.fromJson(Map<String, dynamic> json) {
     return BalanceSummaryModel(
-      currentBalance: _parseDouble(json['current_balance']) ?? 0,
+      currentBalance: _parseDouble(json['current_balance']) ?? 
+                      _parseDouble(json['balance']) ?? 0,
       // API returns 'total_used', not 'total_sent'.
       totalSent: json['total_sent'] as int? ?? json['total_used'] as int? ?? 0,
       totalPurchased: _parseDouble(json['total_purchased']) ?? 0,
+      totalTransferred: json['total_transferred'] as int? ?? 
+                        json['transferred'] as int? ?? 
+                        json['transferred_balance'] as int? ?? 0,
       expiredAt: json['expired_at'] != null
           ? DateTime.tryParse(json['expired_at'].toString())
           : (json['expiry_date'] != null

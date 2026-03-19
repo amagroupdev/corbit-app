@@ -298,6 +298,9 @@ class SendMessageController extends AsyncNotifier<void> {
     // Initial state is idle (data = null).
   }
 
+  /// Server response data from the last successful send.
+  Map<String, dynamic>? lastSendData;
+
   /// Sends the message using the current form state.
   Future<bool> send() async {
     final formState = ref.read(messageFormProvider);
@@ -314,8 +317,8 @@ class SendMessageController extends AsyncNotifier<void> {
       final response = await repo.sendMessage(formState.toRequest());
 
       if (response.success) {
+        lastSendData = response.data;
         state = const AsyncData(null);
-        // Refresh the messages list.
         ref.invalidate(messagesListProvider);
         return true;
       } else {
