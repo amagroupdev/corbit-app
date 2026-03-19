@@ -495,7 +495,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
               ),
               GestureDetector(
-                onTap: () => context.pushNamed(RouteNames.balance),
+                onTap: () => context.pushNamed(RouteNames.archive),
                 child: const Text(
                   '\u0639\u0631\u0636 \u0627\u0644\u0643\u0644', // عرض الكل
                   style: TextStyle(
@@ -1289,36 +1289,63 @@ class _StatusBadge extends StatelessWidget {
     String label = status;
 
     switch (status.toLowerCase()) {
-      case 'accepted':
       case 'sent':
+      case 'مرسلة':
+        bgColor = const Color(0xFFE3F2FD);
+        textColor = const Color(0xFF1565C0);
+        label = '\u0645\u0631\u0633\u0644\u0629'; // مرسلة
+        break;
       case 'delivered':
+      case 'تم التسليم':
+        bgColor = const Color(0xFFE8F5E9);
+        textColor = const Color(0xFF2E7D32);
+        label = '\u062A\u0645 \u0627\u0644\u062A\u0633\u0644\u064A\u0645'; // تم التسليم
+        break;
+      case 'accepted':
       case 'approved':
+      case 'queued':
       case 'مقبولة':
         bgColor = const Color(0xFFE8F5E9);
         textColor = const Color(0xFF2E7D32);
-        label = '\u0645\u0642\u0628\u0648\u0644\u0629'; // مقبولة
+        label = '\u0645\u0631\u0633\u0644\u0629'; // مرسلة
         break;
       case 'rejected':
-      case 'failed':
       case 'مرفوضة':
         bgColor = const Color(0xFFFFEBEE);
         textColor = const Color(0xFFC62828);
         label = '\u0645\u0631\u0641\u0648\u0636\u0629'; // مرفوضة
         break;
+      case 'failed':
+      case 'فشلت':
+        bgColor = const Color(0xFFFFEBEE);
+        textColor = const Color(0xFFC62828);
+        label = '\u0641\u0634\u0644\u062A'; // فشلت
+        break;
       case 'pending':
       case 'waiting':
       case 'under_review':
-      case 'تحت المراجعة':
       case 'قيد الانتظار':
         bgColor = const Color(0xFFFFF3E0);
         textColor = const Color(0xFFE65100);
         label = '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631'; // قيد الانتظار
         break;
+      case 'scheduled':
+      case 'مجدولة':
+        bgColor = const Color(0xFFE8EAF6);
+        textColor = const Color(0xFF283593);
+        label = '\u0645\u062C\u062F\u0648\u0644\u0629'; // مجدولة
+        break;
+      case 'cancelled':
+      case 'ملغاة':
+        bgColor = const Color(0xFFF5F5F5);
+        textColor = const Color(0xFF616161);
+        label = '\u0645\u0644\u063A\u0627\u0629'; // ملغاة
+        break;
       case 'expired':
-      case 'منتهي':
+      case 'منتهية':
         bgColor = const Color(0xFFF3E5F5);
         textColor = const Color(0xFF6A1B9A);
-        label = '\u0645\u0646\u062A\u0647\u064A'; // منتهي
+        label = '\u0645\u0646\u062A\u0647\u064A\u0629'; // منتهية
         break;
       default:
         bgColor = const Color(0xFFF5F5F5);
