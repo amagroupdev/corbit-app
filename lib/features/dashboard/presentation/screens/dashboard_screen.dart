@@ -861,10 +861,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 // BANNER CARD (used inside carousel)
 // ═══════════════════════════════════════════════════════════════════════════
 
-class _BannerCard extends StatelessWidget {
+class _BannerCard extends StatefulWidget {
   const _BannerCard({required this.banner});
 
   final BannerItem banner;
+
+  @override
+  State<_BannerCard> createState() => _BannerCardState();
+}
+
+class _BannerCardState extends State<_BannerCard> {
+  bool _imageLoadFailed = false;
+
+  bool get _showFallback => widget.banner.imageUrl.isEmpty || _imageLoadFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -894,59 +903,77 @@ class _BannerCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Background image (if available)
-              if (banner.imageUrl.isNotEmpty)
+              // Background image (if available and not failed)
+              if (widget.banner.imageUrl.isNotEmpty && !_imageLoadFailed)
                 CachedNetworkImage(
-                  imageUrl: banner.imageUrl,
+                  imageUrl: widget.banner.imageUrl,
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => const SizedBox.shrink(),
-                  errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                  placeholder: (_, __) => const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (_, __, ___) {
+                    // Mark image as failed so fallback shows
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) setState(() => _imageLoadFailed = true);
+                    });
+                    return const SizedBox.shrink();
+                  },
                 ),
 
-              // Decorative pattern overlay
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _BannerPatternPainter(),
+              // Show fallback design when no image or image failed
+              if (_showFallback) ...[
+                // Decorative pattern overlay
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _BannerPatternPainter(),
+                  ),
                 ),
-              ),
 
-              // Text overlay
-              Padding(
-                padding: const EdgeInsets.all(AppTheme.spacingXl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (banner.title.isNotEmpty)
-                      Text(
-                        banner.title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontFamily: 'Cairo',
+                // Text overlay
+                Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingXl),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (widget.banner.title.isNotEmpty)
+                        Text(
+                          widget.banner.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontFamily: 'Cairo',
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (banner.description.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        banner.description,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.9),
-                          fontFamily: 'Cairo',
-                          height: 1.4,
+                      if (widget.banner.description.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.banner.description,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(0.9),
+                            fontFamily: 'Cairo',
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

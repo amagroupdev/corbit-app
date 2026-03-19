@@ -440,21 +440,15 @@ class DashboardRepository {
     return const [
       BannerItem(
         id: 1,
-        imageUrl: '',
+        imageUrl: 'https://app.mobile.net.sa/image1.png',
         title: 'مرحبا بك في اوربت SMS',
         description: 'ارسل رسائلك بكل سهولة وسرعة',
       ),
       BannerItem(
         id: 2,
-        imageUrl: '',
+        imageUrl: 'https://app.mobile.net.sa/image2.jpg',
         title: 'عروض حصرية',
         description: 'احصل على خصومات تصل الى 30%',
-      ),
-      BannerItem(
-        id: 3,
-        imageUrl: '',
-        title: 'خدمات متميزة',
-        description: 'اكتشف خدماتنا الجديدة',
       ),
     ];
   }
