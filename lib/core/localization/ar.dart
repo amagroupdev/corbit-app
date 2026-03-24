@@ -1130,6 +1130,12 @@ const Map<String, String> ar = {
   'userGuide': 'دليل المستخدم',
   'reportProblem': 'الإبلاغ عن مشكلة',
   'helpAndSupport': 'المساعدة والدعم',
+  'templates': 'القوالب',
+  'studentCertificates': 'شهادات الطلاب',
+  'shortenLinks': 'اختصار الروابط',
+  'legal': 'القانونية',
+  'regulatoryRules': 'ضوابط الهيئة',
+  'logoutConfirmMessage': 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
 
   // ---------------------------------------------------------------------------
   // Miscellaneous

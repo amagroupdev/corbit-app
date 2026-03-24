@@ -1129,6 +1129,12 @@ const Map<String, String> en = {
   'userGuide': 'User Guide',
   'reportProblem': 'Report a Problem',
   'helpAndSupport': 'Help & Support',
+  'templates': 'Templates',
+  'studentCertificates': 'Student Certificates',
+  'shortenLinks': 'Shorten Links',
+  'legal': 'Legal',
+  'regulatoryRules': 'Regulatory Rules',
+  'logoutConfirmMessage': 'Are you sure you want to logout?',
 
   // ---------------------------------------------------------------------------
   // Miscellaneous

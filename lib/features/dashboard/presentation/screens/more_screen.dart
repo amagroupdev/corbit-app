@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_strings.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/utils/helpers.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/settings/presentation/controllers/settings_controller.dart';
@@ -60,178 +61,184 @@ class MoreScreen extends ConsumerWidget {
 
   // ── Menu structure ────────────────────────────────────────────
 
-  static final List<_MoreMenuGroup> _groups = [
-    // ── Section 1: الرسائل (Messages) ─────────────────────────
-    _MoreMenuGroup(
-      label: '\u0627\u0644\u0631\u0633\u0627\u0626\u0644', // الرسائل
-      items: [
-        _MoreMenuItem(
-          icon: Icons.mail_outlined,
-          title: '\u0645\u0631\u0643\u0632 \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // مركز الرسائل
-          route: '/messages',
-          iconColor: AppColors.primary,
-        ),
-        _MoreMenuItem(
-          icon: Icons.archive_outlined,
-          title: '\u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u0645\u0624\u0631\u0634\u0641\u0629', // الرسائل المؤرشفة
-          route: '/archive',
-          iconColor: AppColors.info,
-        ),
-        _MoreMenuItem(
-          icon: Icons.verified_outlined,
-          title: '\u0634\u0647\u0627\u062F\u0627\u062A \u0627\u0644\u0637\u0644\u0627\u0628', // شهادات الطلاب
-          route: '/certifications',
-          iconColor: AppColors.success,
-        ),
-        _MoreMenuItem(
-          icon: Icons.event_busy_outlined,
-          title: '\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u063A\u064A\u0627\u0628 \u0648\u0627\u0644\u062A\u0623\u062E\u0631', // رسائل الغياب والتأخر
-          route: '/absence-messages',
-          iconColor: AppColors.warning,
-        ),
-        _MoreMenuItem(
-          icon: Icons.quiz_outlined,
-          title: '\u0627\u0644\u0627\u0633\u062A\u0628\u064A\u0627\u0646\u0627\u062A', // الاستبيانات
-          route: '/questionnaires',
-          iconColor: AppColors.chartIndigo,
-        ),
-        _MoreMenuItem(
-          icon: Icons.question_answer_outlined,
-          title: '\u0627\u0644\u0625\u0641\u0627\u062F\u0627\u062A \u0648\u0627\u0644\u0631\u062F\u0648\u062F', // الإفادات والردود
-          route: '/statements',
-          iconColor: AppColors.chartTeal,
-        ),
-      ],
-    ),
+  static List<_MoreMenuGroup> _buildGroups(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    return [
+      // ── Section 1: الرسائل (Messages) ─────────────────────────
+      _MoreMenuGroup(
+        label: t.translate('messagesSection'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.mail_outlined,
+            title: t.translate('messageCenter'),
+            route: '/messages',
+            iconColor: AppColors.primary,
+          ),
+          _MoreMenuItem(
+            icon: Icons.archive_outlined,
+            title: t.translate('archivedMessages'),
+            route: '/archive',
+            iconColor: AppColors.info,
+          ),
+          _MoreMenuItem(
+            icon: Icons.verified_outlined,
+            title: t.translate('studentCertificates'),
+            route: '/certifications',
+            iconColor: AppColors.success,
+          ),
+          _MoreMenuItem(
+            icon: Icons.event_busy_outlined,
+            title: t.translate('absenceMessages'),
+            route: '/absence-messages',
+            iconColor: AppColors.warning,
+          ),
+          _MoreMenuItem(
+            icon: Icons.quiz_outlined,
+            title: t.translate('questionnaires'),
+            route: '/questionnaires',
+            iconColor: AppColors.chartIndigo,
+          ),
+          _MoreMenuItem(
+            icon: Icons.question_answer_outlined,
+            title: t.translate('statements'),
+            route: '/statements',
+            iconColor: AppColors.chartTeal,
+          ),
+        ],
+      ),
 
-    // ── Section 2: أدوات الرسائل (Message Tools) ──────────────
-    _MoreMenuGroup(
-      label: '\u0623\u062F\u0648\u0627\u062A \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // أدوات الرسائل
-      items: [
-        _MoreMenuItem(
-          icon: Icons.description_outlined,
-          title: '\u0627\u0644\u0642\u0648\u0627\u0644\u0628', // القوالب
-          route: '/templates',
-          iconColor: AppColors.chartPurple,
-        ),
-        _MoreMenuItem(
-          icon: Icons.person_outlined,
-          title: '\u0623\u0633\u0645\u0627\u0621 \u0627\u0644\u0645\u0631\u0633\u0644\u064A\u0646', // أسماء المرسلين
-          route: '/sender-names',
-          iconColor: AppColors.chartBlue,
-        ),
-        _MoreMenuItem(
-          icon: Icons.link_rounded,
-          title: '\u0627\u062E\u062A\u0635\u0627\u0631 \u0627\u0644\u0631\u0648\u0627\u0628\u0637', // اختصار الروابط
-          route: '/short-links',
-          iconColor: AppColors.chartTeal,
-        ),
-      ],
-    ),
+      // ── Section 2: أدوات الرسائل (Message Tools) ──────────────
+      _MoreMenuGroup(
+        label: t.translate('messageTools'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.description_outlined,
+            title: t.translate('templates'),
+            route: '/templates',
+            iconColor: AppColors.chartPurple,
+          ),
+          _MoreMenuItem(
+            icon: Icons.person_outlined,
+            title: t.translate('senderNames'),
+            route: '/sender-names',
+            iconColor: AppColors.chartBlue,
+          ),
+          _MoreMenuItem(
+            icon: Icons.link_rounded,
+            title: t.translate('shortenLinks'),
+            route: '/short-links',
+            iconColor: AppColors.chartTeal,
+          ),
+        ],
+      ),
 
-    // ── Section 3: الخدمات والإحصائيات ─────────────────────────
-    _MoreMenuGroup(
-      label: '\u0627\u0644\u062E\u062F\u0645\u0627\u062A \u0648\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A', // الخدمات والإحصائيات
-      items: [
-        _MoreMenuItem(
-          icon: Icons.extension_outlined,
-          title: '\u0627\u0644\u062E\u062F\u0645\u0627\u062A', // الخدمات
-          route: '/services',
-          iconColor: AppColors.chartOrange,
-        ),
-        _MoreMenuItem(
-          icon: Icons.bar_chart_rounded,
-          title: '\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A', // الإحصائيات
-          route: '/statistics',
-          iconColor: AppColors.chartGreen,
-        ),
-      ],
-    ),
+      // ── Section 3: الخدمات والإحصائيات ─────────────────────────
+      _MoreMenuGroup(
+        label: t.translate('servicesAndStatistics'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.extension_outlined,
+            title: t.translate('services'),
+            route: '/services',
+            iconColor: AppColors.chartOrange,
+          ),
+          _MoreMenuItem(
+            icon: Icons.bar_chart_rounded,
+            title: t.translate('statistics'),
+            route: '/statistics',
+            iconColor: AppColors.chartGreen,
+          ),
+        ],
+      ),
 
-    // ── Section 4: الحساب (Account) ───────────────────────────
-    _MoreMenuGroup(
-      label: '\u0627\u0644\u062D\u0633\u0627\u0628', // الحساب
-      items: [
-        _MoreMenuItem(
-          icon: Icons.settings_outlined,
-          title: '\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A', // الإعدادات
-          route: '/settings',
-          iconColor: AppColors.textSecondary,
-        ),
-        _MoreMenuItem(
-          icon: Icons.notifications_outlined,
-          title: '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A', // الإشعارات
-          route: '/notifications',
-          iconColor: AppColors.warning,
-        ),
-      ],
-    ),
+      // ── Section 4: الحساب (Account) ───────────────────────────
+      _MoreMenuGroup(
+        label: t.translate('account'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.settings_outlined,
+            title: t.translate('settings'),
+            route: '/settings',
+            iconColor: AppColors.textSecondary,
+          ),
+          _MoreMenuItem(
+            icon: Icons.notifications_outlined,
+            title: t.translate('notifications'),
+            route: '/notifications',
+            iconColor: AppColors.warning,
+          ),
+        ],
+      ),
 
-    // ── Section 5: المساعدة (Help) ────────────────────────────
-    _MoreMenuGroup(
-      label: '\u0627\u0644\u0645\u0633\u0627\u0639\u062F\u0629', // المساعدة
-      items: [
-        _MoreMenuItem(
-          icon: Icons.menu_book_outlined,
-          title: '\u062F\u0644\u064A\u0644 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645', // دليل المستخدم
-          externalUrl: 'https://orbit-sms.com/user-guide',
-          iconColor: AppColors.chartBlue,
-        ),
-        _MoreMenuItem(
-          icon: Icons.bug_report_outlined,
-          title: '\u0627\u0644\u0625\u0628\u0644\u0627\u063A \u0639\u0646 \u0645\u0634\u0643\u0644\u0629', // الإبلاغ عن مشكلة
-          route: '/contact-me',
-          iconColor: AppColors.chartOrange,
-        ),
-        _MoreMenuItem(
-          icon: Icons.help_outline_rounded,
-          title: '\u0627\u0644\u0645\u0633\u0627\u0639\u062F\u0629 \u0648\u0627\u0644\u062F\u0639\u0645', // المساعدة والدعم
-          externalUrl: 'https://orbit-sms.com/help',
-          iconColor: AppColors.chartGreen,
-        ),
-      ],
-    ),
+      // ── Section 5: المساعدة (Help) ────────────────────────────
+      _MoreMenuGroup(
+        label: t.translate('helpSection'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.menu_book_outlined,
+            title: t.translate('userGuide'),
+            externalUrl: 'https://orbit-sms.com/user-guide',
+            iconColor: AppColors.chartBlue,
+          ),
+          _MoreMenuItem(
+            icon: Icons.bug_report_outlined,
+            title: t.translate('reportProblem'),
+            route: '/contact-me',
+            iconColor: AppColors.chartOrange,
+          ),
+          _MoreMenuItem(
+            icon: Icons.help_outline_rounded,
+            title: t.translate('helpAndSupport'),
+            externalUrl: 'https://orbit-sms.com/help',
+            iconColor: AppColors.chartGreen,
+          ),
+        ],
+      ),
 
-    // ── Section 6: القانونية (Legal) ──────────────────────
-    _MoreMenuGroup(
-      label: '\u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064A\u0629', // القانونية
-      items: [
-        _MoreMenuItem(
-          icon: Icons.gavel_outlined,
-          title: '\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0623\u062D\u0643\u0627\u0645', // الشروط والأحكام
-          externalUrl: AppStrings.urlTermsOfService,
-          iconColor: AppColors.chartIndigo,
-        ),
-        _MoreMenuItem(
-          icon: Icons.privacy_tip_outlined,
-          title: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u062E\u0635\u0648\u0635\u064A\u0629', // سياسة الخصوصية
-          externalUrl: AppStrings.urlPrivacyPolicy,
-          iconColor: AppColors.chartPurple,
-        ),
-        _MoreMenuItem(
-          icon: Icons.security_outlined,
-          title: '\u0636\u0648\u0627\u0628\u0637 \u0627\u0644\u0647\u064A\u0626\u0629', // ضوابط الهيئة
-          externalUrl: AppStrings.urlSpamRegulation,
-          iconColor: AppColors.chartRed,
-        ),
-        _MoreMenuItem(
-          icon: Icons.description_outlined,
-          title: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
-          route: '/terms-pdf',
-          iconColor: AppColors.chartTeal,
-        ),
-      ],
-    ),
-  ];
+      // ── Section 6: القانونية (Legal) ──────────────────────
+      _MoreMenuGroup(
+        label: t.translate('legal'),
+        items: [
+          _MoreMenuItem(
+            icon: Icons.gavel_outlined,
+            title: t.translate('termsAndConditions'),
+            externalUrl: AppStrings.urlTermsOfService,
+            iconColor: AppColors.chartIndigo,
+          ),
+          _MoreMenuItem(
+            icon: Icons.privacy_tip_outlined,
+            title: t.translate('privacyPolicy'),
+            externalUrl: AppStrings.urlPrivacyPolicy,
+            iconColor: AppColors.chartPurple,
+          ),
+          _MoreMenuItem(
+            icon: Icons.security_outlined,
+            title: t.translate('regulatoryRules'),
+            externalUrl: AppStrings.urlSpamRegulation,
+            iconColor: AppColors.chartRed,
+          ),
+          _MoreMenuItem(
+            icon: Icons.description_outlined,
+            title: t.translate('usagePolicy'),
+            route: '/terms-pdf',
+            iconColor: AppColors.chartTeal,
+          ),
+        ],
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context)!;
+    final groups = _buildGroups(context);
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0645\u0632\u064A\u062F', // المزيد
-          style: TextStyle(
+        title: Text(
+          t.translate('more'),
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -250,7 +257,7 @@ class MoreScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // ── Menu Groups ────────────────────────────────────
-          for (final group in _groups) ...[
+          for (final group in groups) ...[
             _GroupHeader(label: group.label),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -531,6 +538,8 @@ class _MenuItemTile extends StatelessWidget {
 class _LogoutButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: 52,
       width: double.infinity,
@@ -538,7 +547,7 @@ class _LogoutButton extends ConsumerWidget {
         onPressed: () => _handleLogout(context, ref),
         icon: const Icon(Icons.logout_rounded, size: 20),
         label: Text(
-          '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C', // تسجيل الخروج
+          t.translate('logout'),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -556,14 +565,13 @@ class _LogoutButton extends ConsumerWidget {
   }
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final t = AppLocalizations.of(context)!;
+
     final confirmed = await AppConfirmationDialog.show(
       context: context,
-      title:
-          '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C', // تسجيل الخروج
-      message:
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u0631\u063A\u0628\u062A\u0643 \u0641\u064A \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C\u061F', // هل أنت متأكد من رغبتك في تسجيل الخروج؟
-      confirmText:
-          '\u062E\u0631\u0648\u062C', // خروج
+      title: t.translate('logout'),
+      message: t.translate('logoutConfirmMessage'),
+      confirmText: t.translate('logout'),
       isDestructive: true,
       icon: Icons.logout_rounded,
     );
