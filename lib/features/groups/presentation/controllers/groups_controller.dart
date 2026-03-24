@@ -385,6 +385,69 @@ class GroupDetailController extends StateNotifier<GroupDetailState> {
     }
   }
 
+  /// Add multiple numbers to this group (batch import from contacts).
+  /// Returns a map with success/failed/duplicate/total counts.
+  Future<Map<String, int>> addNumbersBatch({
+    required int groupId,
+    required List<Map<String, String>> contacts,
+    void Function(int current, int total)? onProgress,
+  }) async {
+    int success = 0;
+    int failed = 0;
+    int duplicate = 0;
+    final total = contacts.length;
+
+    for (int i = 0; i < contacts.length; i++) {
+      final contact = contacts[i];
+      try {
+        final newNumber = await _repository.createNumber(
+          groupId: groupId,
+          name: contact['name'] ?? '',
+          number: contact['number'] ?? '',
+        );
+
+        // Add only the first few to the local state to avoid memory issues
+        if (i < 50) {
+          state = state.copyWith(
+            numbers: [newNumber, ...state.numbers],
+            numbersCount: state.numbersCount + 1,
+          );
+        } else if (i == contacts.length - 1) {
+          state = state.copyWith(
+            numbersCount: state.numbersCount + 1,
+          );
+        }
+
+        success++;
+      } on ApiException catch (e) {
+        // Check if it's a duplicate/validation error (422)
+        if (e.statusCode == 422) {
+          duplicate++;
+        } else {
+          failed++;
+        }
+      } catch (_) {
+        failed++;
+      }
+
+      onProgress?.call(i + 1, total);
+    }
+
+    // Reload numbers if large batch
+    if (contacts.length > 50) {
+      await loadNumbers(groupId);
+      final count = await _repository.getNumbersCount(groupId);
+      state = state.copyWith(numbersCount: count);
+    }
+
+    return {
+      'success': success,
+      'failed': failed,
+      'duplicate': duplicate,
+      'total': total,
+    };
+  }
+
   /// Delete a number.
   Future<bool> deleteNumber(int id) async {
     try {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orbit_app/app.dart';
 
@@ -19,6 +20,9 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
+
+  // طلب صلاحية قراءة جهات الاتصال عند أول تشغيل
+  FlutterContacts.requestPermission(readonly: true);
 
   runApp(const ProviderScope(child: OrbitApp()));
 }

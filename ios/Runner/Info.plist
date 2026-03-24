@@ -46,7 +46,7 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSContactsUsageDescription</key>
-	<string>يحتاج التطبيق للوصول إلى جهات الاتصال لاستيراد الأرقام إلى المجموعات</string>
+	<string>يستخدم تطبيق المدار جهات الاتصال المحفوظة على جهازك لتمكينك من إضافة أرقام الجوال السعودية إلى مجموعات الرسائل النصية SMS الخاصة بك، مما يسهل عليك إرسال الرسائل الجماعية دون الحاجة لإدخال الأرقام يدوياً</string>
 	<key>NSCameraUsageDescription</key>
 	<string>يحتاج التطبيق للوصول إلى الكاميرا لالتقاط صورة الملف الشخصي</string>
 	<key>NSPhotoLibraryUsageDescription</key>

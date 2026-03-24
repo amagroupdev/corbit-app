@@ -7,6 +7,7 @@ import 'package:orbit_app/features/groups/data/models/number_model.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
 import 'package:orbit_app/features/groups/presentation/widgets/add_number_sheet.dart';
+import 'package:orbit_app/features/groups/presentation/widgets/contacts_import_sheet.dart';
 import 'package:orbit_app/features/groups/presentation/widgets/number_list_item.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
@@ -123,6 +124,139 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAddOptionsSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 24),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.borderDark,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '\u0625\u0636\u0627\u0641\u0629 \u0623\u0631\u0642\u0627\u0645', // إضافة أرقام
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Option 1: Manual add
+            _buildOptionTile(
+              icon: Icons.dialpad,
+              title: '\u0625\u0636\u0627\u0641\u0629 \u0631\u0642\u0645 \u064A\u062F\u0648\u064A', // إضافة رقم يدوي
+              subtitle: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0627\u0633\u0645 \u0648\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u064A\u062F\u0648\u064A\u0627\u064B', // أدخل الاسم ورقم الهاتف يدوياً
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showAddNumberSheet();
+              },
+            ),
+            const SizedBox(height: 12),
+            // Option 2: Import from contacts
+            _buildOptionTile(
+              icon: Icons.contacts,
+              title: '\u0625\u0636\u0641 \u0645\u0646 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644', // إضف من جهات الاتصال
+              subtitle: '\u0627\u0633\u062A\u064A\u0631\u062F \u0623\u0631\u0642\u0627\u0645 \u062C\u0648\u0627\u0644 \u0633\u0639\u0648\u062F\u064A\u0629 \u0645\u0646 \u062C\u0647\u0627\u0632\u0643', // استيرد أرقام جوال سعودية من جهازك
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showContactsImportSheet();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.scaffoldBackground,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primarySurface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 24),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: AppColors.textHint,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showContactsImportSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => ContactsImportSheet(groupId: widget.groupId),
     );
   }
 
@@ -421,7 +555,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                   ],
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddNumberSheet(),
+        onPressed: _showAddOptionsSheet,
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
