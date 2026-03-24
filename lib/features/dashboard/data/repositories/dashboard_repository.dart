@@ -347,28 +347,29 @@ class DashboardRepository {
     }
 
     // Derive account level from total_purchased if API didn't provide it.
-    // Tiers: اساسي (0) → البرونزي (3,500) → الفضي (10,000) → الذهبي (50,000) → الماسي (100,000)
+    // Tiers: basic (0) -> bronze (3,500) -> silver (10,000) -> gold (50,000) -> diamond (100,000)
+    // Uses translation keys (resolved in UI via AppLocalizations).
     if (accountLevel.isEmpty) {
       if (totalBalance >= 100000) {
-        accountLevel = 'الماسي';
+        accountLevel = 'tier_diamond';
       } else if (totalBalance >= 50000) {
-        accountLevel = 'الذهبي';
-        nextLevelName = 'الماسي';
+        accountLevel = 'tier_gold';
+        nextLevelName = 'tier_diamond';
         nextLevelRequirement = 100000;
         accountLevelProgress = (totalBalance / 100000).clamp(0.0, 1.0);
       } else if (totalBalance >= 10000) {
-        accountLevel = 'الفضي';
-        nextLevelName = 'الذهبي';
+        accountLevel = 'tier_silver';
+        nextLevelName = 'tier_gold';
         nextLevelRequirement = 50000;
         accountLevelProgress = (totalBalance / 50000).clamp(0.0, 1.0);
       } else if (totalBalance >= 3500) {
-        accountLevel = 'البرونزي';
-        nextLevelName = 'الفضي';
+        accountLevel = 'tier_bronze';
+        nextLevelName = 'tier_silver';
         nextLevelRequirement = 10000;
         accountLevelProgress = (totalBalance / 10000).clamp(0.0, 1.0);
       } else {
-        accountLevel = 'اساسي';
-        nextLevelName = 'البرونزي';
+        accountLevel = 'tier_basic';
+        nextLevelName = 'tier_bronze';
         nextLevelRequirement = 3500;
         accountLevelProgress = totalBalance > 0
             ? (totalBalance / 3500).clamp(0.0, 1.0)
@@ -436,19 +437,20 @@ class DashboardRepository {
   }
 
   /// Returns placeholder banners when the API is unavailable.
+  /// Titles and descriptions use translation keys (resolved in UI).
   List<BannerItem> _defaultBanners() {
     return const [
       BannerItem(
         id: 1,
         imageUrl: 'https://app.mobile.net.sa/image1.png',
-        title: 'مرحبا بك في اوربت SMS',
-        description: 'ارسل رسائلك بكل سهولة وسرعة',
+        title: 'bannerWelcomeTitle',
+        description: 'bannerWelcomeDesc',
       ),
       BannerItem(
         id: 2,
         imageUrl: 'https://app.mobile.net.sa/image2.jpg',
-        title: 'عروض حصرية',
-        description: 'احصل على خصومات تصل الى 30%',
+        title: 'bannerOffersTitle',
+        description: 'bannerOffersDesc',
       ),
     ];
   }

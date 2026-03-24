@@ -13,6 +13,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for managing contracts: list, create, upload documents, delete.
 class ContractsScreen extends ConsumerWidget {
   const ContractsScreen({super.key});
@@ -24,7 +25,7 @@ class ContractsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('العقود'),
+        title: Text(AppLocalizations.of(context)!.translate('contracts')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -41,8 +42,8 @@ class ContractsScreen extends ConsumerWidget {
           if (paginated.isEmpty) {
             return AppEmptyState(
               icon: Icons.description_outlined,
-              title: 'لا توجد عقود',
-              description: 'اضغط على زر + لإنشاء عقد جديد',
+              title: AppLocalizations.of(context)!.translate('contracts_empty'),
+              description: AppLocalizations.of(context)!.translate('contracts_empty_desc'),
             );
           }
 
@@ -107,8 +108,8 @@ class ContractsScreen extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم رفع المستند بنجاح'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('contracts_doc_uploaded')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -117,7 +118,7 @@ class ContractsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -133,17 +134,17 @@ class ContractsScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف العقد'),
-        content: const Text('هل أنت متأكد من حذف هذا العقد؟'),
+        title: Text(AppLocalizations.of(context)!.translate('contracts_delete_title')),
+        content: Text(AppLocalizations.of(context)!.translate('contracts_delete_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('حذف'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -154,8 +155,8 @@ class ContractsScreen extends ConsumerWidget {
         await ref.read(contractsProvider.notifier).delete(id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حذف العقد'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('contracts_deleted')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -164,7 +165,7 @@ class ContractsScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ: $e'),
+              content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -246,7 +247,7 @@ class _ContractCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      contract.organizationName ?? 'عقد #${contract.id}',
+                      contract.organizationName ?? '${AppLocalizations.of(context)!.translate('contracts_contract_prefix')} #${contract.id}',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -277,7 +278,7 @@ class _ContractCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  contract.statusLabel,
+                  AppLocalizations.of(context)!.translate(contract.statusLabelKey),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -317,7 +318,7 @@ class _ContractCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onUploadDocument,
                 icon: const Icon(Icons.upload_file_rounded, size: 16),
-                label: const Text('رفع مستند'),
+                label: Text(AppLocalizations.of(context)!.translate('contracts_upload_doc')),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   textStyle: const TextStyle(fontSize: 12),
@@ -327,7 +328,7 @@ class _ContractCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onDelete,
                 icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                label: const Text('حذف'),
+                label: Text(AppLocalizations.of(context)!.translate('delete')),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.error,
                   textStyle: const TextStyle(fontSize: 12),
@@ -371,7 +372,7 @@ class _CreateContractScreenState
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('إنشاء عقد جديد'),
+        title: Text(AppLocalizations.of(context)!.translate('contracts_create_title')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -384,18 +385,18 @@ class _CreateContractScreenState
           padding: const EdgeInsets.all(16),
           children: [
             AppTextField(
-              label: 'اسم المنظمة',
-              hint: 'الاسم الرسمي للمنظمة',
+              label: AppLocalizations.of(context)!.translate('contracts_org_label'),
+              hint: AppLocalizations.of(context)!.translate('contracts_org_hint'),
               controller: _organizationController,
               validator: (v) =>
-                  Validators.validateRequired(v, fieldName: 'اسم المنظمة'),
+                  Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('contracts_org_label')),
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 16),
 
             AppTextField(
-              label: 'ملاحظات',
-              hint: 'ملاحظات إضافية (اختياري)',
+              label: AppLocalizations.of(context)!.translate('contracts_notes_label'),
+              hint: AppLocalizations.of(context)!.translate('contracts_notes_hint'),
               controller: _notesController,
               maxLines: 3,
               textInputAction: TextInputAction.done,
@@ -406,8 +407,8 @@ class _CreateContractScreenState
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'المستند',
+                Text(
+                  AppLocalizations.of(context)!.translate('contracts_document_label'),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -445,7 +446,7 @@ class _CreateContractScreenState
                         Text(
                           _documentPath != null
                               ? _documentPath!.split('/').last
-                              : 'اضغط لرفع المستند',
+                              : AppLocalizations.of(context)!.translate('contracts_upload_doc_btn'),
                           style: TextStyle(
                             fontSize: 14,
                             color: _documentPath != null
@@ -463,7 +464,7 @@ class _CreateContractScreenState
             const SizedBox(height: 32),
 
             AppButton.primary(
-              text: 'إنشاء العقد',
+              text: AppLocalizations.of(context)!.translate('contracts_create_button'),
               onPressed: _isLoading ? null : _submit,
               isLoading: _isLoading,
               icon: Icons.add_rounded,
@@ -516,7 +517,7 @@ class _CreateContractScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'تم إنشاء العقد بنجاح' : 'فشل إنشاء العقد',
+              success ? AppLocalizations.of(context)!.translate('contracts_created') : AppLocalizations.of(context)!.translate('contracts_create_failed'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -527,7 +528,7 @@ class _CreateContractScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );

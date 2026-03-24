@@ -261,12 +261,12 @@ class StatementsActionsNotifier extends StateNotifier<StatementsActionState> {
         listNotifier.removeItemsByIds(responseIds);
         state = state.copyWith(
           isDeleting: false,
-          successMessage: '\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0631\u062F\u0648\u062F \u0628\u0646\u062C\u0627\u062D',
+          successMessage: 'statement_responses_deleted',
         );
       } else {
         state = state.copyWith(
           isDeleting: false,
-          errorMessage: '\u0641\u0634\u0644 \u062D\u0630\u0641 \u0627\u0644\u0631\u062F\u0648\u062F',
+          errorMessage: 'statement_responses_delete_failed',
         );
       }
 
@@ -301,7 +301,7 @@ class StatementsActionsNotifier extends StateNotifier<StatementsActionState> {
 
       state = state.copyWith(
         isExporting: false,
-        successMessage: url ?? '\u062A\u0645 \u0637\u0644\u0628 \u0627\u0644\u062A\u0635\u062F\u064A\u0631 \u0628\u0646\u062C\u0627\u062D',
+        successMessage: url ?? 'statement_export_requested',
       );
 
       return url;

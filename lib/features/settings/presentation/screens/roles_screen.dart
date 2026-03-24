@@ -12,6 +12,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for managing roles and permissions.
 class RolesScreen extends ConsumerWidget {
   const RolesScreen({super.key});
@@ -23,7 +24,7 @@ class RolesScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('الأدوار والصلاحيات'),
+        title: Text(AppLocalizations.of(context)!.translate('settings_roles_title')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -40,8 +41,8 @@ class RolesScreen extends ConsumerWidget {
           if (paginated.isEmpty) {
             return AppEmptyState(
               icon: Icons.security_rounded,
-              title: 'لا توجد أدوار',
-              description: 'اضغط على زر + لإنشاء دور جديد',
+              title: AppLocalizations.of(context)!.translate('roles_empty'),
+              description: AppLocalizations.of(context)!.translate('roles_empty_desc'),
             );
           }
 
@@ -88,17 +89,17 @@ class RolesScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الدور'),
-        content: const Text('هل أنت متأكد من حذف هذا الدور؟'),
+        title: Text(AppLocalizations.of(context)!.translate('roles_delete_title')),
+        content: Text(AppLocalizations.of(context)!.translate('roles_delete_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('حذف'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -109,8 +110,8 @@ class RolesScreen extends ConsumerWidget {
         await ref.read(rolesProvider.notifier).delete(id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حذف الدور بنجاح'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('roles_deleted')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -119,7 +120,7 @@ class RolesScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ: $e'),
+              content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -179,7 +180,7 @@ class _RoleCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  role.name ?? 'غير محدد',
+                  role.name ?? AppLocalizations.of(context)!.translate('invoice_status_unknown'),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -201,7 +202,7 @@ class _RoleCard extends StatelessWidget {
                 ],
                 const SizedBox(height: 4),
                 Text(
-                  '${role.permissions.length} صلاحية',
+                  '${role.permissions.length} ${AppLocalizations.of(context)!.translate('roles_permission_count')}',
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -271,7 +272,7 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: Text(isEditing ? 'تعديل الدور' : 'إنشاء دور جديد'),
+        title: Text(isEditing ? AppLocalizations.of(context)!.translate('roles_edit_title') : AppLocalizations.of(context)!.translate('roles_create_title')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -284,26 +285,26 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             AppTextField(
-              label: 'اسم الدور',
-              hint: 'مثال: مدير',
+              label: AppLocalizations.of(context)!.translate('roles_name_label'),
+              hint: AppLocalizations.of(context)!.translate('roles_name_hint'),
               controller: _nameController,
               validator: (v) =>
-                  Validators.validateRequired(v, fieldName: 'اسم الدور'),
+                  Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('roles_name_label')),
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 16),
 
             AppTextField(
-              label: 'الوصف',
-              hint: 'وصف اختياري للدور',
+              label: AppLocalizations.of(context)!.translate('roles_description_label'),
+              hint: AppLocalizations.of(context)!.translate('roles_description_hint'),
               controller: _descriptionController,
               maxLines: 2,
               textInputAction: TextInputAction.done,
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              'الصلاحيات',
+            Text(
+              AppLocalizations.of(context)!.translate('roles_permissions_label'),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -323,13 +324,13 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
                 );
               },
               loading: () => AppLoading.circular(),
-              error: (error, _) => Text('خطأ: $error'),
+              error: (error, _) => Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $error'),
             ),
 
             const SizedBox(height: 32),
 
             AppButton.primary(
-              text: isEditing ? 'حفظ التغييرات' : 'إنشاء الدور',
+              text: isEditing ? AppLocalizations.of(context)!.translate('profile_save_changes') : AppLocalizations.of(context)!.translate('roles_create_button'),
               onPressed: _isLoading ? null : _submit,
               isLoading: _isLoading,
             ),
@@ -380,7 +381,7 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
                 });
               },
               child: Text(
-                allSelected ? 'إلغاء الكل' : 'تحديد الكل',
+                allSelected ? AppLocalizations.of(context)!.translate('roles_deselect_all') : AppLocalizations.of(context)!.translate('roles_select_all'),
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -445,8 +446,8 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
           SnackBar(
             content: Text(
               success
-                  ? (isEditing ? 'تم تحديث الدور' : 'تم إنشاء الدور')
-                  : (result['message'] as String? ?? 'حدث خطأ'),
+                  ? (isEditing ? AppLocalizations.of(context)!.translate('roles_updated') : AppLocalizations.of(context)!.translate('roles_created'))
+                  : (result['message'] as String? ?? AppLocalizations.of(context)!.translate('unknown_error')),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -456,7 +457,7 @@ class _RoleFormScreenState extends ConsumerState<_RoleFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'), backgroundColor: AppColors.error),
         );
       }
     } finally {

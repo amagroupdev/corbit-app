@@ -1,3 +1,5 @@
+import 'package:orbit_app/core/localization/app_localizations.dart';
+
 /// Form-validation functions for the ORBIT SMS V3 application.
 ///
 /// Every validator returns `null` when the value is valid and an error message
@@ -5,6 +7,15 @@
 /// `TextFormField.validator` parameter.
 class Validators {
   const Validators._();
+
+  // ---------------------------------------------------------------------------
+  // Helper to get translated string
+  // ---------------------------------------------------------------------------
+
+  static String _t(String key) => AppLocalizations.instance.translate(key);
+
+  static String _tParams(String key, Map<String, String> params) =>
+      AppLocalizations.instance.translateWithParams(key, params);
 
   // ---------------------------------------------------------------------------
   // Regular expressions
@@ -51,7 +62,10 @@ class Validators {
   /// Ensures the field is not empty or whitespace-only.
   static String? validateRequired(String? value, {String? fieldName}) {
     if (value == null || value.trim().isEmpty) {
-      return fieldName != null ? '$fieldName مطلوب' : 'هذا الحقل مطلوب';
+      if (fieldName != null) {
+        return _tParams('fieldNameRequired', {'field': fieldName});
+      }
+      return _t('requiredField');
     }
     return null;
   }
@@ -59,10 +73,10 @@ class Validators {
   /// Validates a standard email address.
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'البريد الإلكتروني مطلوب';
+      return _t('emailRequired');
     }
     if (!_emailRegex.hasMatch(value.trim())) {
-      return 'البريد الإلكتروني غير صالح';
+      return _t('emailInvalid');
     }
     return null;
   }
@@ -70,12 +84,12 @@ class Validators {
   /// Validates a Saudi mobile number (with or without country code).
   static String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'رقم الجوال مطلوب';
+      return _t('phoneRequired');
     }
     // Strip spaces and dashes before testing.
     final cleaned = value.replaceAll(RegExp(r'[\s\-]'), '');
     if (!_saudiPhoneRegex.hasMatch(cleaned)) {
-      return 'رقم الجوال غير صالح';
+      return _t('phoneInvalid');
     }
     return null;
   }
@@ -88,22 +102,22 @@ class Validators {
   /// - At least one special character
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'كلمة المرور مطلوبة';
+      return _t('passwordRequired');
     }
     if (value.length < 8) {
-      return 'كلمة المرور قصيرة جداً (8 أحرف على الأقل)';
+      return _t('passwordTooShortMsg');
     }
     if (!_upperCaseRegex.hasMatch(value)) {
-      return 'يجب أن تحتوي على حرف كبير واحد على الأقل';
+      return _t('passwordNeedsUppercase');
     }
     if (!_lowerCaseRegex.hasMatch(value)) {
-      return 'يجب أن تحتوي على حرف صغير واحد على الأقل';
+      return _t('passwordNeedsLowercase');
     }
     if (!_digitRegex.hasMatch(value)) {
-      return 'يجب أن تحتوي على رقم واحد على الأقل';
+      return _t('passwordNeedsDigit');
     }
     if (!_specialCharRegex.hasMatch(value)) {
-      return 'يجب أن تحتوي على رمز خاص واحد على الأقل';
+      return _t('passwordNeedsSpecial');
     }
     return null;
   }
@@ -111,10 +125,10 @@ class Validators {
   /// Ensures [value] matches [password].
   static String? validateConfirmPassword(String? value, String? password) {
     if (value == null || value.isEmpty) {
-      return 'تأكيد كلمة المرور مطلوب';
+      return _t('confirmPasswordRequired');
     }
     if (value != password) {
-      return 'كلمات المرور غير متطابقة';
+      return _t('passwordMismatch');
     }
     return null;
   }
@@ -123,10 +137,10 @@ class Validators {
   /// hyphens.
   static String? validateUsername(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'اسم المستخدم مطلوب';
+      return _t('usernameRequired');
     }
     if (!_usernameRegex.hasMatch(value.trim())) {
-      return 'اسم المستخدم غير صالح (3-30 حرف، أرقام، _ أو -)';
+      return _t('usernameInvalid');
     }
     return null;
   }
@@ -134,8 +148,8 @@ class Validators {
   /// Validates that [value] has at least [min] characters.
   static String? validateMinLength(String? value, int min, {String? fieldName}) {
     if (value == null || value.length < min) {
-      final label = fieldName ?? 'القيمة';
-      return '$label يجب أن لا يقل عن $min أحرف';
+      final label = fieldName ?? _t('defaultFieldName');
+      return _tParams('valueTooShort', {'field': label, 'min': '$min'});
     }
     return null;
   }
@@ -143,8 +157,8 @@ class Validators {
   /// Validates that [value] does not exceed [max] characters.
   static String? validateMaxLength(String? value, int max, {String? fieldName}) {
     if (value != null && value.length > max) {
-      final label = fieldName ?? 'القيمة';
-      return '$label يجب أن لا يزيد عن $max حرف';
+      final label = fieldName ?? _t('defaultFieldName');
+      return _tParams('valueTooLong', {'field': label, 'max': '$max'});
     }
     return null;
   }
@@ -152,10 +166,10 @@ class Validators {
   /// Validates that [value] is a valid number (integer or decimal).
   static String? validateNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'الرجاء إدخال رقم';
+      return _t('numberRequired');
     }
     if (!_numberRegex.hasMatch(value.trim())) {
-      return 'الرجاء إدخال رقم صحيح';
+      return _t('numberInvalid');
     }
     return null;
   }

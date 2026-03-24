@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 
 /// A card widget that displays a group summary in the groups list.
@@ -27,6 +28,7 @@ class GroupCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('yyyy/MM/dd');
+    final t = AppLocalizations.of(context)!;
 
     return Dismissible(
       key: ValueKey('group_${group.id}'),
@@ -137,7 +139,7 @@ class GroupCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${group.numbersCount} \u0631\u0642\u0645',
+                            '${group.numbersCount} ${t.translate('numberUnit')}',
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,
@@ -176,9 +178,9 @@ class GroupCard extends StatelessWidget {
                       color: AppColors.errorSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      '\u0645\u062D\u0630\u0648\u0641',
-                      style: TextStyle(
+                    child: Text(
+                      t.translate('trashed'),
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColors.error,

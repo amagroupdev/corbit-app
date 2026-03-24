@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/sa_regions.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
 
@@ -34,6 +35,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Step 1: Account type
   int _selectedAccountType = 1; // 1=Individual, 2=School, 3=Company, 4=Government
 
+  // Account type options with translation keys instead of hardcoded labels.
+  static const List<_AccountTypeOption> _accountTypes = [
+    _AccountTypeOption(id: 1, labelKey: 'userTypeIndividual', icon: Icons.person_outline_rounded),
+    _AccountTypeOption(id: 2, labelKey: 'userTypeSchool', icon: Icons.school_outlined),
+    _AccountTypeOption(id: 3, labelKey: 'userTypeCompany', icon: Icons.business_outlined),
+    _AccountTypeOption(id: 4, labelKey: 'userTypeGovernment', icon: Icons.account_balance_outlined),
+    _AccountTypeOption(id: 5, labelKey: 'userTypeCharity', icon: Icons.volunteer_activism_outlined),
+  ];
+
   // Step 2: Personal info
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -57,14 +67,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _organizationNameController = TextEditingController();
   final _ministerialNumberController = TextEditingController();
   final _freelanceDocNumberController = TextEditingController();
-
-  static const List<_AccountTypeOption> _accountTypes = [
-    _AccountTypeOption(id: 1, label: '\u0641\u0631\u062f', icon: Icons.person_outline_rounded),
-    _AccountTypeOption(id: 2, label: '\u0645\u062f\u0631\u0633\u0629', icon: Icons.school_outlined),
-    _AccountTypeOption(id: 3, label: '\u0634\u0631\u0643\u0629', icon: Icons.business_outlined),
-    _AccountTypeOption(id: 4, label: '\u062c\u0647\u0629 \u062d\u0643\u0648\u0645\u064a\u0629', icon: Icons.account_balance_outlined),
-    _AccountTypeOption(id: 5, label: '\u062c\u0645\u0639\u064a\u0629 \u062e\u064a\u0631\u064a\u0629', icon: Icons.volunteer_activism_outlined),
-  ];
 
   // Regions and cities – loaded from static data (no network needed)
   late final List<Map<String, dynamic>> _regions = SaRegions.regions
@@ -272,9 +274,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final registerState = ref.watch(registerControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     ref.listen<RegisterState>(registerControllerProvider, (prev, next) {
-      // ── Handle field-specific errors (show inline) ──
+      // Handle field-specific errors (show inline)
       if (next.fieldErrors != null && next.fieldErrors!.isNotEmpty) {
         setState(() => _serverErrors = Map.from(next.fieldErrors!));
 
@@ -291,7 +294,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         }
       }
 
-      // ── Handle generic error (show snackbar) ──
+      // Handle generic error (show snackbar)
       if (next.error != null) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
@@ -311,7 +314,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
       }
 
-      // ── Handle success ──
+      // Handle success
       final response = next.response;
       if (response != null) {
         if (response.isAuthenticated) {
@@ -337,9 +340,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             size: 20,
           ),
         ),
-        title: const Text(
-          '\u062a\u0633\u062c\u064a\u0644 \u062d\u0633\u0627\u0628 \u062c\u062f\u064a\u062f',
-          style: TextStyle(
+        title: Text(
+          t.translate('registerNewAccount'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -370,9 +373,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildStep1AccountType(),
-                  _buildStep2PersonalInfo(),
-                  _buildStep3Documents(),
+                  _buildStep1AccountType(t),
+                  _buildStep2PersonalInfo(t),
+                  _buildStep3Documents(t),
                 ],
               ),
             ),
@@ -415,8 +418,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         )
                       : Text(
                           _currentStep < _totalSteps - 1
-                              ? '\u0627\u0644\u062a\u0627\u0644\u064a'
-                              : '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628',
+                              ? t.translate('next')
+                              : t.translate('createAccount'),
                           style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 16,
@@ -498,16 +501,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Step 1: Account type
   // ---------------------------------------------------------------------------
 
-  Widget _buildStep1AccountType() {
+  Widget _buildStep1AccountType(AppLocalizations t) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          const Text(
-            '\u0627\u062e\u062a\u0631 \u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628',
-            style: TextStyle(
+          Text(
+            t.translate('selectAccountType'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -515,9 +518,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '\u062d\u062f\u062f \u0646\u0648\u0639 \u062d\u0633\u0627\u0628\u0643 \u0644\u0644\u062d\u0635\u0648\u0644 \u0639\u0644\u0649 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629',
-            style: TextStyle(
+          Text(
+            t.translate('selectAccountTypeDesc'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -569,7 +572,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        type.label,
+                        t.translate(type.labelKey),
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 16,
@@ -617,7 +620,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Step 2: Personal info
   // ---------------------------------------------------------------------------
 
-  Widget _buildStep2PersonalInfo() {
+  Widget _buildStep2PersonalInfo(AppLocalizations t) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Form(
@@ -626,9 +629,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
-            const Text(
-              '\u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0634\u062e\u0635\u064a\u0629',
-              style: TextStyle(
+            Text(
+              t.translate('personalInfo'),
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -636,9 +639,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              '\u0623\u062f\u062e\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0627\u0644\u0634\u062e\u0635\u064a\u0629',
-              style: TextStyle(
+            Text(
+              t.translate('enterPersonalInfo'),
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -647,21 +650,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 20),
 
             // Full name
-            _buildLabel('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0643\u0627\u0645\u0644'),
+            _buildLabel(t.translate('fullName')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _nameController,
-              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0643\u0627\u0645\u0644',
+              hint: t.translate('enterFullName'),
               icon: Icons.person_outline_rounded,
               onChanged: (_) => _clearFieldError('name'),
               validator: (v) =>
-                  v == null || v.trim().isEmpty ? '\u0627\u0644\u0627\u0633\u0645 \u0645\u0637\u0644\u0648\u0628' : null,
+                  v == null || v.trim().isEmpty ? t.translate('nameRequired') : null,
             ),
             _fieldErrorWidget('name'),
             const SizedBox(height: 16),
 
             // Email
-            _buildLabel('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a'),
+            _buildLabel(t.translate('email')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _emailController,
@@ -670,10 +673,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               keyboardType: TextInputType.emailAddress,
               onChanged: (_) => _clearFieldError('email'),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0645\u0637\u0644\u0648\u0628';
+                if (v == null || v.trim().isEmpty) return t.translate('emailRequiredMsg');
                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                     .hasMatch(v.trim())) {
-                  return '\u0628\u0631\u064a\u062f \u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0635\u0627\u0644\u062d';
+                  return t.translate('invalidEmailFormat');
                 }
                 return null;
               },
@@ -682,7 +685,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Phone number
-            _buildLabel('\u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644'),
+            _buildLabel(t.translate('phone')),
             const SizedBox(height: 8),
             PhoneInputField(
               controller: _phoneController,
@@ -697,16 +700,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Username
-            _buildLabel('\u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645'),
+            _buildLabel(t.translate('username')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _usernameController,
-              hint: '\u0623\u062f\u062e\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+              hint: t.translate('enterUsername'),
               icon: Icons.alternate_email_rounded,
               onChanged: (_) => _clearFieldError('username'),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return '\u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0645\u0637\u0644\u0648\u0628';
-                if (v.trim().length < 3) return '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u062f\u0646\u0649 3 \u0623\u062d\u0631\u0641';
+                if (v == null || v.trim().isEmpty) return t.translate('usernameRequiredMsg');
+                if (v.trim().length < 3) return t.translate('usernameMinLength3');
                 return null;
               },
             ),
@@ -714,20 +717,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Password
-            _buildLabel('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631'),
+            _buildLabel(t.translate('password')),
             const SizedBox(height: 8),
             _buildPasswordFormField(
               controller: _passwordController,
-              hint: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+              hint: t.translate('enterPassword'),
               obscure: _obscurePassword,
               onToggle: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
               onChanged: (_) => _clearFieldError('password'),
               validator: (v) {
-                if (v == null || v.isEmpty) return '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629';
-                if (v.length < 8) return '8 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
+                if (v == null || v.isEmpty) return t.translate('passwordRequiredMsg');
+                if (v.length < 8) return t.translate('passwordMinLength8');
                 if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(v)) {
-                  return '\u064a\u062c\u0628 \u0623\u0646 \u062a\u062d\u062a\u0648\u064a \u0639\u0644\u0649 \u0631\u0645\u0632 \u062e\u0627\u0635 (!@#\$%^&*)';
+                  return t.translate('passwordNeedsSpecialChar');
                 }
                 return null;
               },
@@ -736,18 +739,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Confirm password
-            _buildLabel('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631'),
+            _buildLabel(t.translate('confirmPassword')),
             const SizedBox(height: 8),
             _buildPasswordFormField(
               controller: _confirmPasswordController,
-              hint: '\u0623\u0639\u062f \u0625\u062f\u062e\u0627\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+              hint: t.translate('confirmPasswordHint'),
               obscure: _obscureConfirmPassword,
               onToggle: () =>
                   setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               onChanged: (_) => _clearFieldError('password_confirmation'),
               validator: (v) {
                 if (v != _passwordController.text) {
-                  return '\u0643\u0644\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u0629';
+                  return t.translate('passwordsDoNotMatch');
                 }
                 return null;
               },
@@ -756,14 +759,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Gender
-            _buildLabel('\u0627\u0644\u062c\u0646\u0633'),
+            _buildLabel(t.translate('genderLabel')),
             const SizedBox(height: 8),
             _buildDropdown<String>(
               value: _selectedGender,
-              hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u062c\u0646\u0633',
-              items: const [
-                DropdownMenuItem(value: 'M', child: Text('\u0630\u0643\u0631', style: TextStyle(fontFamily: 'Cairo'))),
-                DropdownMenuItem(value: 'F', child: Text('\u0623\u0646\u062b\u0649', style: TextStyle(fontFamily: 'Cairo'))),
+              hint: t.translate('selectGender'),
+              items: [
+                DropdownMenuItem(value: 'M', child: Text(t.translate('male'), style: const TextStyle(fontFamily: 'Cairo'))),
+                DropdownMenuItem(value: 'F', child: Text(t.translate('female'), style: const TextStyle(fontFamily: 'Cairo'))),
               ],
               onChanged: (v) {
                 setState(() => _selectedGender = v);
@@ -774,11 +777,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // Region
-            _buildLabel('\u0627\u0644\u0645\u0646\u0637\u0642\u0629'),
+            _buildLabel(t.translate('regionLabel')),
             const SizedBox(height: 8),
             _buildDropdown<String>(
               value: _selectedRegion,
-              hint: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629',
+              hint: t.translate('selectRegion'),
               items: _regions
                   .map((r) => DropdownMenuItem(
                         value: r['id'] as String,
@@ -800,13 +803,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
 
             // City
-            _buildLabel('\u0627\u0644\u0645\u062f\u064a\u0646\u0629'),
+            _buildLabel(t.translate('cityLabel')),
             const SizedBox(height: 8),
             _buildDropdown<String>(
               value: _selectedCity,
               hint: _selectedRegion == null
-                  ? '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0623\u0648\u0644\u0627\u064b'
-                  : '\u0627\u062e\u062a\u0631 \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
+                  ? t.translate('selectRegionFirst')
+                  : t.translate('selectCity'),
               items: _cities
                   .map((c) => DropdownMenuItem(
                         value: c['id'] as String,
@@ -831,16 +834,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Step 3: Documents
   // ---------------------------------------------------------------------------
 
-  Widget _buildStep3Documents() {
+  Widget _buildStep3Documents(AppLocalizations t) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          const Text(
-            '\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a',
-            style: TextStyle(
+          Text(
+            t.translate('documentsTitle'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -848,9 +851,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '\u0627\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 \u0644\u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062a\u0633\u062c\u064a\u0644',
-            style: TextStyle(
+          Text(
+            t.translate('uploadRequiredDocs'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -861,25 +864,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           // Organization fields (for non-individual accounts)
           if (_selectedAccountType != 1) ...[
             _buildLabel(_selectedAccountType == 2
-                ? '\u0627\u0633\u0645 \u0627\u0644\u0645\u062f\u0631\u0633\u0629'
+                ? t.translate('schoolName')
                 : _selectedAccountType == 3
-                    ? '\u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629'
-                    : '\u0627\u0633\u0645 \u0627\u0644\u062c\u0647\u0629'),
+                    ? t.translate('companyName')
+                    : t.translate('entityName')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _organizationNameController,
-              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0627\u0633\u0645',
+              hint: t.translate('enterNameHint'),
               icon: Icons.business_outlined,
               onChanged: (_) => _clearFieldError('organization_name'),
             ),
             _fieldErrorWidget('organization_name'),
             const SizedBox(height: 16),
 
-            _buildLabel('\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u0648\u0632\u0627\u0631\u064a / \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a'),
+            _buildLabel(t.translate('ministerialOrCommercial')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _ministerialNumberController,
-              hint: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0631\u0642\u0645',
+              hint: t.translate('enterNumber'),
               icon: Icons.numbers_rounded,
               onChanged: (_) => _clearFieldError('ministerial_number'),
             ),
@@ -889,11 +892,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
           // Freelance document number (for individuals)
           if (_selectedAccountType == 1) ...[
-            _buildLabel('\u0631\u0642\u0645 \u0648\u062B\u064A\u0642\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062D\u0631'), // رقم وثيقة العمل الحر
+            _buildLabel(t.translate('freelanceDocNumber')),
             const SizedBox(height: 8),
             _buildTextFormField(
               controller: _freelanceDocNumberController,
-              hint: '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0648\u062B\u064A\u0642\u0629', // أدخل رقم الوثيقة
+              hint: t.translate('enterDocNumber'),
               icon: Icons.numbers_rounded,
               onChanged: (_) => _clearFieldError('freelance_document_number'),
             ),
@@ -903,8 +906,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
           // Document upload
           _buildLabel(_selectedAccountType == 1
-              ? '\u0648\u062b\u064a\u0642\u0629 \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u062d\u0631' // وثيقة العمل الحر
-              : '\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a / \u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u0627\u0644\u0631\u0633\u0645\u064a\u0629'),
+              ? t.translate('freelanceDoc')
+              : t.translate('commercialOrOfficial')),
           const SizedBox(height: 8),
           _buildFileUploadArea(
             file: _documentFile,
@@ -913,7 +916,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               _clearFieldError('freelance_document_file');
               _clearFieldError('commercial_register_file');
             },
-            label: '\u0627\u0636\u063a\u0637 \u0644\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f',
+            label: t.translate('tapToUploadDoc'),
             sublabel: 'PDF, JPG, PNG',
           ),
           _fieldErrorWidget('freelance_document_file'),
@@ -921,7 +924,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           const SizedBox(height: 24),
 
           // Profile photo
-          _buildLabel('\u0627\u0644\u0635\u0648\u0631\u0629 \u0627\u0644\u0634\u062e\u0635\u064a\u0629 (\u0627\u062e\u062a\u064a\u0627\u0631\u064a)'),
+          _buildLabel(t.translate('profilePhotoOptional')),
           const SizedBox(height: 8),
           Center(
             child: GestureDetector(
@@ -941,15 +944,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       : null,
                 ),
                 child: _profilePhoto == null
-                    ? const Column(
+                    ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt_outlined,
+                          const Icon(Icons.camera_alt_outlined,
                               color: AppColors.textSecondary, size: 28),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            '\u0631\u0641\u0639 \u0635\u0648\u0631\u0629',
-                            style: TextStyle(
+                            t.translate('uploadPhoto'),
+                            style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 10,
                               color: AppColors.textSecondary,
@@ -1263,11 +1266,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 class _AccountTypeOption {
   const _AccountTypeOption({
     required this.id,
-    required this.label,
+    required this.labelKey,
     required this.icon,
   });
 
   final int id;
-  final String label;
+  /// Translation key for the label (resolved at build time).
+  final String labelKey;
   final IconData icon;
 }

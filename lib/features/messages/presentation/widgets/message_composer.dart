@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 
 /// Multi-line text field for composing SMS message body.
@@ -29,18 +30,18 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
 
   /// Available message variables that can be inserted.
   static const List<_Variable> _variables = [
-    _Variable('student_name', 'اسم الطالب'),
-    _Variable('customer_name', 'اسم العميل'),
-    _Variable('guardian_name', 'اسم ولي الأمر'),
-    _Variable('teacher_name', 'اسم المعلم'),
-    _Variable('class_name', 'اسم الفصل'),
-    _Variable('school_name', 'اسم المدرسة'),
-    _Variable('date', 'التاريخ'),
-    _Variable('time', 'الوقت'),
-    _Variable('grade', 'الدرجة'),
-    _Variable('absence_date', 'تاريخ الغياب'),
-    _Variable('company_name', 'اسم الشركة'),
-    _Variable('order_number', 'رقم الطلب'),
+    _Variable('student_name', 'msg_var_student_name'),
+    _Variable('customer_name', 'msg_var_customer_name'),
+    _Variable('guardian_name', 'msg_var_guardian_name'),
+    _Variable('teacher_name', 'msg_var_teacher_name'),
+    _Variable('class_name', 'msg_var_class_name'),
+    _Variable('school_name', 'msg_var_school_name'),
+    _Variable('date', 'msg_var_date'),
+    _Variable('time', 'msg_var_time'),
+    _Variable('grade', 'msg_var_grade'),
+    _Variable('absence_date', 'msg_var_absence_date'),
+    _Variable('company_name', 'msg_var_company_name'),
+    _Variable('order_number', 'msg_var_order_number'),
   ];
 
   @override
@@ -102,7 +103,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
@@ -113,8 +114,8 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'إدراج متغير',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.translate('msg_insert_variable'),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -154,7 +155,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                           ),
                         ),
                         title: Text(
-                          variable.label,
+                          AppLocalizations.of(context)!.translate(variable.labelKey),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textPrimary,
@@ -197,9 +198,9 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
         // ─── Label Row ───────────────────────────────────────────
         Row(
           children: [
-            const Text(
-              'نص الرسالة',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('msg_message_body_label'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -223,7 +224,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                       color: AppColors.primaryBorder,
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
@@ -233,8 +234,8 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                       ),
                       SizedBox(width: 4),
                       Text(
-                        'قالب',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.translate('msg_template_btn'),
+                        style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,
@@ -259,7 +260,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: AppColors.infoBorder),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
@@ -269,8 +270,8 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                     ),
                     SizedBox(width: 4),
                     Text(
-                      'متغير',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.translate('msg_variable_btn'),
+                      style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.info,
                         fontWeight: FontWeight.w500,
@@ -299,7 +300,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
             height: 1.6,
           ),
           decoration: InputDecoration(
-            hintText: 'اكتب نص الرسالة هنا...',
+            hintText: AppLocalizations.of(context)!.translate('msg_body_hint'),
             hintStyle: const TextStyle(
               color: AppColors.textHint,
               fontSize: 14,
@@ -339,14 +340,14 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
               // Character count
               _CountIndicator(
                 icon: Icons.text_fields,
-                label: 'حرف',
+                label: AppLocalizations.of(context)!.translate('msg_char_label'),
                 value: smsCount.characterCount,
               ),
               const SizedBox(width: 20),
               // SMS segment count
               _CountIndicator(
                 icon: Icons.sms_outlined,
-                label: 'رسالة',
+                label: AppLocalizations.of(context)!.translate('msg_sms_label'),
                 value: smsCount.smsCount,
                 highlight: smsCount.smsCount > 1,
               ),
@@ -417,11 +418,11 @@ class _CountIndicator extends StatelessWidget {
 // ─── Variable Model ──────────────────────────────────────────────────────────
 
 class _Variable {
-  const _Variable(this.key, this.label);
+  const _Variable(this.key, this.labelKey);
 
   /// The variable key used in the message body (e.g. 'student_name').
   final String key;
 
-  /// Arabic display label.
-  final String label;
+  /// Localization key for display label.
+  final String labelKey;
 }

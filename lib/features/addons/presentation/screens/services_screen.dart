@@ -11,6 +11,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen displaying all available addons/services in a grid layout.
 ///
@@ -80,8 +81,8 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u062E\u062F\u0645\u0627\u062A', // الخدمات
+        title: Text(
+          AppLocalizations.of(context)!.translate('servicesTitle'),
         ),
       ),
       body: Column(
@@ -90,7 +91,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: AppSearchBar(
-              hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u062E\u062F\u0645\u0627\u062A...', // بحث في الخدمات...
+              hint: AppLocalizations.of(context)!.translate('searchServices'),
               onChanged: _onSearchChanged,
             ),
           ),
@@ -99,13 +100,13 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
             child: Row(
               children: [
                 _FilterChip(
-                  label: '\u0627\u0644\u0643\u0644', // الكل
+                  label: AppLocalizations.of(context)!.translate('all'),
                   isSelected: !_showActiveOnly,
                   onTap: () => setState(() => _showActiveOnly = false),
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: '\u0627\u0644\u0645\u0641\u0639\u0644\u0629', // المفعلة
+                  label: AppLocalizations.of(context)!.translate('activeFilter'),
                   isSelected: _showActiveOnly,
                   onTap: () => setState(() => _showActiveOnly = true),
                 ),
@@ -139,9 +140,9 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
       return AppEmptyState(
         icon: Icons.extension_outlined,
         title: _showActiveOnly
-            ? '\u0644\u0627 \u062A\u0648\u062C\u062F \u062E\u062F\u0645\u0627\u062A \u0645\u0641\u0639\u0644\u0629' // لا توجد خدمات مفعلة
-            : '\u0644\u0627 \u062A\u0648\u062C\u062F \u062E\u062F\u0645\u0627\u062A', // لا توجد خدمات
-        description: '\u0627\u0633\u062A\u0643\u0634\u0641 \u0627\u0644\u062E\u062F\u0645\u0627\u062A \u0627\u0644\u0645\u062A\u0627\u062D\u0629 \u0644\u062A\u0648\u0633\u064A\u0639 \u0625\u0645\u0643\u0627\u0646\u064A\u0627\u062A \u062D\u0633\u0627\u0628\u0643', // استكشف الخدمات المتاحة لتوسيع إمكانيات حسابك
+            ? AppLocalizations.of(context)!.translate('noActiveServices')
+            : AppLocalizations.of(context)!.translate('noServices'),
+        description: AppLocalizations.of(context)!.translate('exploreServices'),
       );
     }
 

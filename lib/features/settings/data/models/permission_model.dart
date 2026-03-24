@@ -61,7 +61,7 @@ class PermissionGroup {
   static List<PermissionGroup> groupPermissions(List<PermissionModel> all) {
     final Map<String, List<PermissionModel>> grouped = {};
     for (final permission in all) {
-      final groupName = permission.group ?? 'عام';
+      final groupName = permission.group ?? 'permission_group_general';
       grouped.putIfAbsent(groupName, () => []).add(permission);
     }
     return grouped.entries

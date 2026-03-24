@@ -11,27 +11,24 @@
 
 /// The 10 archive types supported by the ORBIT SMS V3 API.
 enum ArchiveType {
-  general('general', 'الأرشيف العام', 'General', false),
-  customMessages('custom_messages', 'الرسائل المخصصة', 'Custom Messages', true),
-  absenceLateness('absence_lateness', 'الغياب والتأخر', 'Absence & Lateness', true),
-  teacherMessages('teacher_messages', 'رسائل المعلمين', 'Teacher Messages', true),
-  longMessages('long_messages', 'الرسائل الطويلة', 'Long Messages', false),
-  voiceMessages('voice_messages', 'الرسائل الصوتية', 'Voice Messages', false),
-  fileMessages('file_messages', 'رسائل الملفات', 'File Messages', false),
-  thanksCertifications('thanks_certifications', 'شهادات الشكر', 'Thanks & Certifications', true),
-  vipCards('vip_cards', 'بطاقات VIP', 'VIP Cards', true),
-  bulkMessages('bulk_messages', 'الرسائل الجماعية', 'Bulk Messages', false);
+  general('general', 'archive_type_general', false),
+  customMessages('custom_messages', 'archive_type_custom_messages', true),
+  absenceLateness('absence_lateness', 'archive_type_absence_lateness', true),
+  teacherMessages('teacher_messages', 'archive_type_teacher_messages', true),
+  longMessages('long_messages', 'archive_type_long_messages', false),
+  voiceMessages('voice_messages', 'archive_type_voice_messages', false),
+  fileMessages('file_messages', 'archive_type_file_messages', false),
+  thanksCertifications('thanks_certifications', 'archive_type_thanks_certifications', true),
+  vipCards('vip_cards', 'archive_type_vip_cards', true),
+  bulkMessages('bulk_messages', 'archive_type_bulk_messages', false);
 
-  const ArchiveType(this.apiValue, this.labelAr, this.labelEn, this.isSchoolOnly);
+  const ArchiveType(this.apiValue, this.labelKey, this.isSchoolOnly);
 
   /// The value sent to the API in the `archive_type` field.
   final String apiValue;
 
-  /// Arabic display label.
-  final String labelAr;
-
-  /// English display label.
-  final String labelEn;
+  /// Localization key for the display label.
+  final String labelKey;
 
   /// Whether this archive type is only available for school accounts (userTypeId == 2).
   final bool isSchoolOnly;
@@ -42,10 +39,6 @@ enum ArchiveType {
     if (userTypeId == 2) return values;
     return values.where((t) => !t.isSchoolOnly).toList();
   }
-
-  /// Returns the localized label based on the language code.
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
 
   /// Parses an API string value into an [ArchiveType].
   ///
@@ -64,19 +57,15 @@ enum ArchiveType {
 
 /// Filter options for the `send_at` field.
 enum SendAtFilter {
-  all('', 'الكل', 'All'),
-  now('now', 'فوري', 'Now'),
-  later('later', 'مجدول', 'Scheduled'),
-  api('api', 'عبر API', 'Via API');
+  all('', 'archive_send_at_all'),
+  now('now', 'archive_send_at_now'),
+  later('later', 'archive_send_at_later'),
+  api('api', 'archive_send_at_api');
 
-  const SendAtFilter(this.apiValue, this.labelAr, this.labelEn);
+  const SendAtFilter(this.apiValue, this.labelKey);
 
   final String apiValue;
-  final String labelAr;
-  final String labelEn;
-
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
+  final String labelKey;
 
   static SendAtFilter fromApiValue(String value) {
     return SendAtFilter.values.firstWhere(
@@ -92,24 +81,20 @@ enum SendAtFilter {
 
 /// Status of an archived message.
 enum ArchiveMessageStatus {
-  sent('sent', 'مرسلة', 'Sent'),
-  delivered('delivered', 'تم التسليم', 'Delivered'),
-  pending('pending', 'قيد الانتظار', 'Pending'),
-  failed('failed', 'فشلت', 'Failed'),
-  rejected('rejected', 'مرفوضة', 'Rejected'),
-  scheduled('scheduled', 'مجدولة', 'Scheduled'),
-  cancelled('cancelled', 'ملغاة', 'Cancelled'),
-  expired('expired', 'منتهية', 'Expired'),
-  unknown('unknown', 'غير معروف', 'Unknown');
+  sent('sent', 'archive_status_sent'),
+  delivered('delivered', 'archive_status_delivered'),
+  pending('pending', 'archive_status_pending'),
+  failed('failed', 'archive_status_failed'),
+  rejected('rejected', 'archive_status_rejected'),
+  scheduled('scheduled', 'archive_status_scheduled'),
+  cancelled('cancelled', 'archive_status_cancelled'),
+  expired('expired', 'archive_status_expired'),
+  unknown('unknown', 'archive_status_unknown');
 
-  const ArchiveMessageStatus(this.apiValue, this.labelAr, this.labelEn);
+  const ArchiveMessageStatus(this.apiValue, this.labelKey);
 
   final String apiValue;
-  final String labelAr;
-  final String labelEn;
-
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
+  final String labelKey;
 
   static ArchiveMessageStatus fromApiValue(String? value) {
     if (value == null || value.isEmpty) return ArchiveMessageStatus.unknown;

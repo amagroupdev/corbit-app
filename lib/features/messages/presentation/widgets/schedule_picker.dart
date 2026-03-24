@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 
@@ -23,9 +24,9 @@ class SchedulePicker extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ─── Label ──────────────────────────────────────────────
-        const Text(
-          'وقت الإرسال',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.translate('msg_send_time_label'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -46,7 +47,7 @@ class SchedulePicker extends ConsumerWidget {
               // Send now
               Expanded(
                 child: _ToggleOption(
-                  label: 'إرسال الآن',
+                  label: AppLocalizations.of(context)!.translate('msg_send_now'),
                   icon: Icons.send_rounded,
                   isSelected: !isScheduled,
                   onTap: () {
@@ -59,7 +60,7 @@ class SchedulePicker extends ConsumerWidget {
               // Schedule
               Expanded(
                 child: _ToggleOption(
-                  label: 'إرسال لاحقاً',
+                  label: AppLocalizations.of(context)!.translate('msg_send_later'),
                   icon: Icons.schedule,
                   isSelected: isScheduled,
                   onTap: () {
@@ -236,12 +237,14 @@ class _ScheduleDateTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    final locale = t.currentLocaleCode;
     final dateStr = selectedDateTime != null
-        ? DateFormat('yyyy/MM/dd', 'ar').format(selectedDateTime!)
-        : 'اختر التاريخ';
+        ? DateFormat('yyyy/MM/dd', locale).format(selectedDateTime!)
+        : t.translate('msg_pick_date');
     final timeStr = selectedDateTime != null
-        ? DateFormat('hh:mm a', 'ar').format(selectedDateTime!)
-        : 'اختر الوقت';
+        ? DateFormat('hh:mm a', locale).format(selectedDateTime!)
+        : t.translate('msg_pick_time');
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -255,7 +258,7 @@ class _ScheduleDateTime extends StatelessWidget {
           // Date picker row
           _PickerRow(
             icon: Icons.calendar_today_outlined,
-            label: 'التاريخ',
+            label: t.translate('msg_date_label'),
             value: dateStr,
             isPlaceholder: selectedDateTime == null,
             onTap: () => _pickDate(context),
@@ -269,7 +272,7 @@ class _ScheduleDateTime extends StatelessWidget {
           // Time picker row
           _PickerRow(
             icon: Icons.access_time_outlined,
-            label: 'الوقت',
+            label: t.translate('msg_time_label'),
             value: timeStr,
             isPlaceholder: selectedDateTime == null,
             onTap: () => _pickTime(context),
@@ -299,7 +302,7 @@ class _ScheduleDateTime extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'سيتم الإرسال في $dateStr الساعة $timeStr',
+                      t.translateWithParams('msg_scheduled_summary', {'date': dateStr, 'time': timeStr}),
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,

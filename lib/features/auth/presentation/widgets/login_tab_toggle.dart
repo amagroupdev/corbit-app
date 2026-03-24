@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Defines the two login modes available on the login screen.
 enum LoginMode { phone, username }
@@ -25,6 +26,8 @@ class LoginTabToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     return Container(
       height: 48,
       decoration: BoxDecoration(
@@ -35,12 +38,12 @@ class LoginTabToggle extends StatelessWidget {
       child: Row(
         children: [
           _buildTab(
-            label: 'رقم الجوال',
+            label: t.translate('loginTabPhone'),
             icon: Icons.phone_android_rounded,
             mode: LoginMode.phone,
           ),
           _buildTab(
-            label: 'إسم المستخدم',
+            label: t.translate('loginTabUsername'),
             icon: Icons.person_outline_rounded,
             mode: LoginMode.username,
           ),

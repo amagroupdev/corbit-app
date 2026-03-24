@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/data/models/balance_model.dart';
 
 /// A gradient card displaying the user's current balance summary.
@@ -18,6 +19,7 @@ class BalanceSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('yyyy/MM/dd');
     final numberFormat = NumberFormat('#,##0', 'ar');
 
@@ -42,8 +44,8 @@ class BalanceSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '\u0631\u0635\u064A\u062F\u0643 \u0627\u0644\u062D\u0627\u0644\u064A',
+              Text(
+                t.translate('currentBalanceLabel'),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -83,8 +85,8 @@ class BalanceSummaryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '\u0631\u0633\u0627\u0644\u0629 \u0645\u062A\u0627\u062D\u0629',
+          Text(
+            t.translate('availableMessages'),
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -108,8 +110,8 @@ class BalanceSummaryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0627\u0646\u062A\u0647\u0627\u0621',
+                    Text(
+                      t.translate('expiryDate'),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white60,
@@ -150,8 +152,8 @@ class BalanceSummaryCard extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    const Text(
-                      '\u064A\u0648\u0645 \u0645\u062A\u0628\u0642\u064A',
+                    Text(
+                      t.translate('remainingDaysLabel'),
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.white70,

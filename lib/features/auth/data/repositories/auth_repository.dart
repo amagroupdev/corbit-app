@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/localization/ar.dart' as arabic;
+import 'package:orbit_app/core/localization/en.dart' as english;
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:orbit_app/features/auth/data/models/auth_response_model.dart';
@@ -47,11 +50,21 @@ class AuthRepository {
   const AuthRepository({
     required AuthRemoteDataSource dataSource,
     required SecureStorageService storageService,
+    this.locale = 'ar',
   })  : _dataSource = dataSource,
         _storageService = storageService;
 
   final AuthRemoteDataSource _dataSource;
   final SecureStorageService _storageService;
+
+  /// Current locale code for fallback message resolution.
+  final String locale;
+
+  /// Resolves a translation key using the current locale.
+  String _t(String key) {
+    final translations = locale == 'en' ? english.en : arabic.ar;
+    return translations[key] ?? key;
+  }
 
   // ---------------------------------------------------------------------------
   // Login
@@ -153,7 +166,7 @@ class AuthRepository {
   Future<Result<String>> resendOtp({required int userId}) async {
     return _guard(() async {
       final json = await _dataSource.resendOtp(userId: userId);
-      return json['message'] as String? ?? 'تم إرسال الرمز بنجاح';
+      return json['message'] as String? ?? _t('otpSentSuccess');
     });
   }
 
@@ -165,7 +178,7 @@ class AuthRepository {
   Future<Result<String>> forgotPassword({required String phone}) async {
     return _guard(() async {
       final json = await _dataSource.forgotPassword(phone: phone);
-      return json['message'] as String? ?? 'تم إرسال رمز التحقق';
+      return json['message'] as String? ?? _t('verificationCodeSent');
     });
   }
 
@@ -181,7 +194,7 @@ class AuthRepository {
         password: password,
         passwordConfirmation: passwordConfirmation,
       );
-      return json['message'] as String? ?? 'تم إعادة تعيين كلمة المرور بنجاح';
+      return json['message'] as String? ?? _t('passwordResetSuccess');
     });
   }
 
@@ -234,7 +247,7 @@ class AuthRepository {
     } on ApiException catch (e) {
       return Result.failure(e.message);
     } catch (e) {
-      return Result.failure('حدث خطأ غير متوقع. حاول مرة أخرى.');
+      return Result.failure(_t('unexpectedError'));
     }
   }
 }
@@ -247,5 +260,17 @@ class AuthRepository {
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final dataSource = ref.watch(authRemoteDataSourceProvider);
   final storage = ref.watch(secureStorageProvider);
-  return AuthRepository(dataSource: dataSource, storageService: storage);
+  // Import locale to provide locale-aware fallback messages.
+  // Using a try-catch because localeProvider may not be initialized yet.
+  String locale;
+  try {
+    locale = ref.watch(localeProvider).languageCode;
+  } catch (_) {
+    locale = 'ar';
+  }
+  return AuthRepository(
+    dataSource: dataSource,
+    storageService: storage,
+    locale: locale,
+  );
 });

@@ -9,6 +9,7 @@ import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/balance/data/models/bank_model.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/payment_method_selector.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
@@ -133,22 +134,22 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
               '/payment-webview',
               extra: {
                 'url': url.toString(),
-                'title': '\u0627\u0644\u062F\u0641\u0639 \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A', // الدفع الإلكتروني
+                'title': AppLocalizations.of(context)!.translate('onlinePayment'),
               },
             );
             if (mounted) {
               if (paymentResult == true) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('\u062A\u0645\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639 \u0628\u0646\u062C\u0627\u062D'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.translate('paymentSuccess')),
                     backgroundColor: AppColors.success,
                   ),
                 );
                 context.pop();
               } else if (paymentResult == false) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('\u0641\u0634\u0644\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.translate('paymentFailed')),
                     backgroundColor: AppColors.error,
                   ),
                 );
@@ -162,8 +163,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
       case 'bank_transfer':
         if (_selectedBank == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u064A\u0631\u062C\u0649 \u0627\u062E\u062A\u064A\u0627\u0631 \u0627\u0644\u0628\u0646\u0643'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('selectBankRequired')),
               backgroundColor: AppColors.error,
             ),
           );
@@ -179,8 +180,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
         );
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0637\u0644\u0628 \u0627\u0644\u0634\u0631\u0627\u0621 \u0628\u0646\u062C\u0627\u062D'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('purchaseRequestSent')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -195,8 +196,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
         );
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0645\u0632 \u0627\u0644\u062A\u062D\u0642\u0642'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('otpSentInfo')),
               backgroundColor: AppColors.info,
             ),
           );
@@ -220,10 +221,10 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
           await showDialog<void>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text(
-                '\u062A\u0645 \u0625\u0646\u0634\u0627\u0621 \u0641\u0627\u062A\u0648\u0631\u0629 \u0633\u062F\u0627\u062F',
+              title: Text(
+                AppLocalizations.of(context)!.translate('sadadInvoiceCreated'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -231,9 +232,9 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                   const Icon(Icons.check_circle, color: AppColors.success, size: 48),
                   const SizedBox(height: 12),
                   if (billRef.toString().isNotEmpty) ...[
-                    const Text(
-                      '\u0631\u0642\u0645 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629:',
-                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                    Text(
+                      AppLocalizations.of(context)!.translate('invoiceNumberLabel'),
+                      style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 4),
                     SelectableText(
@@ -248,13 +249,13 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                   if (expiresAt.toString().isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
-                      '\u0635\u0627\u0644\u062D\u0629 \u062D\u062A\u0649: ${expiresAt.toString().split('T').first}',
+                      '${AppLocalizations.of(context)!.translate('validUntil')} ${expiresAt.toString().split('T').first}',
                       style: const TextStyle(fontSize: 13, color: AppColors.textHint),
                     ),
                   ],
                   const SizedBox(height: 8),
-                  const Text(
-                    '\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u062F\u0641\u0639 \u0639\u0628\u0631 \u062A\u0637\u0628\u064A\u0642 \u0627\u0644\u0628\u0646\u0643 \u0623\u0648 \u0623\u062C\u0647\u0632\u0629 \u0627\u0644\u0635\u0631\u0627\u0641',
+                  Text(
+                    AppLocalizations.of(context)!.translate('payViaBankOrAtm'),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
@@ -263,7 +264,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('\u062A\u0645'),
+                  child: Text(AppLocalizations.of(context)!.translate('done')),
                 ),
               ],
             ),
@@ -284,8 +285,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u062A\u0645 \u0627\u0644\u0634\u0631\u0627\u0621 \u0628\u0646\u062C\u0627\u062D'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('purchaseSuccess')),
           backgroundColor: AppColors.success,
         ),
       );
@@ -296,14 +297,15 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(buyBalanceControllerProvider);
+    final t = AppLocalizations.of(context)!;
     final numberFormat = NumberFormat('#,##0.00', 'ar');
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0634\u0631\u0627\u0621 \u0631\u0635\u064A\u062F',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          AppLocalizations.of(context)!.translate('buyBalance'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -323,18 +325,18 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
             children: [
               // Amount input (SAR)
               AppTextField(
-                label: '\u0627\u0644\u0645\u0628\u0644\u063A (\u0631.\u0633)',
-                hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0645\u0628\u0644\u063A \u0628\u0627\u0644\u0631\u064A\u0627\u0644 \u0627\u0644\u0633\u0639\u0648\u062F\u064A',
+                label: t.translate('amountSar'),
+                hint: t.translate('enterAmountSar'),
                 controller: _amountController,
                 keyboardType: TextInputType.number,
                 onChanged: _onAmountChanged,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '\u0627\u0644\u0645\u0628\u0644\u063A \u0645\u0637\u0644\u0648\u0628';
+                    return t.translate('amountRequired');
                   }
                   final count = int.tryParse(value);
                   if (count == null || count <= 0) {
-                    return '\u0623\u062F\u062E\u0644 \u0645\u0628\u0644\u063A\u0627\u064B \u0635\u062D\u064A\u062D\u0627\u064B';
+                    return t.translate('enterValidAmount');
                   }
                   return null;
                 },
@@ -364,24 +366,24 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                   child: Column(
                     children: [
                       _buildCalcRow(
-                        '\u0627\u0644\u0645\u0628\u0644\u063A \u0627\u0644\u0623\u0633\u0627\u0633\u064A',
-                        '${numberFormat.format(state.calculation!['base_amount'] ?? 0)} \u0631.\u0633',
+                        t.translate('baseAmount'),
+                        '${numberFormat.format(state.calculation!['base_amount'] ?? 0)} ${t.translate('sar')}',
                       ),
                       const SizedBox(height: 8),
                       _buildCalcRow(
-                        '\u0627\u0644\u0636\u0631\u064A\u0628\u0629 (15%)',
-                        '${numberFormat.format(state.calculation!['vat_amount'] ?? 0)} \u0631.\u0633',
+                        t.translate('taxAmount'),
+                        '${numberFormat.format(state.calculation!['vat_amount'] ?? 0)} ${t.translate('sar')}',
                       ),
                       const Divider(height: 20),
                       _buildCalcRow(
-                        '\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A',
-                        '${numberFormat.format(state.calculation!['total_amount'] ?? 0)} \u0631.\u0633',
+                        t.translate('totalAmount'),
+                        '${numberFormat.format(state.calculation!['total_amount'] ?? 0)} ${t.translate('sar')}',
                         isBold: true,
                       ),
                       const SizedBox(height: 8),
                       _buildCalcRow(
-                        '\u0639\u062F\u062F \u0627\u0644\u0631\u0633\u0627\u0626\u0644',
-                        '${NumberFormat('#,##0', 'ar').format(state.calculation!['total_sms_credit'] ?? 0)} \u0631\u0633\u0627\u0644\u0629',
+                        t.translate('smsCountLabel'),
+                        '${NumberFormat('#,##0', 'ar').format(state.calculation!['total_sms_credit'] ?? 0)} ${t.translate('messageUnit')}',
                         isBold: true,
                       ),
                     ],
@@ -435,7 +437,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
 
                 // Purchase button
                 AppButton.primary(
-                  text: '\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0634\u0631\u0627\u0621',
+                  text: t.translate('confirmPurchase'),
                   onPressed: state.isPurchasing ? null : _handlePurchase,
                   isLoading: state.isPurchasing,
                   icon: Icons.shopping_cart_checkout,
@@ -452,14 +454,14 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.infoBorder),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.sms_outlined, color: AppColors.info, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.sms_outlined, color: AppColors.info, size: 20),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0645\u0632 \u0627\u0644\u062A\u062D\u0642\u0642 \u0625\u0644\u0649 \u0647\u0627\u062A\u0641\u0643 \u0639\u0628\u0631 STC Pay',
-                          style: TextStyle(
+                          t.translate('otpSentStcPay'),
+                          style: const TextStyle(
                             fontSize: 13,
                             color: AppColors.infoDark,
                           ),
@@ -470,15 +472,15 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: '\u0631\u0645\u0632 \u0627\u0644\u062A\u062D\u0642\u0642',
-                  hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0631\u0645\u0632 \u0627\u0644\u0645\u0631\u0633\u0644',
+                  label: t.translate('otpCode'),
+                  hint: t.translate('enterOtpCode'),
                   controller: _otpController,
                   keyboardType: TextInputType.number,
                   maxLength: 6,
                 ),
                 const SizedBox(height: 16),
                 AppButton.primary(
-                  text: '\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0631\u0645\u0632',
+                  text: t.translate('confirmOtp'),
                   onPressed: state.isPurchasing ? null : _handleVerifyOtp,
                   isLoading: state.isPurchasing,
                   icon: Icons.verified_outlined,
@@ -488,8 +490,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
               // Price tiers info
               if (state.priceTiers.isNotEmpty) ...[
                 const SizedBox(height: 32),
-                const Text(
-                  '\u062C\u062F\u0648\u0644 \u0627\u0644\u0623\u0633\u0639\u0627\u0631',
+                Text(
+                  t.translate('priceTable'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -517,13 +519,13 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                             top: Radius.circular(12),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
                             Expanded(
                               flex: 2,
                               child: Text(
-                                '\u0627\u0644\u0643\u0645\u064A\u0629',
-                                style: TextStyle(
+                                t.translate('quantity'),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
@@ -532,8 +534,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                             ),
                             Expanded(
                               child: Text(
-                                '\u0633\u0639\u0631 \u0627\u0644\u0631\u0633\u0627\u0644\u0629',
-                                style: TextStyle(
+                                t.translate('pricePerSms'),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
@@ -570,7 +572,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                               ),
                               Expanded(
                                 child: Text(
-                                  '${tier.pricePerSms.toStringAsFixed(3)} \u0631.\u0633',
+                                  '${tier.pricePerSms.toStringAsFixed(3)} ${t.translate('sar')}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -638,9 +640,9 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Bank selection
-        const Text(
-          '\u0627\u062E\u062A\u0631 \u0627\u0644\u0628\u0646\u0643',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.translate('selectBank'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
@@ -658,8 +660,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
             child: DropdownButton<BankModel>(
               value: _selectedBank,
               isExpanded: true,
-              hint: const Text(
-                '\u0627\u062E\u062A\u0631 \u0627\u0644\u0628\u0646\u0643',
+              hint: Text(
+                AppLocalizations.of(context)!.translate('selectBank'),
                 style: TextStyle(color: AppColors.inputHint),
               ),
               items: state.banks
@@ -688,9 +690,9 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildBankInfoRow(
-                    '\u0627\u0633\u0645 \u0627\u0644\u062D\u0633\u0627\u0628', _selectedBank!.accountName),
+                    AppLocalizations.of(context)!.translate('accountName'), _selectedBank!.accountName),
                 _buildBankInfoRow(
-                    '\u0631\u0642\u0645 \u0627\u0644\u062D\u0633\u0627\u0628', _selectedBank!.accountNumber),
+                    AppLocalizations.of(context)!.translate('accountNumber'), _selectedBank!.accountNumber),
                 if (_selectedBank!.iban.isNotEmpty)
                   _buildBankInfoRow('IBAN', _selectedBank!.iban),
               ],
@@ -701,14 +703,14 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
 
         // Depositor name
         AppTextField(
-          label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0648\u062F\u0639',
-          hint: '\u0627\u0633\u0645 \u0635\u0627\u062D\u0628 \u0627\u0644\u062D\u0648\u0627\u0644\u0629',
+          label: AppLocalizations.of(context)!.translate('depositorName'),
+          hint: AppLocalizations.of(context)!.translate('depositorNameHint'),
           controller: _depositorNameController,
           textCapitalization: TextCapitalization.words,
           validator: (value) {
             if (state.selectedPaymentMethod == 'bank_transfer' &&
                 (value == null || value.trim().isEmpty)) {
-              return '\u0627\u0633\u0645 \u0627\u0644\u0645\u0648\u062F\u0639 \u0645\u0637\u0644\u0648\u0628';
+              return AppLocalizations.of(context)!.translate('depositorNameRequired');
             }
             return null;
           },
@@ -717,8 +719,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
 
         // Transfer date
         AppTextField(
-          label: '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u062D\u0648\u064A\u0644',
-          hint: '\u0627\u062E\u062A\u0631 \u0627\u0644\u062A\u0627\u0631\u064A\u062E',
+          label: AppLocalizations.of(context)!.translate('transferDateLabel'),
+          hint: AppLocalizations.of(context)!.translate('selectDateLabel'),
           controller: _transferDateController,
           readOnly: true,
           onTap: _pickDate,
@@ -726,7 +728,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
           validator: (value) {
             if (state.selectedPaymentMethod == 'bank_transfer' &&
                 (value == null || value.trim().isEmpty)) {
-              return '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u062D\u0648\u064A\u0644 \u0645\u0637\u0644\u0648\u0628';
+              return AppLocalizations.of(context)!.translate('transferDateRequired');
             }
             return null;
           },
@@ -734,8 +736,8 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
         const SizedBox(height: 16),
 
         // Receipt upload
-        const Text(
-          '\u0625\u064A\u0635\u0627\u0644 \u0627\u0644\u062A\u062D\u0648\u064A\u0644 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)',
+        Text(
+          AppLocalizations.of(context)!.translate('receiptOptional'),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -770,7 +772,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    _receiptFileName ?? '\u0627\u0636\u063A\u0637 \u0644\u0631\u0641\u0639 \u0627\u0644\u0625\u064A\u0635\u0627\u0644',
+                    _receiptFileName ?? AppLocalizations.of(context)!.translate('tapToUploadReceipt'),
                     style: TextStyle(
                       fontSize: 14,
                       color: _receiptFileName != null
@@ -819,7 +821,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
     return Column(
       children: [
         AppTextField(
-          label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 (STC Pay)',
+          label: AppLocalizations.of(context)!.translate('phoneStcPay'),
           hint: '05xxxxxxxx',
           controller: _stcPhoneController,
           keyboardType: TextInputType.phone,
@@ -827,7 +829,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
             final state = ref.read(buyBalanceControllerProvider);
             if (state.selectedPaymentMethod == 'stc_pay' &&
                 (value == null || value.trim().isEmpty)) {
-              return '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628';
+              return AppLocalizations.of(context)!.translate('phoneRequired');
             }
             return null;
           },
@@ -840,7 +842,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
     return Column(
       children: [
         AppTextField(
-          label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641',
+          label: AppLocalizations.of(context)!.translate('phone'),
           hint: '05xxxxxxxx',
           controller: _sadadPhoneController,
           keyboardType: TextInputType.phone,
@@ -849,15 +851,15 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
             final state = ref.read(buyBalanceControllerProvider);
             if (state.selectedPaymentMethod == 'sadad' &&
                 (value == null || value.trim().isEmpty)) {
-              return '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628';
+              return AppLocalizations.of(context)!.translate('phoneRequired');
             }
             return null;
           },
         ),
         const SizedBox(height: 16),
         AppTextField(
-          label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0648\u064A\u0629 \u0627\u0644\u0648\u0637\u0646\u064A\u0629',
-          hint: '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0647\u0648\u064A\u0629',
+          label: AppLocalizations.of(context)!.translate('nationalId'),
+          hint: AppLocalizations.of(context)!.translate('enterNationalId'),
           controller: _nationalIdController,
           keyboardType: TextInputType.number,
           maxLength: 10,
@@ -865,7 +867,7 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
             final state = ref.read(buyBalanceControllerProvider);
             if (state.selectedPaymentMethod == 'sadad' &&
                 (value == null || value.trim().isEmpty)) {
-              return '\u0631\u0642\u0645 \u0627\u0644\u0647\u0648\u064A\u0629 \u0645\u0637\u0644\u0648\u0628';
+              return AppLocalizations.of(context)!.translate('nationalIdRequired');
             }
             return null;
           },

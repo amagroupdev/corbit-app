@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/transaction_card.dart';
 
@@ -99,6 +100,7 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
   Widget build(BuildContext context) {
     super.build(context);
     final state = ref.watch(transactionsControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       children: [
@@ -116,7 +118,7 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
                       controller: _searchController,
                       onChanged: _onSearchChanged,
                       decoration: InputDecoration(
-                        hintText: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0633\u062C\u0644...',
+                        hintText: t.translate('searchLog'),
                         hintStyle: const TextStyle(
                           color: AppColors.inputHint,
                           fontSize: 14,
@@ -174,8 +176,8 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
                       onTap: () {
                         // Export functionality placeholder
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('\u0633\u064A\u062A\u0645 \u062A\u0635\u062F\u064A\u0631 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0642\u0631\u064A\u0628\u0627\u064B'),
+                          SnackBar(
+                            content: Text(t.translate('exportData')),
                             backgroundColor: AppColors.info,
                           ),
                         );
@@ -202,31 +204,31 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
                   scrollDirection: Axis.horizontal,
                   children: [
                     _buildFilterChip(
-                      '\u0627\u0644\u0643\u0644',
+                      t.translate('all'),
                       null,
                       state.statusFilter,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
-                      '\u0645\u0642\u0628\u0648\u0644\u0629',
+                      t.translate('accepted'),
                       'approved',
                       state.statusFilter,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
-                      '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631',
+                      t.translate('statusPending'),
                       'pending',
                       state.statusFilter,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
-                      '\u0645\u0631\u0641\u0648\u0636\u0629',
+                      t.translate('rejected'),
                       'rejected',
                       state.statusFilter,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
-                      '\u0645\u0646\u062A\u0647\u064A',
+                      t.translate('expired'),
                       'expired',
                       state.statusFilter,
                     ),
@@ -275,7 +277,7 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '${state.total} \u0639\u0645\u0644\u064A\u0629',
+                  '${state.total} ${t.translate('transactionCount')}',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -390,17 +392,17 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0639\u0645\u0644\u064A\u0627\u062A',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('noTransactionsFound'),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0639\u0645\u0644\u064A\u0627\u062A \u0645\u0637\u0627\u0628\u0642\u0629',
+            Text(
+              AppLocalizations.of(context)!.translate('noTransactionsMatchFound'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -437,7 +439,7 @@ class _BalanceLogTabState extends ConsumerState<BalanceLogTab>
             TextButton.icon(
               onPressed: _onRefresh,
               icon: const Icon(Icons.refresh),
-              label: const Text('\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629'),
+              label: Text(AppLocalizations.of(context)!.translate('retry')),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],

@@ -281,12 +281,12 @@ class ArchiveActionsNotifier extends StateNotifier<ArchiveActionState> {
         listNotifier.removeItemsByIds(messageIds);
         state = state.copyWith(
           isDeleting: false,
-          successMessage: 'تم حذف الرسائل بنجاح',
+          successMessage: 'archive_messages_deleted',
         );
       } else {
         state = state.copyWith(
           isDeleting: false,
-          errorMessage: 'فشل حذف الرسائل',
+          errorMessage: 'archive_delete_failed',
         );
       }
 
@@ -322,12 +322,12 @@ class ArchiveActionsNotifier extends StateNotifier<ArchiveActionState> {
         listNotifier.removeItemsByIds(messageIds);
         state = state.copyWith(
           isCancelling: false,
-          successMessage: 'تم إلغاء الرسائل المعلقة بنجاح',
+          successMessage: 'archive_cancel_pending_success',
         );
       } else {
         state = state.copyWith(
           isCancelling: false,
-          errorMessage: 'فشل إلغاء الرسائل',
+          errorMessage: 'archive_cancel_pending_failed',
         );
       }
 
@@ -363,12 +363,12 @@ class ArchiveActionsNotifier extends StateNotifier<ArchiveActionState> {
         listNotifier.removeItemsByIds(messageIds);
         state = state.copyWith(
           isRestoring: false,
-          successMessage: 'تم استعادة الرسائل بنجاح',
+          successMessage: 'archive_messages_restored',
         );
       } else {
         state = state.copyWith(
           isRestoring: false,
-          errorMessage: 'فشل استعادة الرسائل',
+          errorMessage: 'archive_restore_failed',
         );
       }
 
@@ -403,7 +403,7 @@ class ArchiveActionsNotifier extends StateNotifier<ArchiveActionState> {
 
       state = state.copyWith(
         isExporting: false,
-        successMessage: url ?? 'تم طلب التصدير بنجاح',
+        successMessage: url ?? 'archive_export_requested',
       );
 
       return url;

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/routing/route_names.dart';
 import 'package:orbit_app/features/dashboard/data/models/dashboard_model.dart';
 import 'package:orbit_app/features/dashboard/presentation/controllers/dashboard_controller.dart';
@@ -136,7 +137,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 // Quick access section title
                 _buildSectionTitle(
-                  '\u0625\u062C\u0631\u0627\u0621\u0627\u062A \u0633\u0631\u064A\u0639\u0629', // إجراءات سريعة
+                  AppLocalizations.of(context)?.translate('quickActions') ?? 'Quick Actions',
                 ),
 
                 // Quick access cards
@@ -152,6 +153,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ─── Welcome Section ────────────────────────────────────────────────
 
   Widget _buildWelcomeSection() {
+    final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppTheme.spacingLg,
@@ -162,9 +164,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '\u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645', // لوحة التحكم
-            style: TextStyle(
+          Text(
+            t?.translate('dashboard') ?? 'Dashboard',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -173,8 +175,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643 \u0641\u064A \u0644\u0648\u062D\u0629 \u062A\u062D\u0643\u0645 \u0627\u0648\u0631\u0628\u062A SMS\u060C \u064A\u0645\u0643\u0646\u0643 \u0625\u062F\u0627\u0631\u0629 \u062D\u0633\u0627\u0628\u0643 \u0648\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644\u0643 \u0628\u0643\u0644 \u0633\u0647\u0648\u0644\u0629', // مرحباً بك في لوحة تحكم اوربت SMS، يمكنك إدارة حسابك وإرسال رسائلك بكل سهولة
-            style: TextStyle(
+            t?.translate('dashboardWelcomeDesc') ?? '',
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,
@@ -210,9 +212,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 extra: {'message_type': 'advanced'},
               ),
               icon: const Icon(Icons.send_outlined, size: 16),
-              label: const Text(
-                '\u0625\u0631\u0633\u0627\u0644 \u0645\u062A\u0642\u062F\u0645', // إرسال متقدم
-                style: TextStyle(
+              label: Text(
+                AppLocalizations.of(context)?.translate('advancedSend') ?? 'Advanced Send',
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Cairo',
@@ -320,11 +322,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ─── Stats Row ──────────────────────────────────────────────────────
 
   Widget _buildStatsRow(DashboardStats stats) {
+    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(
-          '\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0627\u0644\u062D\u0633\u0627\u0628', // إحصائيات الحساب
+          t?.translate('accountStats') ?? 'Account Statistics',
         ),
 
         SizedBox(
@@ -336,54 +339,54 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               // Balance card
               StatsCard(
                 type: StatsCardType.balance,
-                title: '\u0627\u0644\u0631\u0635\u064A\u062F \u0627\u0644\u062D\u0627\u0644\u064A', // الرصيد الحالي
+                title: t?.translate('currentBalance') ?? 'Current Balance',
                 value: stats.currentBalance,
-                unit: '\u0631\u0633\u0627\u0644\u0629', // رسالة
+                unit: t?.translate('messagesUnit') ?? 'messages',
                 onTap: () => context.pushNamed(RouteNames.transactions),
                 onViewAll: () => context.pushNamed(RouteNames.transactions),
-                viewAllLabel: '\u0639\u0631\u0636 \u062C\u0645\u064A\u0639 \u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A', // عرض جميع العمليات
+                viewAllLabel: t?.translate('viewAllOperations') ?? 'View All Operations',
               ),
               const SizedBox(width: AppTheme.spacingMd),
 
               // Services card
               StatsCard(
                 type: StatsCardType.services,
-                title: '\u0627\u0644\u062E\u062F\u0645\u0627\u062A', // الخدمات
+                title: t?.translate('services') ?? 'Services',
                 value: stats.servicesCount,
                 onTap: () => context.pushNamed(RouteNames.services),
                 onViewAll: () => context.pushNamed(RouteNames.services),
-                viewAllLabel: '\u0639\u0631\u0636 \u062C\u0645\u064A\u0639 \u0627\u0644\u062E\u062F\u0645\u0627\u062A', // عرض جميع الخدمات
+                viewAllLabel: t?.translate('viewAllServices') ?? 'View All Services',
               ),
               const SizedBox(width: AppTheme.spacingMd),
 
               // Consumed points card
               StatsCard(
                 type: StatsCardType.consumedPoints,
-                title: '\u0627\u0644\u0646\u0642\u0627\u0637 \u0627\u0644\u0645\u0633\u062A\u0647\u0644\u0643\u0629', // النقاط المستهلكة
+                title: t?.translate('consumedPoints') ?? 'Consumed Points',
                 value: stats.consumedPoints,
-                unit: '\u0631\u0633\u0627\u0644\u0629', // رسالة
+                unit: t?.translate('messagesUnit') ?? 'messages',
               ),
               const SizedBox(width: AppTheme.spacingMd),
 
               // Groups card
               StatsCard(
                 type: StatsCardType.services,
-                title: '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // المجموعات
+                title: t?.translate('groups') ?? 'Groups',
                 value: stats.groupsCount,
                 onTap: () => context.pushNamed(RouteNames.groups),
                 onViewAll: () => context.pushNamed(RouteNames.groups),
-                viewAllLabel: '\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // إدارة المجموعات
+                viewAllLabel: t?.translate('manageGroups') ?? 'Manage Groups',
               ),
               const SizedBox(width: AppTheme.spacingMd),
 
               // Sub accounts card
               StatsCard(
                 type: StatsCardType.consumedPoints,
-                title: '\u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u0641\u0631\u0639\u064A\u0629', // الحسابات الفرعية
+                title: t?.translate('subAccounts') ?? 'Sub Accounts',
                 value: stats.subAccountsCount,
                 onTap: () => context.pushNamed(RouteNames.subAccounts),
                 onViewAll: () => context.pushNamed(RouteNames.subAccounts),
-                viewAllLabel: '\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A', // إدارة الحسابات
+                viewAllLabel: t?.translate('manageAccounts') ?? 'Manage Accounts',
               ),
               const SizedBox(width: AppTheme.spacingLg),
             ],
@@ -396,6 +399,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ─── Quick Access Cards ─────────────────────────────────────────────
 
   Widget _buildQuickAccessCards(DashboardStats stats) {
+    final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
       child: Column(
@@ -403,10 +407,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           // Groups card
           QuickActionCard(
             icon: Icons.people_rounded,
-            title: '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // المجموعات
+            title: t?.translate('groups') ?? 'Groups',
             count: stats.groupsCount,
             subtitle:
-                '${stats.groupsCount} \u0645\u062C\u0645\u0648\u0639\u0629', // مجموعة
+                '${stats.groupsCount} ${t?.translate('groupUnit') ?? 'group'}',
             iconColor: AppColors.success,
             onTap: () => context.pushNamed(RouteNames.groups),
           ),
@@ -416,10 +420,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           // Sub Accounts card
           QuickActionCard(
             icon: Icons.manage_accounts_rounded,
-            title: '\u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u0641\u0631\u0639\u064A\u0629', // الحسابات الفرعية
+            title: t?.translate('subAccounts') ?? 'Sub Accounts',
             count: stats.subAccountsCount,
             subtitle:
-                '${stats.subAccountsCount} \u062D\u0633\u0627\u0628', // حساب
+                '${stats.subAccountsCount} ${t?.translate('accountUnit') ?? 'account'}',
             iconColor: AppColors.info,
             onTap: () => context.pushNamed(RouteNames.subAccounts),
           ),
@@ -429,8 +433,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           // Add Balance card
           QuickActionCard(
             icon: Icons.account_balance_wallet_rounded,
-            title: '\u0625\u0636\u0627\u0641\u0629 \u0631\u0635\u064A\u062F', // إضافة رصيد
-            subtitle: '\u0634\u0631\u0627\u0621 \u0631\u0635\u064A\u062F \u062C\u062F\u064A\u062F', // شراء رصيد جديد
+            title: t?.translate('addBalance') ?? 'Add Balance',
+            subtitle: t?.translate('buyNewBalance') ?? 'Buy New Balance',
             iconColor: AppColors.warning,
             onTap: () => context.pushNamed(RouteNames.buyBalance),
           ),
@@ -440,8 +444,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           // Statistics card
           QuickActionCard(
             icon: Icons.bar_chart_rounded,
-            title: '\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A', // الإحصائيات
-            subtitle: '\u062A\u0642\u0627\u0631\u064A\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644', // تقارير الإرسال
+            title: t?.translate('statistics') ?? 'Statistics',
+            subtitle: t?.translate('sendingReports') ?? 'Sending Reports',
             iconColor: AppColors.balancePurpleStart,
             onTap: () => context.pushNamed(RouteNames.statistics),
           ),
@@ -459,7 +463,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('\u0627\u0644\u0631\u0635\u064A\u062F'), // الرصيد
+        _buildSectionTitle(AppLocalizations.of(context)?.translate('balance') ?? 'Balance'),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
@@ -485,9 +489,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '\u0623\u062D\u062F\u062B \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // أحدث الرسائل
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)?.translate('recentMessages') ?? 'Recent Messages',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -496,9 +500,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               GestureDetector(
                 onTap: () => context.pushNamed(RouteNames.archive),
-                child: const Text(
-                  '\u0639\u0631\u0636 \u0627\u0644\u0643\u0644', // عرض الكل
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)?.translate('seeAll') ?? 'See All',
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primary,
@@ -539,7 +543,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('\u0645\u0633\u062A\u0648\u0627\u0643 \u0627\u0644\u062D\u0627\u0644\u064A'), // مستواك الحالي
+        _buildSectionTitle(AppLocalizations.of(context)?.translate('currentLevel') ?? 'Your Current Level'),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
@@ -577,7 +581,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 // Level name
                 Text(
-                  stats.accountLevel,
+                  AppLocalizations.of(context)?.translate(stats.accountLevel) ?? stats.accountLevel,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -620,9 +624,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
-                    child: Text(
-                      '\u0644\u0644\u062A\u0631\u0642\u064A\u0629 \u0625\u0644\u0649 "${stats.nextLevelName}"\u060C \u064A\u062C\u0628 \u0634\u062D\u0646 \u0631\u0635\u064A\u062F \u0628\u0642\u064A\u0645\u0629 ${NumberFormat('#,###').format(stats.nextLevelRequirement)} \u0631\u064A\u0627\u0644',
-                      // للترقية إلى "البرونزي"، يجب شحن رصيد بقيمة 3,500 ريال
+                    child: Builder(builder: (ctx) {
+                      final t = AppLocalizations.of(ctx);
+                      final translatedNextLevel = t?.translate(stats.nextLevelName) ?? stats.nextLevelName;
+                      final formattedAmount = NumberFormat('#,###').format(stats.nextLevelRequirement);
+                      return Text(
+                      t?.translateWithParams('upgradeToLevel', {
+                        'level': translatedNextLevel,
+                        'amount': formattedAmount,
+                      }) ?? 'To upgrade to "$translatedNextLevel", you need to recharge $formattedAmount SAR',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 13,
@@ -631,7 +641,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         fontFamily: 'Cairo',
                         height: 1.5,
                       ),
-                    ),
+                    );
+                    }),
                   ),
                 ],
               ],
@@ -801,9 +812,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
             const SizedBox(height: AppTheme.spacingLg),
-            const Text(
-              '\u062D\u062F\u062B \u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A', // حدث خطأ في تحميل البيانات
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)?.translate('loadingDataError') ?? 'Error loading data',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -832,9 +843,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ref.invalidate(dashboardBannersProvider);
                 },
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text(
-                  '\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629', // إعادة المحاولة
-                  style: TextStyle(
+                label: Text(
+                  AppLocalizations.of(context)?.translate('retry') ?? 'Retry',
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w600,
                   ),
@@ -945,7 +956,7 @@ class _BannerCardState extends State<_BannerCard> {
                     children: [
                       if (widget.banner.title.isNotEmpty)
                         Text(
-                          widget.banner.title,
+                          AppLocalizations.of(context)?.translate(widget.banner.title) ?? widget.banner.title,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -958,7 +969,7 @@ class _BannerCardState extends State<_BannerCard> {
                       if (widget.banner.description.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         Text(
-                          widget.banner.description,
+                          AppLocalizations.of(context)?.translate(widget.banner.description) ?? widget.banner.description,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
@@ -1063,7 +1074,7 @@ class _BalanceMetricCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${NumberFormat('#,###').format(value)} \u0631\u0633\u0627\u0644\u0629', // رسالة
+            '${NumberFormat('#,###').format(value)} ${AppLocalizations.of(context)?.translate('messagesUnit') ?? 'messages'}',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1134,9 +1145,9 @@ class _BalanceCountdownTimerState extends State<_BalanceCountdownTimer> {
       ),
       child: Column(
         children: [
-          const Text(
-            '\u0633\u064A\u0646\u062A\u0647\u064A \u0627\u0644\u0631\u0635\u064A\u062F \u062E\u0644\u0627\u0644', // سينتهي الرصيد خلال
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)?.translate('balanceExpiresIn') ?? 'Balance expires in',
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
@@ -1147,13 +1158,13 @@ class _BalanceCountdownTimerState extends State<_BalanceCountdownTimer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _CountdownUnit(value: days, label: '\u0623\u064A\u0627\u0645'), // أيام
+              _CountdownUnit(value: days, label: AppLocalizations.of(context)?.translate('days') ?? 'days'),
               _countdownSeparator(),
-              _CountdownUnit(value: hours, label: '\u0633\u0627\u0639\u0627\u062A'), // ساعات
+              _CountdownUnit(value: hours, label: AppLocalizations.of(context)?.translate('hours') ?? 'hours'),
               _countdownSeparator(),
-              _CountdownUnit(value: minutes, label: '\u062F\u0642\u0627\u0626\u0642'), // دقائق
+              _CountdownUnit(value: minutes, label: AppLocalizations.of(context)?.translate('minutes') ?? 'minutes'),
               _countdownSeparator(),
-              _CountdownUnit(value: seconds, label: '\u062B\u0648\u0627\u0646\u064A'), // ثواني
+              _CountdownUnit(value: seconds, label: AppLocalizations.of(context)?.translate('seconds') ?? 'seconds'),
             ],
           ),
         ],
@@ -1226,7 +1237,7 @@ class _RecentMessageRow extends StatelessWidget {
         ? message.note
         : message.senderName.isNotEmpty
             ? message.senderName
-            : '\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641'; // غير معروف
+            : AppLocalizations.of(context)?.translate('unknown') ?? 'Unknown';
 
     // Display amount if present.
     final hasAmount = message.amount.isNotEmpty && message.amount != '0';
@@ -1260,7 +1271,7 @@ class _RecentMessageRow extends StatelessWidget {
                   children: [
                     if (hasAmount) ...[
                       Text(
-                        '${message.amount} \u0631\u0633\u0627\u0644\u0629', // رسالة
+                        '${message.amount} ${AppLocalizations.of(context)?.translate('messagesUnit') ?? 'messages'}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1311,6 +1322,7 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     Color bgColor;
     Color textColor;
     String label = status;
@@ -1320,13 +1332,13 @@ class _StatusBadge extends StatelessWidget {
       case 'مرسلة':
         bgColor = const Color(0xFFE3F2FD);
         textColor = const Color(0xFF1565C0);
-        label = '\u0645\u0631\u0633\u0644\u0629'; // مرسلة
+        label = t?.translate('statusSent_') ?? 'Sent';
         break;
       case 'delivered':
       case 'تم التسليم':
         bgColor = const Color(0xFFE8F5E9);
         textColor = const Color(0xFF2E7D32);
-        label = '\u062A\u0645 \u0627\u0644\u062A\u0633\u0644\u064A\u0645'; // تم التسليم
+        label = t?.translate('statusDelivered_') ?? 'Delivered';
         break;
       case 'accepted':
       case 'approved':
@@ -1334,19 +1346,19 @@ class _StatusBadge extends StatelessWidget {
       case 'مقبولة':
         bgColor = const Color(0xFFE8F5E9);
         textColor = const Color(0xFF2E7D32);
-        label = '\u0645\u0631\u0633\u0644\u0629'; // مرسلة
+        label = t?.translate('statusSent_') ?? 'Sent';
         break;
       case 'rejected':
       case 'مرفوضة':
         bgColor = const Color(0xFFFFEBEE);
         textColor = const Color(0xFFC62828);
-        label = '\u0645\u0631\u0641\u0648\u0636\u0629'; // مرفوضة
+        label = t?.translate('statusRejected_') ?? 'Rejected';
         break;
       case 'failed':
       case 'فشلت':
         bgColor = const Color(0xFFFFEBEE);
         textColor = const Color(0xFFC62828);
-        label = '\u0641\u0634\u0644\u062A'; // فشلت
+        label = t?.translate('statusFailed_') ?? 'Failed';
         break;
       case 'pending':
       case 'waiting':
@@ -1354,25 +1366,25 @@ class _StatusBadge extends StatelessWidget {
       case 'قيد الانتظار':
         bgColor = const Color(0xFFFFF3E0);
         textColor = const Color(0xFFE65100);
-        label = '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631'; // قيد الانتظار
+        label = t?.translate('statusPending__') ?? 'Pending';
         break;
       case 'scheduled':
       case 'مجدولة':
         bgColor = const Color(0xFFE8EAF6);
         textColor = const Color(0xFF283593);
-        label = '\u0645\u062C\u062F\u0648\u0644\u0629'; // مجدولة
+        label = t?.translate('statusScheduled_') ?? 'Scheduled';
         break;
       case 'cancelled':
       case 'ملغاة':
         bgColor = const Color(0xFFF5F5F5);
         textColor = const Color(0xFF616161);
-        label = '\u0645\u0644\u063A\u0627\u0629'; // ملغاة
+        label = t?.translate('statusCancelled_') ?? 'Cancelled';
         break;
       case 'expired':
       case 'منتهية':
         bgColor = const Color(0xFFF3E5F5);
         textColor = const Color(0xFF6A1B9A);
-        label = '\u0645\u0646\u062A\u0647\u064A\u0629'; // منتهية
+        label = t?.translate('statusExpired__') ?? 'Expired';
         break;
       default:
         bgColor = const Color(0xFFF5F5F5);

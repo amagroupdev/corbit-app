@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
 
@@ -29,14 +30,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   void _handleSubmit() {
+    final t = AppLocalizations.of(context)!;
     if (_phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: const Text(
-              '\u0627\u0644\u0631\u062c\u0627\u0621 \u0625\u062f\u062e\u0627\u0644 \u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644',
-              style: TextStyle(fontFamily: 'Cairo'),
+            content: Text(
+              t.translate('pleaseEnterPhone'),
+              style: const TextStyle(fontFamily: 'Cairo'),
             ),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
@@ -56,6 +58,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(forgotPasswordControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     ref.listen<ForgotPasswordState>(forgotPasswordControllerProvider,
         (prev, next) {
@@ -97,8 +100,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: state.successMessage != null
-                ? _buildSuccessView(state.successMessage!)
-                : _buildFormView(state),
+                ? _buildSuccessView(state.successMessage!, t)
+                : _buildFormView(state, t),
           ),
         ),
       ),
@@ -109,7 +112,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   // Form view
   // ---------------------------------------------------------------------------
 
-  Widget _buildFormView(ForgotPasswordState state) {
+  Widget _buildFormView(ForgotPasswordState state, AppLocalizations t) {
     return Column(
       children: [
         // Logo
@@ -137,9 +140,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: 24),
 
         // Title
-        const Text(
-          '\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f',
-          style: TextStyle(
+        Text(
+          t.translate('forgotPassword'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -147,9 +150,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          '\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u062c\u0648\u0627\u0644\u0643 \u0627\u0644\u0645\u0633\u062c\u0644 \u0644\u0625\u0631\u0633\u0627\u0644 \u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646',
-          style: TextStyle(
+        Text(
+          t.translate('enterRegisteredPhone'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -176,9 +179,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '\u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644',
-                style: TextStyle(
+              Text(
+                t.translate('phone'),
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -219,9 +222,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          '\u0625\u0631\u0633\u0627\u0644 \u0631\u0645\u0632 \u0627\u0644\u062a\u062d\u0642\u0642',
-                          style: TextStyle(
+                      : Text(
+                          t.translate('sendVerificationCode'),
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -238,15 +241,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         // Back to login
         GestureDetector(
           onTap: () => context.pop(),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.arrow_back_rounded,
+              const Icon(Icons.arrow_back_rounded,
                   size: 18, color: AppColors.primary),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
-                '\u0627\u0644\u0631\u062c\u0648\u0639 \u0644\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
-                style: TextStyle(
+                t.translate('backToLogin'),
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -264,7 +267,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   // Success view
   // ---------------------------------------------------------------------------
 
-  Widget _buildSuccessView(String message) {
+  Widget _buildSuccessView(String message, AppLocalizations t) {
     return Column(
       children: [
         // Success icon
@@ -284,9 +287,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         ),
         const SizedBox(height: 24),
 
-        const Text(
-          '\u062a\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644 \u0628\u0646\u062c\u0627\u062d',
-          style: TextStyle(
+        Text(
+          t.translate('sentSuccessfully'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -320,9 +323,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              '\u0627\u0644\u0631\u062c\u0648\u0639 \u0644\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
-              style: TextStyle(
+            child: Text(
+              t.translate('backToLogin'),
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

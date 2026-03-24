@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/data/models/offer_model.dart';
 
 /// A card widget displaying an SMS offer package.
@@ -71,8 +72,8 @@ class OfferCard extends StatelessWidget {
                       color: AppColors.primarySurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      '\u0645\u0645\u064A\u0632',
+                    child: Text(
+                      AppLocalizations.of(context)!.translate('popular'),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -94,7 +95,7 @@ class OfferCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${numberFormat.format(offer.smsCredit)} \u0631\u0633\u0627\u0644\u0629',
+                  '${numberFormat.format(offer.smsCredit)} ${AppLocalizations.of(context)!.translate('messageUnit')}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -135,7 +136,7 @@ class OfferCard extends StatelessWidget {
                   ),
               if (offer.addons.length > 2)
                 Text(
-                  '+${offer.addons.length - 2} \u0625\u0636\u0627\u0641\u064A',
+                  '+${offer.addons.length - 2} ${AppLocalizations.of(context)!.translate('additionalAddons')}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textHint,
@@ -155,7 +156,7 @@ class OfferCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                '${numberFormat.format(offer.price.toInt())} \u0631.\u0633',
+                '${numberFormat.format(offer.price.toInt())} ${AppLocalizations.of(context)!.translate('sar')}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 16,

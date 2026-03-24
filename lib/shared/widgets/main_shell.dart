@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Tracks the currently selected bottom navigation tab index.
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
@@ -161,12 +162,13 @@ class _MainShellState extends ConsumerState<MainShell> {
   }
 
   String _labelForIndex(int index) {
+    final t = AppLocalizations.instance;
     return switch (index) {
-      0 => '\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629', // الرئيسية
-      1 => '\u0627\u0644\u0631\u0633\u0627\u0626\u0644',       // الرسائل
-      2 => '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // المجموعات
-      3 => '\u0627\u0644\u0631\u0635\u064A\u062F',             // الرصيد
-      4 => '\u0627\u0644\u0645\u0632\u064A\u062F',             // المزيد
+      0 => t.translate('navHome'),
+      1 => t.translate('navMessages'),
+      2 => t.translate('navGroups'),
+      3 => t.translate('navBalance'),
+      4 => t.translate('navMore'),
       _ => '',
     };
   }

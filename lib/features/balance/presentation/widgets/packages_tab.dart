@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/data/models/offer_model.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/routing/route_names.dart';
@@ -46,17 +47,17 @@ class _PackagesTabState extends ConsumerState<PackagesTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          const Text(
-            '\u0627\u0644\u0628\u0627\u0642\u0627\u062A \u0627\u0644\u0645\u062A\u0627\u062D\u0629',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.translate('availablePackages'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '\u0627\u062E\u062A\u0631 \u0627\u0644\u0628\u0627\u0642\u0629 \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629 \u0644\u0627\u062D\u062A\u064A\u0627\u062C\u0627\u062A\u0643',
+          Text(
+            AppLocalizations.of(context)!.translate('choosePackage'),
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -95,17 +96,17 @@ class _PackagesTabState extends ConsumerState<PackagesTab>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u0627\u0642\u0627\u062A \u0645\u062A\u0627\u062D\u0629',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('noPackages'),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u0627\u0642\u0627\u062A \u0631\u0633\u0627\u0626\u0644 \u0645\u062A\u0627\u062D\u0629 \u062D\u0627\u0644\u064A\u0627\u064B',
+            Text(
+              AppLocalizations.of(context)!.translate('noPackagesCurrently'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -178,8 +179,8 @@ class _PackageCard extends StatelessWidget {
                       color: AppColors.primarySurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      '\u0645\u0645\u064A\u0632',
+                    child: Text(
+                      AppLocalizations.of(context)!.translate('popular'),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -208,7 +209,7 @@ class _PackageCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  '${numberFormat.format(offer.smsCredit)} \u0631\u0633\u0627\u0644\u0629',
+                  '${numberFormat.format(offer.smsCredit)} ${AppLocalizations.of(context)!.translate('messageUnit')}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -276,8 +277,8 @@ class _PackageCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '\u0627\u0644\u0633\u0639\u0631',
+                    Text(
+                      AppLocalizations.of(context)!.translate('price'),
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -285,7 +286,7 @@ class _PackageCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${numberFormat.format(offer.price.toInt())} \u0631.\u0633',
+                      '${numberFormat.format(offer.price.toInt())} ${AppLocalizations.of(context)!.translate('sar')}',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -303,8 +304,8 @@ class _PackageCard extends StatelessWidget {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
-                    '\u0634\u0631\u0627\u0621',
+                  child: Text(
+                    AppLocalizations.of(context)!.translate('buy'),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

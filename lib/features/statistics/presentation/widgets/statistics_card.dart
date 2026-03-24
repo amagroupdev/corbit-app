@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/statistics/data/models/statistics_model.dart';
 
 /// Displays a single statistics record as a styled card.
@@ -126,7 +127,7 @@ class StatisticsCard extends StatelessWidget {
                     item.studentNumber!.isNotEmpty)
                   _DetailRow(
                     icon: Icons.badge_outlined,
-                    label: '\u0631\u0642\u0645 \u0627\u0644\u0637\u0627\u0644\u0628', // رقم الطالب
+                    label: AppLocalizations.of(context)!.translate('stat_student_number'),
                     value: item.studentNumber!,
                   ),
 
@@ -134,7 +135,7 @@ class StatisticsCard extends StatelessWidget {
                 if (item.date != null)
                   _DetailRow(
                     icon: Icons.calendar_today_outlined,
-                    label: '\u0627\u0644\u062A\u0627\u0631\u064A\u062E', // التاريخ
+                    label: AppLocalizations.of(context)!.translate('date'),
                     value: dateFormat.format(item.date!),
                   ),
 
@@ -143,7 +144,7 @@ class StatisticsCard extends StatelessWidget {
                     item.teacherName!.isNotEmpty)
                   _DetailRow(
                     icon: Icons.person_outlined,
-                    label: '\u0627\u0644\u0645\u0639\u0644\u0645', // المعلم
+                    label: AppLocalizations.of(context)!.translate('stat_teacher'),
                     value: item.teacherName!,
                   ),
 
@@ -151,7 +152,7 @@ class StatisticsCard extends StatelessWidget {
                 if (item.semester != null && item.semester!.isNotEmpty)
                   _DetailRow(
                     icon: Icons.school_outlined,
-                    label: '\u0627\u0644\u0641\u0635\u0644', // الفصل
+                    label: AppLocalizations.of(context)!.translate('stat_semester'),
                     value: item.semester!,
                   ),
 
@@ -159,7 +160,7 @@ class StatisticsCard extends StatelessWidget {
                 if (item.groupName != null && item.groupName!.isNotEmpty)
                   _DetailRow(
                     icon: Icons.groups_outlined,
-                    label: '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629', // المجموعة
+                    label: AppLocalizations.of(context)!.translate('stat_group'),
                     value: item.groupName!,
                   ),
 
@@ -167,7 +168,7 @@ class StatisticsCard extends StatelessWidget {
                 if (item.count > 0)
                   _DetailRow(
                     icon: Icons.numbers,
-                    label: '\u0627\u0644\u0639\u062F\u062F', // العدد
+                    label: AppLocalizations.of(context)!.translate('stat_count'),
                     value: item.count.toString(),
                     valueColor: AppColors.primary,
                   ),
@@ -238,8 +239,8 @@ class StatisticsCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             item.messageSent
-                                ? '\u062A\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644' // تم الإرسال
-                                : '\u0644\u0645 \u064A\u0631\u0633\u0644', // لم يرسل
+                                ? AppLocalizations.of(context)!.translate('stat_sms_sent')
+                                : AppLocalizations.of(context)!.translate('stat_sms_not_sent'),
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,

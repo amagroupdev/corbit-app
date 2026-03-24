@@ -3,9 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
+import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/routing/app_router.dart';
-
-final localeProvider = StateProvider<Locale>((ref) => const Locale('ar'));
 
 class OrbitApp extends ConsumerWidget {
   const OrbitApp({super.key});

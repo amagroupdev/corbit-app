@@ -48,15 +48,15 @@ class ContractModel {
     };
   }
 
-  /// Returns the display-friendly status label in Arabic.
-  String get statusLabel {
+  /// Returns the translation key for the contract status label.
+  String get statusLabelKey {
     return switch (status?.toLowerCase()) {
-      'active' => 'نشط',
-      'inactive' => 'غير نشط',
-      'pending' => 'قيد المراجعة',
-      'expired' => 'منتهي',
-      'cancelled' => 'ملغي',
-      _ => status ?? 'غير محدد',
+      'active' => 'contract_status_active',
+      'inactive' => 'contract_status_inactive',
+      'pending' => 'contract_status_pending',
+      'expired' => 'contract_status_expired',
+      'cancelled' => 'contract_status_cancelled',
+      _ => 'contract_status_unknown',
     };
   }
 

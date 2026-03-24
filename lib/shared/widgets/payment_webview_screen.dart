@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A full-screen WebView for payment pages.
 ///
@@ -31,15 +32,15 @@ class PaymentWebViewScreen extends StatefulWidget {
   const PaymentWebViewScreen({
     super.key,
     required this.url,
-    this.title = '\u0627\u0644\u062F\u0641\u0639', // الدفع
+    this.title,
     this.appDomain = 'mobile.net.sa',
   });
 
   /// The payment URL to load.
   final String url;
 
-  /// Title shown in the AppBar.
-  final String title;
+  /// Title shown in the AppBar. If not provided, uses localized 'payment'.
+  final String? title;
 
   /// The app's own domain. When the WebView navigates to a URL on this
   /// domain, it's treated as a payment callback.
@@ -149,7 +150,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           path.contains('/thankyou')) {
         _popWithResult(
           isSuccess: true,
-          message: '\u062A\u0645\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639 \u0628\u0646\u062C\u0627\u062D', // تمت عملية الدفع بنجاح
+          message: AppLocalizations.instance.translate('paymentSuccess'),
         );
         return;
       }
@@ -162,7 +163,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           path.contains('/canceled')) {
         _popWithResult(
           isSuccess: false,
-          message: '\u0641\u0634\u0644\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639', // فشلت عملية الدفع
+          message: AppLocalizations.instance.translate('paymentFailure'),
         );
         return;
       }
@@ -199,22 +200,23 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
         path.contains('declined') ||
         path.contains('error');
 
+    final t = AppLocalizations.instance;
     if (isSuccess) {
       _popWithResult(
         isSuccess: true,
-        message: '\u062A\u0645\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639 \u0628\u0646\u062C\u0627\u062D', // تمت عملية الدفع بنجاح
+        message: t.translate('paymentSuccess'),
       );
     } else if (isFailure) {
       _popWithResult(
         isSuccess: false,
-        message: '\u0641\u0634\u0644\u062A \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639', // فشلت عملية الدفع
+        message: t.translate('paymentFailure'),
       );
     } else {
       // Callback to our domain but unclear status - treat as failure
       // to prevent showing false success when payment actually failed.
       _popWithResult(
         isSuccess: false,
-        message: '\u0644\u0645 \u064A\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0639\u0645\u0644\u064A\u0629 \u0627\u0644\u062F\u0641\u0639\u060C \u064A\u0631\u062C\u0649 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0631\u0635\u064A\u062F\u0643', // لم يتم تأكيد عملية الدفع، يرجى التحقق من رصيدك
+        message: t.translate('paymentUnconfirmed'),
       );
     }
   }
@@ -243,33 +245,34 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
 
   /// Shows a confirmation dialog before closing.
   Future<void> _confirmClose() async {
+    final t = AppLocalizations.instance;
     final shouldClose = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text(
-          '\u0625\u063A\u0644\u0627\u0642 \u0635\u0641\u062D\u0629 \u0627\u0644\u062F\u0641\u0639', // إغلاق صفحة الدفع
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        title: Text(
+          t.translate('closePaymentPage'),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         ),
-        content: const Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u0625\u063A\u0644\u0627\u0642 \u0635\u0641\u062D\u0629 \u0627\u0644\u062F\u0641\u0639\u061F', // هل أنت متأكد من إغلاق صفحة الدفع؟
-          style: TextStyle(fontSize: 14),
+        content: Text(
+          t.translate('confirmClosePayment'),
+          style: const TextStyle(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-              '\u0627\u0633\u062A\u0645\u0631\u0627\u0631', // استمرار
-              style: TextStyle(color: AppColors.primary),
+            child: Text(
+              t.translate('continuePayment'),
+              style: const TextStyle(color: AppColors.primary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              '\u0625\u063A\u0644\u0627\u0642', // إغلاق
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              t.translate('close'),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -307,7 +310,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
         backgroundColor: AppColors.scaffoldBackground,
         appBar: AppBar(
           title: Text(
-            widget.title,
+            widget.title ?? AppLocalizations.instance.translate('payment'),
             style: const TextStyle(fontWeight: FontWeight.w700),
           ),
           centerTitle: true,
@@ -323,7 +326,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _controller.reload(),
-              tooltip: '\u0625\u0639\u0627\u062F\u0629 \u062A\u062D\u0645\u064A\u0644', // إعادة تحميل
+              tooltip: AppLocalizations.instance.translate('reloadPage'),
             ),
           ],
           bottom: PreferredSize(

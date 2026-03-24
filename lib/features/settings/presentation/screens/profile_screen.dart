@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Profile editing screen with photo, personal info form, and save.
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -60,7 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('الملف الشخصي'),
+        title: Text(AppLocalizations.of(context)!.translate('profile')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -72,15 +73,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           _initializeForm(profile);
           return _buildForm(profile);
         },
-        loading: () => AppLoading.circular(message: 'جاري التحميل...'),
+        loading: () => AppLoading.circular(message: AppLocalizations.of(context)!.translate('loading')),
         error: (error, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('خطأ: $error'),
+              Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $error'),
               const SizedBox(height: 16),
               AppButton.secondary(
-                text: 'إعادة المحاولة',
+                text: AppLocalizations.of(context)!.translate('retry'),
                 onPressed: () => ref.read(profileProvider.notifier).refresh(),
                 width: 200,
               ),
@@ -149,17 +150,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // ── Name ────────────────────────────────────────────────
           AppTextField(
-            label: 'الاسم',
-            hint: 'أدخل اسمك الكامل',
+            label: AppLocalizations.of(context)!.translate('profile_name_label'),
+            hint: AppLocalizations.of(context)!.translate('profile_name_hint'),
             controller: _nameController,
-            validator: (v) => Validators.validateRequired(v, fieldName: 'الاسم'),
+            validator: (v) => Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('profile_name_label')),
             textInputAction: TextInputAction.next,
           ),
           const SizedBox(height: 16),
 
           // ── Email ───────────────────────────────────────────────
           AppTextField(
-            label: 'البريد الإلكتروني',
+            label: AppLocalizations.of(context)!.translate('profile_email_label'),
             hint: 'example@email.com',
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -170,7 +171,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // ── Phone ───────────────────────────────────────────────
           AppTextField(
-            label: 'رقم الجوال',
+            label: AppLocalizations.of(context)!.translate('profile_phone_label'),
             hint: '05XXXXXXXX',
             controller: _phoneController,
             keyboardType: TextInputType.phone,
@@ -181,8 +182,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // ── Landphone ───────────────────────────────────────────
           AppTextField(
-            label: 'رقم الهاتف الثابت',
-            hint: 'اختياري',
+            label: AppLocalizations.of(context)!.translate('profile_landphone_label'),
+            hint: AppLocalizations.of(context)!.translate('profile_optional'),
             controller: _landphoneController,
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
@@ -193,8 +194,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'الجنس',
+              Text(
+                AppLocalizations.of(context)!.translate('profile_gender'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -212,23 +213,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: DropdownButton<String>(
                     value: _gender,
                     isExpanded: true,
-                    hint: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    hint: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'اختر الجنس',
+                        AppLocalizations.of(context)!.translate('profile_gender_select'),
                         style: TextStyle(color: AppColors.inputHint),
                       ),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     borderRadius: BorderRadius.circular(12),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'male',
-                        child: Text('ذكر'),
+                        child: Text(AppLocalizations.of(context)!.translate('profile_gender_male')),
                       ),
                       DropdownMenuItem(
                         value: 'female',
-                        child: Text('أنثى'),
+                        child: Text(AppLocalizations.of(context)!.translate('profile_gender_female')),
                       ),
                     ],
                     onChanged: (value) => setState(() => _gender = value),
@@ -241,8 +242,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // ── Organization Name ───────────────────────────────────
           AppTextField(
-            label: 'اسم المنظمة',
-            hint: 'اختياري',
+            label: AppLocalizations.of(context)!.translate('profile_org_name'),
+            hint: AppLocalizations.of(context)!.translate('profile_optional'),
             controller: _organizationController,
             textInputAction: TextInputAction.done,
           ),
@@ -250,7 +251,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // ── Save Button ─────────────────────────────────────────
           AppButton.primary(
-            text: 'حفظ التغييرات',
+            text: AppLocalizations.of(context)!.translate('profile_save_changes'),
             onPressed: _isLoading ? null : _saveProfile,
             isLoading: _isLoading,
             icon: Icons.save_rounded,
@@ -285,7 +286,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded,
                   color: AppColors.primary),
-              title: const Text('الكاميرا'),
+              title: Text(AppLocalizations.of(context)!.translate('profile_camera')),
               onTap: () {
                 Navigator.pop(context);
                 _pickPhoto(ImageSource.camera);
@@ -294,7 +295,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.photo_library_rounded,
                   color: AppColors.primary),
-              title: const Text('المعرض'),
+              title: Text(AppLocalizations.of(context)!.translate('profile_gallery')),
               onTap: () {
                 Navigator.pop(context);
                 _pickPhoto(ImageSource.gallery);
@@ -302,8 +303,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_rounded, color: AppColors.error),
-              title: const Text(
-                'حذف الصورة',
+              title: Text(
+                AppLocalizations.of(context)!.translate('profile_delete_photo'),
                 style: TextStyle(color: AppColors.error),
               ),
               onTap: () {
@@ -349,7 +350,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'تم تحديث الصورة بنجاح' : 'فشل تحديث الصورة',
+              success ? AppLocalizations.of(context)!.translate('profile_photo_updated') : AppLocalizations.of(context)!.translate('profile_photo_update_failed'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -359,7 +360,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -380,7 +381,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'تم حذف الصورة بنجاح' : 'فشل حذف الصورة',
+              success ? AppLocalizations.of(context)!.translate('profile_photo_deleted') : AppLocalizations.of(context)!.translate('profile_photo_delete_failed'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -390,7 +391,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -425,8 +426,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'تم تحديث الملف الشخصي بنجاح'
-                  : 'فشل تحديث الملف الشخصي',
+                  ? AppLocalizations.of(context)!.translate('profile_updated')
+                  : AppLocalizations.of(context)!.translate('profile_update_failed'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -436,7 +437,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );

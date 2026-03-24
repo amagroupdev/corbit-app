@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing certifications through the Noor system.
 ///
@@ -62,8 +63,8 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
     if (_usernameController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u062F\u062E\u0648\u0644'), // يرجى إدخال بيانات الدخول
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('enterLoginCredentials')),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -150,15 +151,15 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u0634\u0647\u0627\u062F\u0627\u062A'), // الشهادات
+        title: Text(AppLocalizations.of(context)!.translate('certifications')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0625\u0631\u0633\u0627\u0644'), // إرسال
-            Tab(text: '\u0627\u0644\u0623\u0631\u0634\u064A\u0641'), // الأرشيف
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('sendTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('archiveTab')),
           ],
         ),
       ),
@@ -190,28 +191,28 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
                 children: [
                   const Icon(Icons.school_outlined, size: 48, color: AppColors.primary),
                   const SizedBox(height: 16),
-                  const Text(
-                    '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0644\u0646\u0638\u0627\u0645 \u0646\u0648\u0631', // تسجيل الدخول لنظام نور
+                  Text(
+                    AppLocalizations.of(context)!.translate('noorLoginTitle'),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 20),
                   AppTextField(
-                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645', // اسم المستخدم
-                    hint: '\u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645', // أدخل اسم المستخدم
+                    label: AppLocalizations.of(context)!.translate('username'),
+                    hint: AppLocalizations.of(context)!.translate('enterUsername'),
                     controller: _usernameController,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   AppTextField(
-                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', // كلمة المرور
-                    hint: '\u0623\u062F\u062E\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', // أدخل كلمة المرور
+                    label: AppLocalizations.of(context)!.translate('password'),
+                    hint: AppLocalizations.of(context)!.translate('enterPassword'),
                     controller: _passwordController,
                     obscureText: true,
                     textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 20),
                   AppButton.primary(
-                    text: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644', // تسجيل الدخول
+                    text: AppLocalizations.of(context)!.translate('login'),
                     onPressed: _noorLogin,
                     isLoading: _isLoggingIn,
                     icon: Icons.login_rounded,
@@ -238,20 +239,20 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.successBorder),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.check_circle, color: AppColors.success, size: 20),
-                SizedBox(width: 8),
+                const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                const SizedBox(width: 8),
                 Text(
-                  '\u062A\u0645 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0646\u0638\u0627\u0645 \u0646\u0648\u0631', // تم الاتصال بنظام نور
+                  AppLocalizations.of(context)!.translate('noorConnected'),
                   style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            '\u0627\u062E\u062A\u0631 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A', // اختر الملف الشخصي
+          Text(
+            AppLocalizations.of(context)!.translate('selectProfile'),
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 12),
@@ -299,11 +300,11 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
           ),
           const SizedBox(height: 16),
           AppButton.primary(
-            text: '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0634\u0647\u0627\u062F\u0627\u062A', // إرسال الشهادات
+            text: AppLocalizations.of(context)!.translate('sendCertifications'),
             onPressed: _selectedProfileId != null ? () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('\u062C\u0627\u0631\u064A \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0634\u0647\u0627\u062F\u0627\u062A'), // جاري إرسال الشهادات
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.translate('sendingCertifications')),
                   backgroundColor: AppColors.info,
                 ),
               );
@@ -321,9 +322,9 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
       return AppErrorWidget(message: _archiveError!, onRetry: _loadArchive);
     }
     if (_archive.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.school_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0634\u0647\u0627\u062F\u0627\u062A', // لا توجد شهادات
+        title: AppLocalizations.of(context)!.translate('noCertifications'),
       );
     }
 
@@ -369,7 +370,7 @@ class _CertificationsScreenState extends ConsumerState<CertificationsScreen>
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    cert.isSent ? '\u0645\u0631\u0633\u0644' : '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631', // مرسل / قيد الانتظار
+                    cert.isSent ? AppLocalizations.of(context)!.translate('sent') : AppLocalizations.of(context)!.translate('pending'),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,

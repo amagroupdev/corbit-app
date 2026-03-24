@@ -12,6 +12,7 @@ import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for managing sub-accounts: list, create, edit, delete, toggle status.
 class SubAccountsScreen extends ConsumerStatefulWidget {
   const SubAccountsScreen({super.key});
@@ -28,7 +29,7 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('الحسابات الفرعية'),
+        title: Text(AppLocalizations.of(context)!.translate('subAccounts')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -46,7 +47,7 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppSearchBar(
-              hint: 'بحث في الحسابات الفرعية...',
+              hint: AppLocalizations.of(context)!.translate('sub_accounts_search'),
               onChanged: (query) {
                 ref.read(subAccountsProvider.notifier).search(query);
               },
@@ -60,8 +61,8 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
                 if (paginated.isEmpty) {
                   return AppEmptyState(
                     icon: Icons.people_outline_rounded,
-                    title: 'لا توجد حسابات فرعية',
-                    description: 'اضغط على زر + لإنشاء حساب فرعي جديد',
+                    title: AppLocalizations.of(context)!.translate('sub_accounts_empty'),
+                    description: AppLocalizations.of(context)!.translate('sub_accounts_empty_desc'),
                   );
                 }
 
@@ -104,7 +105,7 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -114,17 +115,17 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الحساب الفرعي'),
-        content: const Text('هل أنت متأكد من حذف هذا الحساب الفرعي؟'),
+        title: Text(AppLocalizations.of(context)!.translate('sub_accounts_delete_title')),
+        content: Text(AppLocalizations.of(context)!.translate('sub_accounts_delete_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('حذف'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -135,8 +136,8 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
         await ref.read(subAccountsProvider.notifier).delete(id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حذف الحساب الفرعي'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('sub_accounts_deleted')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -145,7 +146,7 @@ class _SubAccountsScreenState extends ConsumerState<SubAccountsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('خطأ: $e'), backgroundColor: AppColors.error),
+                content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'), backgroundColor: AppColors.error),
           );
         }
       }
@@ -240,7 +241,7 @@ class _SubAccountCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        account.name ?? 'غير محدد',
+                        account.name ?? AppLocalizations.of(context)!.translate('invoice_status_unknown'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -383,7 +384,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
               const SizedBox(height: 20),
 
               Text(
-                isEditing ? 'تعديل الحساب الفرعي' : 'إنشاء حساب فرعي',
+                isEditing ? AppLocalizations.of(context)!.translate('sub_accounts_edit_title') : AppLocalizations.of(context)!.translate('sub_accounts_create_title'),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -394,8 +395,8 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
 
               if (_showOtpField) ...[
                 // OTP verification
-                const Text(
-                  'تم إرسال رمز التحقق إلى الجوال',
+                Text(
+                  AppLocalizations.of(context)!.translate('sub_accounts_otp_sent'),
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -403,32 +404,32 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'رمز التحقق',
-                  hint: 'أدخل رمز التحقق',
+                  label: AppLocalizations.of(context)!.translate('sub_accounts_otp_label'),
+                  hint: AppLocalizations.of(context)!.translate('sub_accounts_otp_hint'),
                   controller: _otpController,
                   keyboardType: TextInputType.number,
                   validator: (v) =>
-                      Validators.validateRequired(v, fieldName: 'رمز التحقق'),
+                      Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('sub_accounts_otp_label')),
                 ),
                 const SizedBox(height: 24),
                 AppButton.primary(
-                  text: 'تحقق',
+                  text: AppLocalizations.of(context)!.translate('verify_btn'),
                   onPressed: _isLoading ? null : _verifyOtp,
                   isLoading: _isLoading,
                 ),
               ] else ...[
                 AppTextField(
-                  label: 'الاسم',
-                  hint: 'أدخل الاسم',
+                  label: AppLocalizations.of(context)!.translate('sub_accounts_name_label'),
+                  hint: AppLocalizations.of(context)!.translate('sub_accounts_name_hint'),
                   controller: _nameController,
                   validator: (v) =>
-                      Validators.validateRequired(v, fieldName: 'الاسم'),
+                      Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('sub_accounts_name_label')),
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 16),
 
                 AppTextField(
-                  label: 'البريد الإلكتروني',
+                  label: AppLocalizations.of(context)!.translate('profile_email_label'),
                   hint: 'example@email.com',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -438,7 +439,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
                 const SizedBox(height: 16),
 
                 AppTextField(
-                  label: 'رقم الجوال',
+                  label: AppLocalizations.of(context)!.translate('profile_phone_label'),
                   hint: '05XXXXXXXX',
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
@@ -449,8 +450,8 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
 
                 if (!isEditing) ...[
                   AppTextField(
-                    label: 'كلمة المرور',
-                    hint: 'أدخل كلمة المرور',
+                    label: AppLocalizations.of(context)!.translate('sub_accounts_password_label'),
+                    hint: AppLocalizations.of(context)!.translate('sub_accounts_password_hint'),
                     controller: _passwordController,
                     obscureText: true,
                     validator: Validators.validatePassword,
@@ -461,12 +462,12 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
 
                 // API Access toggle
                 SwitchListTile(
-                  title: const Text(
-                    'صلاحية API',
+                  title: Text(
+                    AppLocalizations.of(context)!.translate('sub_accounts_api_access'),
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                   ),
-                  subtitle: const Text(
-                    'السماح بالوصول عبر الواجهة البرمجية',
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.translate('sub_accounts_api_access_desc'),
                     style: TextStyle(fontSize: 12),
                   ),
                   value: _apiAccess,
@@ -477,8 +478,8 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
 
                 // Active toggle
                 SwitchListTile(
-                  title: const Text(
-                    'نشط',
+                  title: Text(
+                    AppLocalizations.of(context)!.translate('active'),
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                   value: _isActive,
@@ -489,7 +490,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
                 const SizedBox(height: 24),
 
                 AppButton.primary(
-                  text: isEditing ? 'حفظ التغييرات' : 'إنشاء',
+                  text: isEditing ? AppLocalizations.of(context)!.translate('profile_save_changes') : AppLocalizations.of(context)!.translate('sub_accounts_create_btn'),
                   onPressed: _isLoading ? null : _submit,
                   isLoading: _isLoading,
                 ),
@@ -526,7 +527,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                success ? 'تم تحديث الحساب الفرعي' : 'فشل التحديث',
+                success ? AppLocalizations.of(context)!.translate('sub_accounts_updated') : AppLocalizations.of(context)!.translate('sub_accounts_update_failed'),
               ),
               backgroundColor: success ? AppColors.success : AppColors.error,
             ),
@@ -549,7 +550,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(result['message'] as String? ?? 'فشل الإنشاء'),
+                content: Text(result['message'] as String? ?? AppLocalizations.of(context)!.translate('sub_accounts_create_failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -559,7 +560,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -585,7 +586,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'تم إنشاء الحساب بنجاح' : 'رمز التحقق غير صحيح',
+              success ? AppLocalizations.of(context)!.translate('sub_accounts_created') : AppLocalizations.of(context)!.translate('sub_accounts_otp_invalid'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -595,7 +596,7 @@ class _SubAccountFormSheetState extends ConsumerState<_SubAccountFormSheet> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'), backgroundColor: AppColors.error),
         );
       }
     } finally {

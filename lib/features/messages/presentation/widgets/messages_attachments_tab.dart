@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Tab that shows message attachments.
 class MessagesAttachmentsTab extends ConsumerStatefulWidget {
@@ -24,19 +25,19 @@ class _MessagesAttachmentsTabState
           Icon(Icons.attach_file_rounded,
               size: 64, color: AppColors.textHint.withOpacity(0.5)),
           const SizedBox(height: 16),
-          const Text(
-            'المرفقات',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.translate('msg_attachments_title'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              'استعرض جميع المرفقات المرسلة مع الرسائل',
+              AppLocalizations.of(context)!.translate('msg_attachments_desc'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -52,13 +53,13 @@ class _MessagesAttachmentsTabState
               color: AppColors.primarySurface,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.cloud_download_outlined,
+                const Icon(Icons.cloud_download_outlined,
                     size: 32, color: AppColors.primary),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'سيتم عرض المرفقات هنا عند إرسال رسائل مع ملفات',
+                  AppLocalizations.of(context)!.translate('msg_attachments_placeholder'),
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.primary,

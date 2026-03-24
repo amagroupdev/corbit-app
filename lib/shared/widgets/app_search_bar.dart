@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A styled search bar with debounced input, clear button, and consistent
 /// ORBIT theming.
@@ -106,7 +107,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
       ),
       decoration: InputDecoration(
         hintText: widget.hint ??
-            '\u0628\u062D\u062B...', // بحث...
+            AppLocalizations.instance.translate('searchHint'),
         hintStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w400,

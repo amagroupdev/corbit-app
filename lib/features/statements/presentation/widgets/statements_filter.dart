@@ -5,6 +5,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/statements/data/models/statement_response_model.dart';
 import 'package:orbit_app/features/statements/presentation/controllers/statements_controller.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
 /// Bottom sheet with filter controls for the statements list.
@@ -155,14 +156,14 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 20),
 
               // ── Title ─────────────────────────────────────────────
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.filter_list_rounded,
+                  const Icon(Icons.filter_list_rounded,
                       color: AppColors.primary, size: 22),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    '\u062A\u0635\u0641\u064A\u0629 \u0627\u0644\u0625\u0641\u0627\u062F\u0627\u062A', // تصفية الإفادات
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.translate('statement_filter_title'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -175,9 +176,9 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 20),
 
               // ── General Search ─────────────────────────────────────
-              const Text(
-                '\u0628\u062D\u062B \u0639\u0627\u0645', // بحث عام
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('statement_general_search'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -186,15 +187,15 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _searchController,
-                hintText: '\u0628\u062D\u062B \u0628\u0627\u0644\u0646\u0635: \u0627\u0644\u0631\u0633\u0627\u0644\u0629\u060C \u0627\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644', // بحث بالنص: الرسالة، اسم المرسل
+                hintText: AppLocalizations.of(context)!.translate('statement_search_text_hint'),
                 icon: Icons.search,
               ),
               const SizedBox(height: 16),
 
               // ── Name ───────────────────────────────────────────────
-              const Text(
-                '\u0627\u0644\u0625\u0633\u0645', // الإسم
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('statement_name_label'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -203,15 +204,15 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _nameController,
-                hintText: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0625\u0633\u0645', // أدخل الإسم
+                hintText: AppLocalizations.of(context)!.translate('statement_enter_name'),
                 icon: Icons.person_outline,
               ),
               const SizedBox(height: 16),
 
               // ── Sender Name ────────────────────────────────────────
-              const Text(
-                '\u0625\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644', // إسم المرسل
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('statement_sender_name'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -220,7 +221,7 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 10),
               _buildTextField(
                 controller: _senderNameController,
-                hintText: '\u0623\u062F\u062E\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644', // أدخل إسم المرسل
+                hintText: AppLocalizations.of(context)!.translate('statement_enter_sender_name'),
                 icon: Icons.account_circle_outlined,
               ),
               const SizedBox(height: 16),
@@ -248,9 +249,9 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    '\u0627\u0644\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0647\u062C\u0631\u064A', // التاريخ الهجري
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.translate('hijriDate'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
@@ -261,9 +262,9 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
               const SizedBox(height: 16),
 
               // ── Date Range ────────────────────────────────────────
-              const Text(
-                '\u0627\u0644\u0641\u062A\u0631\u0629 \u0627\u0644\u0632\u0645\u0646\u064A\u0629', // الفترة الزمنية
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('statement_date_range'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -275,7 +276,7 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
                   // From date
                   Expanded(
                     child: _DatePickerButton(
-                      label: '\u0645\u0646 \u062A\u0627\u0631\u064A\u062E', // من تاريخ
+                      label: AppLocalizations.of(context)!.translate('statement_from_date'),
                       value: _fromDate != null
                           ? dateFormat.format(_fromDate!)
                           : null,
@@ -289,7 +290,7 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
                   // To date
                   Expanded(
                     child: _DatePickerButton(
-                      label: '\u0625\u0644\u0649 \u062A\u0627\u0631\u064A\u062E', // إلى تاريخ
+                      label: AppLocalizations.of(context)!.translate('statement_to_date'),
                       value: _toDate != null
                           ? dateFormat.format(_toDate!)
                           : null,
@@ -308,7 +309,7 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      text: '\u062A\u0635\u0641\u064A\u0629', // تصفية
+                      text: AppLocalizations.of(context)!.translate('reset'),
                       onPressed: _resetFilters,
                       icon: Icons.refresh_rounded,
                     ),
@@ -316,7 +317,7 @@ class _StatementsFilterSheetState extends ConsumerState<StatementsFilterSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton.primary(
-                      text: '\u062A\u0637\u0628\u064A\u0642', // تطبيق
+                      text: AppLocalizations.of(context)!.translate('apply'),
                       onPressed: _applyFilters,
                       icon: Icons.check_rounded,
                     ),

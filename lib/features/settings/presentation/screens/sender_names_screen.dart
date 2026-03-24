@@ -13,6 +13,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for managing sender name requests with status badges,
 /// document uploads, and payment flow.
 class SenderNamesScreen extends ConsumerWidget {
@@ -30,8 +31,8 @@ class SenderNamesScreen extends ConsumerWidget {
           if (paginated.isEmpty) {
             return AppEmptyState(
               icon: Icons.badge_outlined,
-              title: 'لا توجد طلبات',
-              description: 'اضغط على زر + لتقديم طلب اسم مرسل جديد',
+              title: AppLocalizations.of(context)!.translate('sender_empty'),
+              description: AppLocalizations.of(context)!.translate('sender_empty_desc'),
             );
           }
 
@@ -70,7 +71,7 @@ class SenderNamesScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('أسماء المرسلين'),
+        title: Text(AppLocalizations.of(context)!.translate('senderNames')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -102,17 +103,17 @@ class SenderNamesScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الطلب'),
-        content: const Text('هل أنت متأكد من حذف طلب اسم المرسل؟'),
+        title: Text(AppLocalizations.of(context)!.translate('sender_delete_title')),
+        content: Text(AppLocalizations.of(context)!.translate('sender_delete_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('حذف'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -123,8 +124,8 @@ class SenderNamesScreen extends ConsumerWidget {
         await ref.read(senderRequestsProvider.notifier).delete(id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حذف الطلب'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('sender_deleted')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -133,7 +134,7 @@ class SenderNamesScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ: $e'),
+              content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -162,8 +163,8 @@ class SenderNamesScreen extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم رفع المستند بنجاح'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('sender_doc_uploaded')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -172,7 +173,7 @@ class SenderNamesScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -196,8 +197,8 @@ class SenderNamesScreen extends ConsumerWidget {
       if (context.mounted) {
         if (paymentUrl != null && paymentUrl.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم تجهيز رابط الدفع'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('sender_payment_ready')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -205,7 +206,7 @@ class SenderNamesScreen extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                result['message'] as String? ?? 'تمت العملية',
+                result['message'] as String? ?? AppLocalizations.of(context)!.translate('operation_completed'),
               ),
               backgroundColor: AppColors.info,
             ),
@@ -216,7 +217,7 @@ class SenderNamesScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -300,7 +301,7 @@ class _SenderRequestCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      request.name ?? 'غير محدد',
+                      request.name ?? AppLocalizations.of(context)!.translate('sender_status_unknown'),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -331,7 +332,7 @@ class _SenderRequestCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  request.statusLabel,
+                  AppLocalizations.of(context)!.translate(request.statusLabelKey),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -388,7 +389,7 @@ class _SenderRequestCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onUploadDocument,
                   icon: const Icon(Icons.upload_file_rounded, size: 16),
-                  label: const Text('رفع مستند'),
+                  label: Text(AppLocalizations.of(context)!.translate('sender_upload_doc')),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     textStyle: const TextStyle(fontSize: 12),
@@ -400,7 +401,7 @@ class _SenderRequestCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onInitiatePayment,
                   icon: const Icon(Icons.payment_rounded, size: 16),
-                  label: const Text('الدفع'),
+                  label: Text(AppLocalizations.of(context)!.translate('sender_payment')),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.success,
                     textStyle: const TextStyle(fontSize: 12),
@@ -410,7 +411,7 @@ class _SenderRequestCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                  label: const Text('حذف'),
+                  label: Text(AppLocalizations.of(context)!.translate('delete')),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.error,
                     textStyle: const TextStyle(fontSize: 12),
@@ -455,7 +456,7 @@ class _CreateSenderRequestScreenState
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('طلب اسم مرسل جديد'),
+        title: Text(AppLocalizations.of(context)!.translate('sender_create_title')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -475,14 +476,14 @@ class _CreateSenderRequestScreenState
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.infoBorder),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
+                  const Icon(Icons.info_outline_rounded,
                       color: AppColors.info, size: 20),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'سيتم مراجعة طلبك خلال 1-3 أيام عمل. يرجى إرفاق المستندات المطلوبة.',
+                      AppLocalizations.of(context)!.translate('sender_review_notice'),
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.info,
@@ -495,28 +496,28 @@ class _CreateSenderRequestScreenState
             const SizedBox(height: 24),
 
             AppTextField(
-              label: 'اسم المرسل',
-              hint: 'مثال: MyCompany',
+              label: AppLocalizations.of(context)!.translate('sender_name_label'),
+              hint: AppLocalizations.of(context)!.translate('sender_name_hint'),
               controller: _nameController,
               validator: (v) =>
-                  Validators.validateRequired(v, fieldName: 'اسم المرسل'),
+                  Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('sender_name_label')),
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 16),
 
             AppTextField(
-              label: 'اسم المنظمة',
-              hint: 'الاسم الرسمي للمنظمة',
+              label: AppLocalizations.of(context)!.translate('sender_org_label'),
+              hint: AppLocalizations.of(context)!.translate('sender_org_hint'),
               controller: _organizationController,
               validator: (v) =>
-                  Validators.validateRequired(v, fieldName: 'اسم المنظمة'),
+                  Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('sender_org_label')),
               textInputAction: TextInputAction.done,
             ),
             const SizedBox(height: 24),
 
             // Commercial Register upload
             _buildFileUploadRow(
-              label: 'السجل التجاري',
+              label: AppLocalizations.of(context)!.translate('sender_commercial_register'),
               filePath: _commercialRegisterPath,
               onTap: () => _pickFile('commercial_register'),
             ),
@@ -524,14 +525,14 @@ class _CreateSenderRequestScreenState
 
             // Document upload
             _buildFileUploadRow(
-              label: 'خطاب التفويض',
+              label: AppLocalizations.of(context)!.translate('sender_authorization_letter'),
               filePath: _documentPath,
               onTap: () => _pickFile('document'),
             ),
             const SizedBox(height: 32),
 
             AppButton.primary(
-              text: 'تقديم الطلب',
+              text: AppLocalizations.of(context)!.translate('sender_submit'),
               onPressed: _isLoading ? null : _submit,
               isLoading: _isLoading,
               icon: Icons.send_rounded,
@@ -593,7 +594,7 @@ class _CreateSenderRequestScreenState
                   child: Text(
                     filePath != null
                         ? filePath.split('/').last
-                        : 'اضغط لرفع الملف',
+                        : AppLocalizations.of(context)!.translate('sender_upload_file'),
                     style: TextStyle(
                       fontSize: 14,
                       color: filePath != null
@@ -671,7 +672,7 @@ class _CreateSenderRequestScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              success ? 'تم تقديم الطلب بنجاح' : 'فشل تقديم الطلب',
+              success ? AppLocalizations.of(context)!.translate('sender_submitted') : AppLocalizations.of(context)!.translate('sender_submit_failed'),
             ),
             backgroundColor: success ? AppColors.success : AppColors.error,
           ),
@@ -682,7 +683,7 @@ class _CreateSenderRequestScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );

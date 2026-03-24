@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing interaction (two-way SMS) with replies list
 /// and send form.
@@ -97,8 +98,8 @@ class _InteractionScreenState extends ConsumerState<InteractionScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644 \u0628\u0646\u062C\u0627\u062D'), // تم الإرسال بنجاح
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('sentSuccessfully')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -121,15 +122,15 @@ class _InteractionScreenState extends ConsumerState<InteractionScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u062A\u0641\u0627\u0639\u0644'), // التفاعل
+        title: Text(AppLocalizations.of(context)!.translate('interaction')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0625\u0631\u0633\u0627\u0644'), // إرسال
-            Tab(text: '\u0627\u0644\u0631\u062F\u0648\u062F'), // الردود
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('sendTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('repliesLabel')),
           ],
         ),
       ),
@@ -152,30 +153,30 @@ class _InteractionScreenState extends ConsumerState<InteractionScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppTextField(
-              label: '\u0623\u0631\u0642\u0627\u0645 \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // أرقام المستلمين
-              hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u0645\u0641\u0635\u0648\u0644\u0629 \u0628\u0641\u0627\u0635\u0644\u0629', // أدخل الأرقام مفصولة بفاصلة
+              label: AppLocalizations.of(context)!.translate('recipientNumbers'),
+              hint: AppLocalizations.of(context)!.translate('enterNumbersSeparated'),
               controller: _numbersController,
               maxLines: 3,
               minLines: 2,
               keyboardType: TextInputType.phone,
               validator: (v) => v == null || v.trim().isEmpty
-                  ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0631\u0642\u0645 \u0648\u0627\u062D\u062F \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644' // يرجى إدخال رقم واحد على الأقل
+                  ? AppLocalizations.of(context)!.translate('enterAtLeastOneNumber')
                   : null,
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: '\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // نص الرسالة
-              hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062A\u0641\u0627\u0639\u0644', // أدخل نص رسالة التفاعل
+              label: AppLocalizations.of(context)!.translate('messageBody'),
+              hint: AppLocalizations.of(context)!.translate('interactionMessageHint'),
               controller: _messageController,
               maxLines: 5,
               minLines: 3,
               validator: (v) => v == null || v.trim().isEmpty
-                  ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629' // يرجى إدخال نص الرسالة
+                  ? AppLocalizations.of(context)!.translate('enterMessageBodyValidation')
                   : null,
             ),
             const SizedBox(height: 24),
             AppButton.primary(
-              text: '\u0625\u0631\u0633\u0627\u0644', // إرسال
+              text: AppLocalizations.of(context)!.translate('submit'),
               onPressed: _send,
               isLoading: _isSending,
               icon: Icons.send_rounded,
@@ -192,10 +193,10 @@ class _InteractionScreenState extends ConsumerState<InteractionScreen>
       return AppErrorWidget(message: _repliesError!, onRetry: _loadReplies);
     }
     if (_replies.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.chat_bubble_outline,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u062F\u0648\u062F', // لا توجد ردود
-        description: '\u0633\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0631\u062F\u0648\u062F \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // ستظهر هنا ردود المستلمين
+        title: AppLocalizations.of(context)!.translate('noReplies'),
+        description: AppLocalizations.of(context)!.translate('recipientRepliesDesc'),
       );
     }
 

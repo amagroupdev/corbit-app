@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
 /// A full-width, centered error display with an icon, message, and
@@ -70,7 +71,7 @@ class AppErrorWidget extends StatelessWidget {
               const SizedBox(height: 24),
               AppButton.secondary(
                 text: retryText ??
-                    '\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629', // إعادة المحاولة
+                    AppLocalizations.instance.translate('retry'),
                 onPressed: onRetry,
                 icon: Icons.refresh_rounded,
                 width: 200,

@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Formatting utilities for the ORBIT SMS V3 application.
 ///
@@ -6,6 +7,15 @@ import 'package:intl/intl.dart';
 /// without instantiation.
 class Formatters {
   const Formatters._();
+
+  // ---------------------------------------------------------------------------
+  // Localization helper
+  // ---------------------------------------------------------------------------
+
+  static String _t(String key) => AppLocalizations.instance.translate(key);
+
+  static String _tParams(String key, Map<String, String> params) =>
+      AppLocalizations.instance.translateWithParams(key, params);
 
   // ---------------------------------------------------------------------------
   // Phone
@@ -72,66 +82,51 @@ class Formatters {
 
   /// Returns a human-readable relative time string such as "Just now",
   /// "5 minutes ago", "2 hours ago", "Yesterday", etc.
+  ///
+  /// Uses the current app locale via [AppLocalizations.instance].
   static String timeAgo(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
+    final c = (int count) => '$count';
 
     if (difference.inSeconds < 60) {
-      return 'الآن';
+      return _t('timeJustNow');
     }
     if (difference.inMinutes < 60) {
       final minutes = difference.inMinutes;
-      return 'منذ $minutes ${minutes == 1 ? 'دقيقة' : 'دقائق'}';
+      final key = minutes == 1 ? 'timeMinuteAgo' : 'timeMinutesAgo';
+      return _tParams(key, {'count': c(minutes)});
     }
     if (difference.inHours < 24) {
       final hours = difference.inHours;
-      return 'منذ $hours ${hours == 1 ? 'ساعة' : 'ساعات'}';
+      final key = hours == 1 ? 'timeHourAgo' : 'timeHoursAgo';
+      return _tParams(key, {'count': c(hours)});
     }
     if (difference.inDays == 1) {
-      return 'أمس';
+      return _t('timeYesterday');
     }
     if (difference.inDays < 7) {
-      return 'منذ ${difference.inDays} أيام';
+      return _tParams('timeDaysAgo', {'count': c(difference.inDays)});
     }
     if (difference.inDays < 30) {
       final weeks = (difference.inDays / 7).floor();
-      return 'منذ $weeks ${weeks == 1 ? 'أسبوع' : 'أسابيع'}';
+      final key = weeks == 1 ? 'timeWeekAgo' : 'timeWeeksAgo';
+      return _tParams(key, {'count': c(weeks)});
     }
     if (difference.inDays < 365) {
       final months = (difference.inDays / 30).floor();
-      return 'منذ $months ${months == 1 ? 'شهر' : 'أشهر'}';
+      final key = months == 1 ? 'timeMonthAgo' : 'timeMonthsAgo';
+      return _tParams(key, {'count': c(months)});
     }
     final years = (difference.inDays / 365).floor();
-    return 'منذ $years ${years == 1 ? 'سنة' : 'سنوات'}';
+    final key = years == 1 ? 'timeYearAgo' : 'timeYearsAgo';
+    return _tParams(key, {'count': c(years)});
   }
 
   /// English variant of [timeAgo].
-  static String timeAgoEn(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) return 'Just now';
-    if (difference.inMinutes < 60) {
-      final m = difference.inMinutes;
-      return '$m ${m == 1 ? 'minute' : 'minutes'} ago';
-    }
-    if (difference.inHours < 24) {
-      final h = difference.inHours;
-      return '$h ${h == 1 ? 'hour' : 'hours'} ago';
-    }
-    if (difference.inDays == 1) return 'Yesterday';
-    if (difference.inDays < 7) return '${difference.inDays} days ago';
-    if (difference.inDays < 30) {
-      final w = (difference.inDays / 7).floor();
-      return '$w ${w == 1 ? 'week' : 'weeks'} ago';
-    }
-    if (difference.inDays < 365) {
-      final mo = (difference.inDays / 30).floor();
-      return '$mo ${mo == 1 ? 'month' : 'months'} ago';
-    }
-    final y = (difference.inDays / 365).floor();
-    return '$y ${y == 1 ? 'year' : 'years'} ago';
-  }
+  ///
+  /// @deprecated Use [timeAgo] instead, which now auto-detects locale.
+  static String timeAgoEn(DateTime date) => timeAgo(date);
 
   // ---------------------------------------------------------------------------
   // Currency
@@ -153,7 +148,7 @@ class Formatters {
       decimalDigits: decimalDigits,
     );
     final formatted = formatter.format(amount).trim();
-    return showSymbol ? '$formatted ر.س' : formatted;
+    return showSymbol ? '$formatted ${_t('currencySymbol')}' : formatted;
   }
 
   // ---------------------------------------------------------------------------
@@ -204,8 +199,12 @@ class Formatters {
         ? (segments == 1 ? 70 : 67)
         : (segments == 1 ? 160 : 153);
     final remaining = (maxPerSegment * segments) - charCount;
-    return '$segments ${segments == 1 ? 'رسالة' : 'رسائل'} '
-        '($charCount حرف، متبقي $remaining)';
+    final key = segments == 1 ? 'smsCountSingular' : 'smsCountPlural';
+    return _tParams(key, {
+      'segments': '$segments',
+      'chars': '$charCount',
+      'remaining': '$remaining',
+    });
   }
 
   // ---------------------------------------------------------------------------

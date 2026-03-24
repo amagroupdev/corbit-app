@@ -8,6 +8,7 @@ import 'package:orbit_app/features/addons/data/repositories/addons_repository.da
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Detail screen for a single addon/service.
 ///
@@ -72,9 +73,9 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
       await repository.activateTrial(widget.addonId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              '\u062A\u0645 \u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u0641\u062A\u0631\u0629 \u0627\u0644\u062A\u062C\u0631\u064A\u0628\u064A\u0629 \u0628\u0646\u062C\u0627\u062D', // تم تفعيل الفترة التجريبية بنجاح
+              AppLocalizations.of(context)!.translate('addonTrialActivated'),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -152,7 +153,7 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_addon?.name ?? '\u062A\u0641\u0627\u0635\u064A\u0644 \u0627\u0644\u062E\u062F\u0645\u0629'), // تفاصيل الخدمة
+        title: Text(_addon?.name ?? AppLocalizations.of(context)!.translate('serviceDetails')),
       ),
       body: _buildBody(),
     );
@@ -238,8 +239,8 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
                           color: AppColors.successSurface,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
-                          '\u0645\u0641\u0639\u0644', // مفعل
+                        child: Text(
+                          AppLocalizations.of(context)!.translate('addonActivated'),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -264,8 +265,8 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
 
                 // ── Subscription Plans ──────────────────────
                 if (addon.subscriptionPlans.isNotEmpty && !addon.isActive) ...[
-                  const Text(
-                    '\u062E\u0637\u0637 \u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643', // خطط الاشتراك
+                  Text(
+                    AppLocalizations.of(context)!.translate('addonSubscriptionPlans'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -290,7 +291,7 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: AppButton.secondary(
-                        text: '\u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u0641\u062A\u0631\u0629 \u0627\u0644\u062A\u062C\u0631\u064A\u0628\u064A\u0629', // تفعيل الفترة التجريبية
+                        text: AppLocalizations.of(context)!.translate('addonActivateTrial'),
                         onPressed: _activateTrial,
                         isLoading: _isActivating,
                         icon: Icons.play_circle_outline_rounded,
@@ -298,7 +299,7 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
                     ),
                   if (!addon.isFree)
                     AppButton.primary(
-                      text: '\u0627\u0634\u062A\u0631\u0643 \u0627\u0644\u0622\u0646', // اشترك الآن
+                      text: AppLocalizations.of(context)!.translate('addonSubscribeNow'),
                       onPressed: _selectedPlanId != null
                           ? _initiatePayment
                           : null,
@@ -309,7 +310,7 @@ class _AddonDetailScreenState extends ConsumerState<AddonDetailScreen> {
 
                 if (addon.isComingSoon)
                   AppButton.secondary(
-                    text: '\u0642\u0631\u064A\u0628\u0627\u064B', // قريباً
+                    text: AppLocalizations.of(context)!.translate('addonComingSoon'),
                     onPressed: null,
                     isDisabled: true,
                     icon: Icons.schedule_rounded,

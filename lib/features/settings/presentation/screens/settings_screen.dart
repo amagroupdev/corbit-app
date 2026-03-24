@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/features/settings/data/models/sub_account_model.dart';
 import 'package:orbit_app/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:orbit_app/features/settings/presentation/widgets/settings_item.dart';
 import 'package:orbit_app/features/settings/presentation/widgets/settings_section.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Main settings screen with grouped list items organized by category.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -20,7 +22,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('الإعدادات'),
+        title: Text(AppLocalizations.of(context)!.translate('settings')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -34,21 +36,24 @@ class SettingsScreen extends ConsumerWidget {
             // ── Profile Header ──────────────────────────────────────
             _buildProfileHeader(context, profileAsync),
 
+            // ── اللغة (Language) ─────────────────────────────────────
+            _LanguageSection(),
+
             // ── الحساب (Account) ────────────────────────────────────
             SettingsSection(
-              title: 'الحساب',
+              title: AppLocalizations.of(context)!.translate('settings_section_account'),
               icon: Icons.person_outline_rounded,
               children: [
                 SettingsItem(
                   icon: Icons.person_rounded,
-                  title: 'الملف الشخصي',
-                  subtitle: 'تعديل البيانات الشخصية',
+                  title: AppLocalizations.of(context)!.translate('profile'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_profile_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.profile),
                 ),
                 SettingsItem(
                   icon: Icons.lock_outline_rounded,
-                  title: 'تغيير كلمة المرور',
-                  subtitle: 'تحديث كلمة المرور الحالية',
+                  title: AppLocalizations.of(context)!.translate('changePassword'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_change_password_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.changePassword),
                 ),
               ],
@@ -56,19 +61,19 @@ class SettingsScreen extends ConsumerWidget {
 
             // ── الإدارة (Management) ────────────────────────────────
             SettingsSection(
-              title: 'الإدارة',
+              title: AppLocalizations.of(context)!.translate('settings_section_management'),
               icon: Icons.admin_panel_settings_outlined,
               children: [
                 SettingsItem(
                   icon: Icons.people_outline_rounded,
-                  title: 'الحسابات الفرعية',
-                  subtitle: 'إدارة المستخدمين الفرعيين',
+                  title: AppLocalizations.of(context)!.translate('subAccounts'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_sub_accounts_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.subAccounts),
                 ),
                 SettingsItem(
                   icon: Icons.security_rounded,
-                  title: 'الأدوار والصلاحيات',
-                  subtitle: 'إدارة أدوار المستخدمين',
+                  title: AppLocalizations.of(context)!.translate('settings_roles_title'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_roles_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.roles),
                 ),
               ],
@@ -76,19 +81,19 @@ class SettingsScreen extends ConsumerWidget {
 
             // ── المالية (Financial) ─────────────────────────────────
             SettingsSection(
-              title: 'المالية',
+              title: AppLocalizations.of(context)!.translate('settings_section_financial'),
               icon: Icons.account_balance_wallet_outlined,
               children: [
                 SettingsItem(
                   icon: Icons.receipt_long_rounded,
-                  title: 'الفواتير',
-                  subtitle: 'عرض وتحميل الفواتير',
+                  title: AppLocalizations.of(context)!.translate('invoices'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_invoices_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.invoices),
                 ),
                 SettingsItem(
                   icon: Icons.notifications_active_outlined,
-                  title: 'تنبيه الرصيد',
-                  subtitle: 'إعدادات التنبيه عند انخفاض الرصيد',
+                  title: AppLocalizations.of(context)!.translate('balanceReminder'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_balance_reminder_subtitle'),
                   onTap: () => _showBalanceReminderSheet(context, ref),
                 ),
               ],
@@ -96,13 +101,13 @@ class SettingsScreen extends ConsumerWidget {
 
             // ── التقنية (Technical) ─────────────────────────────────
             SettingsSection(
-              title: 'التقنية',
+              title: AppLocalizations.of(context)!.translate('settings_section_technical'),
               icon: Icons.code_rounded,
               children: [
                 SettingsItem(
                   icon: Icons.vpn_key_rounded,
-                  title: 'مفاتيح API',
-                  subtitle: 'إدارة مفاتيح الوصول للواجهة البرمجية',
+                  title: AppLocalizations.of(context)!.translate('apiKeys'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_api_keys_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.apiKeys),
                 ),
               ],
@@ -110,19 +115,19 @@ class SettingsScreen extends ConsumerWidget {
 
             // ── المرسلين (Senders) ──────────────────────────────────
             SettingsSection(
-              title: 'المرسلين',
+              title: AppLocalizations.of(context)!.translate('settings_section_senders'),
               icon: Icons.send_rounded,
               children: [
                 SettingsItem(
                   icon: Icons.badge_outlined,
-                  title: 'أسماء المرسلين',
-                  subtitle: 'طلب وإدارة أسماء المرسلين',
+                  title: AppLocalizations.of(context)!.translate('senderNames'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_sender_names_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.senderNames),
                 ),
                 SettingsItem(
                   icon: Icons.description_outlined,
-                  title: 'العقود',
-                  subtitle: 'إدارة العقود والمستندات',
+                  title: AppLocalizations.of(context)!.translate('contracts'),
+                  subtitle: AppLocalizations.of(context)!.translate('settings_contracts_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.contracts),
                 ),
               ],
@@ -177,7 +182,7 @@ class SettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    profile['name'] as String? ?? 'المستخدم',
+                    profile['name'] as String? ?? AppLocalizations.of(context)!.translate('settings_user_default'),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -227,9 +232,9 @@ class SettingsScreen extends ConsumerWidget {
               child: const Icon(Icons.person, size: 32, color: Colors.white),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
-                'المستخدم',
+                AppLocalizations.of(context)!.translate('settings_user_default'),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -317,8 +322,8 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
             ),
             const SizedBox(height: 20),
 
-            const Text(
-              'تنبيه الرصيد',
+            Text(
+              AppLocalizations.of(context)!.translate('balanceReminder'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -326,8 +331,8 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'سيتم تنبيهك عندما ينخفض رصيدك عن الحد المحدد.',
+            Text(
+              AppLocalizations.of(context)!.translate('settings_balance_reminder_desc'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -337,8 +342,8 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
 
             // Enable toggle
             SwitchListTile(
-              title: const Text(
-                'تفعيل التنبيه',
+              title: Text(
+                AppLocalizations.of(context)!.translate('settings_enable_reminder'),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -353,8 +358,8 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
 
             // Threshold input
             if (_isEnabled) ...[
-              const Text(
-                'الحد الأدنى للرصيد',
+              Text(
+                AppLocalizations.of(context)!.translate('settings_min_balance'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -366,7 +371,7 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
                 controller: _thresholdController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  hintText: 'مثال: 100',
+                  hintText: AppLocalizations.of(context)!.translate('settings_min_balance_hint'),
                   hintStyle: const TextStyle(color: AppColors.inputHint),
                   filled: true,
                   fillColor: AppColors.surfaceVariant,
@@ -406,8 +411,8 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'حفظ',
+                    : Text(
+                        AppLocalizations.of(context)!.translate('save'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -437,16 +442,16 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
       if (mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حفظ إعدادات التنبيه بنجاح'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('settings_reminder_saved')),
               backgroundColor: AppColors.success,
             ),
           );
           Navigator.of(context).pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('حدث خطأ أثناء الحفظ'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('settings_reminder_save_error')),
               backgroundColor: AppColors.error,
             ),
           );
@@ -456,7 +461,7 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -464,5 +469,53 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+}
+
+/// Language selection section for the settings screen.
+class _LanguageSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
+    return SettingsSection(
+      title: AppLocalizations.of(context)!.translate('language'),
+      icon: Icons.language_rounded,
+      children: [
+        SettingsItem(
+          icon: Icons.language_rounded,
+          title: AppLocalizations.of(context)!.translate('arabic'),
+          subtitle: locale.languageCode == 'ar' ? AppLocalizations.of(context)!.translate('current') : null,
+          showChevron: false,
+          trailing: Radio<String>(
+            value: 'ar',
+            groupValue: locale.languageCode,
+            onChanged: (_) {
+              ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
+            },
+            activeColor: AppColors.primary,
+          ),
+          onTap: () {
+            ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
+          },
+        ),
+        SettingsItem(
+          icon: Icons.language_rounded,
+          title: AppLocalizations.of(context)!.translate('english'),
+          subtitle: locale.languageCode == 'en' ? AppLocalizations.of(context)!.translate('current') : null,
+          showChevron: false,
+          trailing: Radio<String>(
+            value: 'en',
+            groupValue: locale.languageCode,
+            onChanged: (_) {
+              ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+            },
+            activeColor: AppColors.primary,
+          ),
+          onTap: () {
+            ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+          },
+        ),
+      ],
+    );
   }
 }

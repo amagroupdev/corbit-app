@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing occasion/greeting cards.
 ///
@@ -138,7 +139,7 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
               ),
               const SizedBox(height: 20),
               Text(
-                '\u0625\u0631\u0633\u0627\u0644 \u0628\u0637\u0627\u0642\u0629: ${template.name}', // إرسال بطاقة: ...
+                '${AppLocalizations.of(context)!.translate("sendCardTitle")} ${template.name}',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -159,28 +160,28 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
                 ),
               const SizedBox(height: 16),
               AppTextField(
-                label: '\u0627\u0644\u0631\u0633\u0627\u0644\u0629', // الرسالة
-                hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0627\u0644\u062A\u0647\u0646\u0626\u0629', // أدخل نص التهنئة
+                label: AppLocalizations.of(context)!.translate('theMessage'),
+                hint: AppLocalizations.of(context)!.translate('enterGreeting'),
                 controller: messageController,
                 maxLines: 3,
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629' // يرجى إدخال الرسالة
+                    ? AppLocalizations.of(context)!.translate('enterMessageValidation')
                     : null,
               ),
               const SizedBox(height: 12),
               AppTextField(
-                label: '\u0627\u0644\u0623\u0631\u0642\u0627\u0645', // الأرقام
-                hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u0645\u0641\u0635\u0648\u0644\u0629 \u0628\u0641\u0627\u0635\u0644\u0629', // أدخل الأرقام مفصولة بفاصلة
+                label: AppLocalizations.of(context)!.translate('theNumbers'),
+                hint: AppLocalizations.of(context)!.translate('enterNumbersSeparated'),
                 controller: numbersController,
                 maxLines: 2,
                 keyboardType: TextInputType.phone,
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645' // يرجى إدخال الأرقام
+                    ? AppLocalizations.of(context)!.translate('enterNumbersValidation')
                     : null,
               ),
               const SizedBox(height: 20),
               AppButton.primary(
-                text: '\u0625\u0631\u0633\u0627\u0644', // إرسال
+                text: AppLocalizations.of(context)!.translate('submit'),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     Navigator.pop(ctx, true);
@@ -212,8 +213,8 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0628\u0637\u0627\u0642\u0629 \u0628\u0646\u062C\u0627\u062D'), // تم إرسال البطاقة بنجاح
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('cardSent')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -236,15 +237,15 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0628\u0637\u0627\u0642\u0627\u062A \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0627\u062A'), // بطاقات المناسبات
+        title: Text(AppLocalizations.of(context)!.translate('occasionCards')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0627\u0644\u0642\u0648\u0627\u0644\u0628'), // القوالب
-            Tab(text: '\u0627\u0644\u0623\u0631\u0634\u064A\u0641'), // الأرشيف
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('templatesTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('archiveTab')),
           ],
         ),
       ),
@@ -264,9 +265,9 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
       return AppErrorWidget(message: _templatesError!, onRetry: _loadTemplates);
     }
     if (_templates.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.card_giftcard_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0642\u0648\u0627\u0644\u0628', // لا توجد قوالب
+        title: AppLocalizations.of(context)!.translate('noCardTemplates'),
       );
     }
 
@@ -299,9 +300,9 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
       return AppErrorWidget(message: _archiveError!, onRetry: _loadArchive);
     }
     if (_archive.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.card_giftcard_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u0637\u0627\u0642\u0627\u062A \u0645\u0631\u0633\u0644\u0629', // لا توجد بطاقات مرسلة
+        title: AppLocalizations.of(context)!.translate('noSentCards'),
       );
     }
 
@@ -349,7 +350,7 @@ class _OccasionCardsScreenState extends ConsumerState<OccasionCardsScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${card.recipientCount} \u0645\u0633\u062A\u0644\u0645 \u2022 ${dateFormat.format(card.createdAt)}', // مستلم
+                        '${card.recipientCount} ${AppLocalizations.of(context)!.translate("recipientUnit")} \u2022 ${dateFormat.format(card.createdAt)}',
                         style: const TextStyle(fontSize: 12, color: AppColors.textHint),
                       ),
                     ],

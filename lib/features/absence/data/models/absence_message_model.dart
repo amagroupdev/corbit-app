@@ -1,4 +1,5 @@
 /// Model representing an absence/tardiness message in the ORBIT SMS platform.
+import 'package:orbit_app/core/localization/app_localizations.dart';
 ///
 /// These messages are sent to parents/guardians to notify them about
 /// student absence or tardiness.
@@ -45,22 +46,22 @@ class AbsenceMessageModel {
   /// Whether the message is a tardiness type.
   bool get isTardiness => messageType == 'tardiness';
 
-  /// Arabic label for the message type.
-  String get messageTypeLabel {
+  /// Returns a localization key for the message type label.
+  String get messageTypeKey {
     return switch (messageType) {
-      'absence' => '\u063A\u064A\u0627\u0628', // غياب
-      'tardiness' => '\u062A\u0623\u062E\u0631', // تأخر
+      'absence' => 'absenceType',
+      'tardiness' => 'tardinessType',
       _ => messageType,
     };
   }
 
-  /// Arabic label for the status.
-  String get statusLabel {
+  /// Returns a localization key for the status label.
+  String get statusKey {
     return switch (status) {
-      'accepted' || 'sent' => '\u0645\u0642\u0628\u0648\u0644\u0629', // مقبولة
-      'rejected' || 'failed' => '\u0645\u0631\u0641\u0648\u0636\u0629', // مرفوضة
-      'expired' => '\u0645\u0646\u062A\u0647\u064A', // منتهي
-      'under_review' || 'pending' => '\u062A\u062D\u062A \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629', // تحت المراجعة
+      'accepted' || 'sent' => 'statusAccepted',
+      'rejected' || 'failed' => 'statusRejected',
+      'expired' => 'statusExpired',
+      'under_review' || 'pending' => 'statusUnderReview',
       _ => status,
     };
   }

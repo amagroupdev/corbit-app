@@ -9,6 +9,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing questionnaires with Sent/Unsent tabs.
 class QuestionnairesScreen extends ConsumerStatefulWidget {
@@ -109,22 +110,22 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0627\u0633\u062A\u0628\u064A\u0627\u0646', // حذف الاستبيان
+        title: Text(
+          AppLocalizations.of(context)!.translate('deleteQuestionnaire'),
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 "${q.title}"\u061F', // هل أنت متأكد من حذف "..."؟
+          '${AppLocalizations.of(context)!.translate("confirmDeleteQuestionnaire")} "${q.title}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('\u0625\u0644\u063A\u0627\u0621'), // إلغاء
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'), // حذف
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -137,8 +138,8 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
       await repo.deleteQuestionnaire(q.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u0627\u0644\u062D\u0630\u0641 \u0628\u0646\u062C\u0627\u062D'), // تم الحذف بنجاح
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('deletedSuccessfully')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -158,15 +159,15 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u0627\u0633\u062A\u0628\u064A\u0627\u0646\u0627\u062A'), // الاستبيانات
+        title: Text(AppLocalizations.of(context)!.translate('questionnaires')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
           tabs: [
-            Tab(text: '\u0627\u0644\u0645\u0631\u0633\u0644\u0629 (${_sentList.length})'), // المرسلة
-            Tab(text: '\u063A\u064A\u0631 \u0627\u0644\u0645\u0631\u0633\u0644\u0629 (${_unsentList.length})'), // غير المرسلة
+            Tab(text: '${AppLocalizations.of(context)!.translate("sentTab")} (${_sentList.length})'),
+            Tab(text: '${AppLocalizations.of(context)!.translate("unsentTab")} (${_unsentList.length})'),
           ],
         ),
       ),
@@ -175,7 +176,7 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppSearchBar(
-              hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0627\u0633\u062A\u0628\u064A\u0627\u0646\u0627\u062A...', // بحث في الاستبيانات...
+              hint: AppLocalizations.of(context)!.translate('searchQuestionnaires'),
               onChanged: _onSearchChanged,
             ),
           ),
@@ -202,9 +203,9 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
       );
     }
     if (_sentList.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.quiz_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0627\u0633\u062A\u0628\u064A\u0627\u0646\u0627\u062A \u0645\u0631\u0633\u0644\u0629', // لا توجد استبيانات مرسلة
+        title: AppLocalizations.of(context)!.translate('noSentQuestionnaires'),
       );
     }
     return RefreshIndicator(
@@ -234,9 +235,9 @@ class _QuestionnairesScreenState extends ConsumerState<QuestionnairesScreen>
       );
     }
     if (_unsentList.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.quiz_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0627\u0633\u062A\u0628\u064A\u0627\u0646\u0627\u062A \u063A\u064A\u0631 \u0645\u0631\u0633\u0644\u0629', // لا توجد استبيانات غير مرسلة
+        title: AppLocalizations.of(context)!.translate('noUnsentQuestionnaires'),
       );
     }
     return RefreshIndicator(

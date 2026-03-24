@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A widget that displays payment method options in a grid.
 ///
@@ -22,20 +23,20 @@ class PaymentMethodSelector extends StatelessWidget {
   static const List<_PaymentMethodOption> _methods = [
     _PaymentMethodOption(
       key: 'online',
-      label: '\u062F\u0641\u0639 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A',
-      subtitle: 'Noon Payments',
+      labelKey: 'onlinePayment',
+      subtitleKey: 'onlinePaymentNoon',
       icon: Icons.credit_card,
     ),
     _PaymentMethodOption(
       key: 'bank_transfer',
-      label: '\u062A\u062D\u0648\u064A\u0644 \u0628\u0646\u0643\u064A',
-      subtitle: '\u062D\u0648\u0627\u0644\u0629 \u0645\u0635\u0631\u0641\u064A\u0629',
+      labelKey: 'bankTransfer',
+      subtitleKey: 'bankTransferRemittance',
       icon: Icons.account_balance,
     ),
     _PaymentMethodOption(
       key: 'sadad',
-      label: '\u0633\u062F\u0627\u062F',
-      subtitle: 'SADAD',
+      labelKey: 'sadad',
+      subtitleKey: 'sadad',
       icon: Icons.payment,
     ),
   ];
@@ -45,8 +46,8 @@ class PaymentMethodSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639',
+        Text(
+          AppLocalizations.of(context)!.translate('paymentMethod'),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -66,6 +67,7 @@ class PaymentMethodSelector extends StatelessWidget {
           itemCount: _methods.length,
           itemBuilder: (context, index) {
             final method = _methods[index];
+            final t = AppLocalizations.of(context)!;
             final isSelected = selectedMethod == method.key;
 
             return GestureDetector(
@@ -106,7 +108,7 @@ class PaymentMethodSelector extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      method.label,
+                      t.translate(method.labelKey),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -120,7 +122,7 @@ class PaymentMethodSelector extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      method.subtitle,
+                      t.translate(method.subtitleKey),
                       style: TextStyle(
                         fontSize: 11,
                         color: isSelected
@@ -145,13 +147,13 @@ class PaymentMethodSelector extends StatelessWidget {
 class _PaymentMethodOption {
   const _PaymentMethodOption({
     required this.key,
-    required this.label,
-    required this.subtitle,
+    required this.labelKey,
+    required this.subtitleKey,
     required this.icon,
   });
 
   final String key;
-  final String label;
-  final String subtitle;
+  final String labelKey;
+  final String subtitleKey;
   final IconData icon;
 }

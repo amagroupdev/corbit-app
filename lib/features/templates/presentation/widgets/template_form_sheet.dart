@@ -6,6 +6,7 @@ import 'package:orbit_app/features/messages/data/models/template_model.dart';
 import 'package:orbit_app/features/templates/data/repositories/templates_repository.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Bottom sheet form for creating or editing a message template.
 ///
@@ -133,8 +134,8 @@ class _TemplateFormSheetState extends ConsumerState<TemplateFormSheet> {
             // ── Title ────────────────────────────────────────
             Text(
               _isEditing
-                  ? '\u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0642\u0627\u0644\u0628' // تعديل القالب
-                  : '\u0625\u0646\u0634\u0627\u0621 \u0642\u0627\u0644\u0628 \u062C\u062F\u064A\u062F', // إنشاء قالب جديد
+                  ? AppLocalizations.of(context)!.translate('editTemplate')
+                  : AppLocalizations.of(context)!.translate('createNewTemplate'),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -145,12 +146,12 @@ class _TemplateFormSheetState extends ConsumerState<TemplateFormSheet> {
 
             // ── Name field ───────────────────────────────────
             AppTextField(
-              label: '\u0627\u0633\u0645 \u0627\u0644\u0642\u0627\u0644\u0628', // اسم القالب
-              hint: '\u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0642\u0627\u0644\u0628', // أدخل اسم القالب
+              label: AppLocalizations.of(context)!.translate('templateName'),
+              hint: AppLocalizations.of(context)!.translate('enterTemplateName'),
               controller: _nameController,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u0642\u0627\u0644\u0628'; // يرجى إدخال اسم القالب
+                  return AppLocalizations.of(context)!.translate('enterTemplateNameValidation');
                 }
                 return null;
               },
@@ -160,14 +161,14 @@ class _TemplateFormSheetState extends ConsumerState<TemplateFormSheet> {
 
             // ── Body field ───────────────────────────────────
             AppTextField(
-              label: '\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // نص الرسالة
-              hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // أدخل نص الرسالة
+              label: AppLocalizations.of(context)!.translate('messageBody'),
+              hint: AppLocalizations.of(context)!.translate('enterMessageHint'),
               controller: _bodyController,
               maxLines: 5,
               minLines: 3,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629'; // يرجى إدخال نص الرسالة
+                  return AppLocalizations.of(context)!.translate('enterMessageBodyValidation');
                 }
                 return null;
               },
@@ -178,8 +179,8 @@ class _TemplateFormSheetState extends ConsumerState<TemplateFormSheet> {
             // ── Submit button ────────────────────────────────
             AppButton.primary(
               text: _isEditing
-                  ? '\u062A\u062D\u062F\u064A\u062B' // تحديث
-                  : '\u0625\u0646\u0634\u0627\u0621', // إنشاء
+                  ? AppLocalizations.of(context)!.translate('update')
+                  : AppLocalizations.of(context)!.translate('create'),
               onPressed: _submit,
               isLoading: _isLoading,
               icon: _isEditing ? Icons.save_rounded : Icons.add_rounded,

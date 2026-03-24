@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
@@ -85,9 +86,9 @@ class _SendNotificationScreenState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              '\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631 \u0628\u0646\u062C\u0627\u062D', // تم إرسال الإشعار بنجاح
+              AppLocalizations.of(context)!.translate('notificationSentSuccess'),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -111,8 +112,8 @@ class _SendNotificationScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '\u0625\u0631\u0633\u0627\u0644 \u0625\u0634\u0639\u0627\u0631', // إرسال إشعار
+        title: Text(
+          AppLocalizations.of(context)!.translate('sendNotificationTitle'),
         ),
       ),
       body: SingleChildScrollView(
@@ -124,15 +125,15 @@ class _SendNotificationScreenState
             children: [
               // ── Numbers field ──────────────────────────────
               AppTextField(
-                label: '\u0623\u0631\u0642\u0627\u0645 \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // أرقام المستلمين
-                hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u0645\u0641\u0635\u0648\u0644\u0629 \u0628\u0641\u0627\u0635\u0644\u0629', // أدخل الأرقام مفصولة بفاصلة
+                label: AppLocalizations.of(context)!.translate('recipientNumbers'),
+                hint: AppLocalizations.of(context)!.translate('enterNumbersSeparated'),
                 controller: _numbersController,
                 maxLines: 3,
                 minLines: 2,
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0631\u0642\u0645 \u0648\u0627\u062D\u062F \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644'; // يرجى إدخال رقم واحد على الأقل
+                    return AppLocalizations.of(context)!.translate('enterAtLeastOneNumber');
                   }
                   return null;
                 },
@@ -141,14 +142,14 @@ class _SendNotificationScreenState
 
               // ── Message field ─────────────────────────────
               AppTextField(
-                label: '\u0646\u0635 \u0627\u0644\u0625\u0634\u0639\u0627\u0631', // نص الإشعار
-                hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0627\u0644\u0625\u0634\u0639\u0627\u0631', // أدخل نص الإشعار
+                label: AppLocalizations.of(context)!.translate('notificationText'),
+                hint: AppLocalizations.of(context)!.translate('enterNotificationText'),
                 controller: _messageController,
                 maxLines: 5,
                 minLines: 3,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0646\u0635 \u0627\u0644\u0625\u0634\u0639\u0627\u0631'; // يرجى إدخال نص الإشعار
+                    return AppLocalizations.of(context)!.translate('notificationTextRequired');
                   }
                   return null;
                 },
@@ -167,8 +168,8 @@ class _SendNotificationScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '\u0645\u0639\u0627\u064A\u0646\u0629', // معاينة
+                      Text(
+                        AppLocalizations.of(context)!.translate('preview'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -177,11 +178,11 @@ class _SendNotificationScreenState
                       ),
                       const SizedBox(height: 8),
                       _PreviewRow(
-                        label: '\u0639\u062F\u062F \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // عدد المستلمين
+                        label: AppLocalizations.of(context)!.translate('recipientCountPreview'),
                         value: '${_previewData!['recipient_count'] ?? 0}',
                       ),
                       _PreviewRow(
-                        label: '\u0627\u0644\u062A\u0643\u0644\u0641\u0629 \u0627\u0644\u062A\u0642\u062F\u064A\u0631\u064A\u0629', // التكلفة التقديرية
+                        label: AppLocalizations.of(context)!.translate('estimatedCost'),
                         value: '${_previewData!['cost_estimate'] ?? 0}',
                       ),
                     ],
@@ -195,7 +196,7 @@ class _SendNotificationScreenState
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      text: '\u0645\u0639\u0627\u064A\u0646\u0629', // معاينة
+                      text: AppLocalizations.of(context)!.translate('preview'),
                       onPressed: _preview,
                       isLoading: _isPreviewing,
                       icon: Icons.preview_outlined,
@@ -204,7 +205,7 @@ class _SendNotificationScreenState
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton.primary(
-                      text: '\u0625\u0631\u0633\u0627\u0644', // إرسال
+                      text: AppLocalizations.of(context)!.translate('sendButton'),
                       onPressed: _send,
                       isLoading: _isSending,
                       icon: Icons.send_rounded,

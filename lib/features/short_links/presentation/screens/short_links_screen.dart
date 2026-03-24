@@ -11,6 +11,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing shortened URLs.
 ///
@@ -155,8 +156,8 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                '\u0625\u0646\u0634\u0627\u0621 \u0631\u0627\u0628\u0637 \u0645\u062E\u062A\u0635\u0631', // إنشاء رابط مختصر
+              Text(
+                AppLocalizations.of(context)!.translate('createShortLink'),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -165,17 +166,17 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
               ),
               const SizedBox(height: 24),
               AppTextField(
-                label: '\u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u0623\u0635\u0644\u064A', // الرابط الأصلي
+                label: AppLocalizations.of(context)!.translate('originalUrl'),
                 hint: 'https://example.com/long-url',
                 controller: urlController,
                 keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0631\u0627\u0628\u0637'; // يرجى إدخال الرابط
+                    return AppLocalizations.of(context)!.translate('enterUrl');
                   }
                   final uri = Uri.tryParse(value.trim());
                   if (uri == null || !uri.hasScheme) {
-                    return '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0631\u0627\u0628\u0637 \u0635\u0627\u0644\u062D'; // يرجى إدخال رابط صالح
+                    return AppLocalizations.of(context)!.translate('enterValidUrl');
                   }
                   return null;
                 },
@@ -183,7 +184,7 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
               ),
               const SizedBox(height: 24),
               AppButton.primary(
-                text: '\u0625\u0646\u0634\u0627\u0621', // إنشاء
+                text: AppLocalizations.of(context)!.translate('create'),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     Navigator.pop(context, urlController.text.trim());
@@ -205,9 +206,9 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
         await repository.createShortLink(result);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                '\u062A\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u0645\u062E\u062A\u0635\u0631', // تم إنشاء الرابط المختصر
+                AppLocalizations.of(context)!.translate('shortLinkCreated'),
               ),
               backgroundColor: AppColors.success,
             ),
@@ -231,22 +232,22 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0631\u0627\u0628\u0637', // حذف الرابط
+        title: Text(
+          AppLocalizations.of(context)!.translate('deleteLink'),
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        content: const Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u0631\u0627\u0628\u0637 \u0627\u0644\u0645\u062E\u062A\u0635\u0631\u061F', // هل أنت متأكد من حذف هذا الرابط المختصر؟
+        content: Text(
+          AppLocalizations.of(context)!.translate('confirmDeleteLink'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('\u0625\u0644\u063A\u0627\u0621'), // إلغاء
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'), // حذف
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -259,9 +260,9 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
       await repository.deleteShortLink(link.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              '\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0631\u0627\u0628\u0637', // تم حذف الرابط
+              AppLocalizations.of(context)!.translate('linkDeleted'),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -284,7 +285,7 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: AppSearchBar(
-            hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0631\u0648\u0627\u0628\u0637...', // بحث في الروابط...
+            hint: AppLocalizations.of(context)!.translate('searchLinks'),
             onChanged: _onSearchChanged,
           ),
         ),
@@ -296,8 +297,8 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0631\u0648\u0627\u0628\u0637 \u0627\u0644\u0645\u062E\u062A\u0635\u0631\u0629', // الروابط المختصرة
+        title: Text(
+          AppLocalizations.of(context)!.translate('shortLinks'),
         ),
       ),
       body: body,
@@ -322,9 +323,9 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
     if (_links.isEmpty) {
       return AppEmptyState(
         icon: Icons.link_off_rounded,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0648\u0627\u0628\u0637', // لا توجد روابط
-        description: '\u0642\u0645 \u0628\u0625\u0646\u0634\u0627\u0621 \u0631\u0627\u0628\u0637 \u0645\u062E\u062A\u0635\u0631 \u062C\u062F\u064A\u062F', // قم بإنشاء رابط مختصر جديد
-        actionText: '\u0625\u0646\u0634\u0627\u0621 \u0631\u0627\u0628\u0637', // إنشاء رابط
+        title: AppLocalizations.of(context)!.translate('noLinks'),
+        description: AppLocalizations.of(context)!.translate('createNewLink'),
+        actionText: AppLocalizations.of(context)!.translate('createLink'),
         onAction: _createLink,
       );
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/statements/data/models/statement_response_model.dart';
 
 /// Displays a single statement response as a card with name, phone,
@@ -121,7 +122,7 @@ class StatementCard extends StatelessWidget {
                     ),
 
                     // Action icons
-                    _buildActionIcons(),
+                    _buildActionIcons(context),
                   ],
                 ),
 
@@ -232,17 +233,19 @@ class StatementCard extends StatelessWidget {
           ),
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Icon(Icons.delete_outline, color: Colors.white, size: 24),
-              SizedBox(width: 8),
-              Text(
-                '\u062D\u0630\u0641',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              const Icon(Icons.delete_outline, color: Colors.white, size: 24),
+              const SizedBox(width: 8),
+              Builder(
+                builder: (ctx) => Text(
+                  AppLocalizations.of(ctx)!.translate('delete'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
@@ -255,7 +258,8 @@ class StatementCard extends StatelessWidget {
     return card;
   }
 
-  Widget _buildActionIcons() {
+  Widget _buildActionIcons(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -265,7 +269,7 @@ class StatementCard extends StatelessWidget {
             icon: Icons.visibility_outlined,
             color: AppColors.info,
             onTap: onViewMessage!,
-            tooltip: '\u0639\u0631\u0636 \u0627\u0644\u0631\u0633\u0627\u0644\u0629',
+            tooltip: t.translate('statement_view_message'),
           ),
 
         // Download attachment
@@ -274,7 +278,7 @@ class StatementCard extends StatelessWidget {
             icon: Icons.attach_file_outlined,
             color: AppColors.warning,
             onTap: onDownloadAttachment ?? () {},
-            tooltip: '\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0631\u0641\u0642',
+            tooltip: t.translate('statement_download_attachment'),
           ),
 
         // Export
@@ -283,7 +287,7 @@ class StatementCard extends StatelessWidget {
             icon: Icons.file_download_outlined,
             color: AppColors.warning,
             onTap: onExport!,
-            tooltip: '\u062A\u0635\u062F\u064A\u0631',
+            tooltip: t.translate('export'),
           ),
 
         // Delete
@@ -292,7 +296,7 @@ class StatementCard extends StatelessWidget {
             icon: Icons.delete_outline,
             color: AppColors.error,
             onTap: onDelete!,
-            tooltip: '\u062D\u0630\u0641',
+            tooltip: t.translate('delete'),
           ),
       ],
     );

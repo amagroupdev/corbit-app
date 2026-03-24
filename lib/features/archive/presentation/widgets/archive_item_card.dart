@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/archive/data/models/archive_model.dart';
 
 /// Displays a single archive message as a card with sender, recipient,
@@ -261,17 +262,19 @@ class ArchiveItemCard extends StatelessWidget {
           ),
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Icon(Icons.delete_outline, color: Colors.white, size: 24),
-              SizedBox(width: 8),
-              Text(
-                'حذف',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              const Icon(Icons.delete_outline, color: Colors.white, size: 24),
+              const SizedBox(width: 8),
+              Builder(
+                builder: (ctx) => Text(
+                  AppLocalizations.of(ctx)!.translate('delete'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
@@ -302,7 +305,7 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _statusColor;
     final bgColor = _statusBgColor;
-    final label = status.label(languageCode);
+    final label = AppLocalizations.of(context)!.translate(status.labelKey);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

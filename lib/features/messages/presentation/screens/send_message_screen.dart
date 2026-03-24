@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/data/datasources/groups_remote_datasource.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
@@ -55,7 +56,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     final formState = ref.read(messageFormProvider);
     final validationError = formState.validate();
     if (validationError != null) {
-      _showSnackBar(validationError, isError: true);
+      _showSnackBar(AppLocalizations.of(context)!.translate(validationError), isError: true);
       return;
     }
 
@@ -104,20 +105,21 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
       final totalSms = sendData?['total_sms'] ?? '-';
       await _showResultDialog(
         isSuccess: true,
-        title: '\u062A\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644 \u0628\u0646\u062C\u0627\u062D',
-        message: '\u0639\u062F\u062F \u0627\u0644\u0623\u0631\u0642\u0627\u0645: $totalNumbers\n\u0639\u062F\u062F \u0627\u0644\u0631\u0633\u0627\u0626\u0644: $totalSms',
+        title: AppLocalizations.of(context)!.translate('msg_send_success'),
+        message: '${AppLocalizations.of(context)!.translateWithParams('msg_send_numbers_count', {'count': totalNumbers.toString()})}\n${AppLocalizations.of(context)!.translateWithParams('msg_send_sms_count', {'count': totalSms.toString()})}',
       );
       if (!mounted) return;
       ref.read(messageFormProvider.notifier).resetKeepType();
       context.pop();
     } else {
       final state = ref.read(sendMessageControllerProvider);
-      final errorMessage = state.hasError
-          ? state.error.toString()
-          : '\u0641\u0634\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629';
+      final t = AppLocalizations.of(context)!;
+      final rawError = state.hasError ? state.error.toString() : 'msg_send_failed';
+      final translated = t.translate(rawError);
+      final errorMessage = translated != rawError ? translated : rawError;
       await _showResultDialog(
         isSuccess: false,
-        title: '\u0641\u0634\u0644 \u0627\u0644\u0625\u0631\u0633\u0627\u0644',
+        title: AppLocalizations.of(context)!.translate('msg_send_failed_title'),
         message: errorMessage,
       );
     }
@@ -189,7 +191,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  isSuccess ? '\u062A\u0645' : '\u062D\u0633\u0646\u0627\u064B',
+                  isSuccess ? AppLocalizations.of(context)!.translate('msg_done') : AppLocalizations.of(context)!.translate('msg_ok'),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -247,7 +249,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(_type.arabicLabel),
+        title: Text(AppLocalizations.of(context)!.translate(_type.labelKey)),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -303,7 +305,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      text: '\u0645\u0639\u0627\u064A\u0646\u0629',
+                      text: AppLocalizations.of(context)!.translate('msg_preview_btn'),
                       icon: Icons.visibility_outlined,
                       onPressed: isSending ? null : _showPreview,
                     ),
@@ -312,7 +314,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                   Expanded(
                     flex: 2,
                     child: AppButton.primary(
-                      text: '\u0625\u0631\u0633\u0627\u0644',
+                      text: AppLocalizations.of(context)!.translate('msg_send_btn'),
                       icon: Icons.send_rounded,
                       onPressed: isSending ? null : _sendMessage,
                       isLoading: isSending,
@@ -341,14 +343,14 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
       child: Row(
         children: [
           _buildToggleTab(
-            label: '\u0623\u0631\u0642\u0627\u0645',
+            label: AppLocalizations.of(context)!.translate('msg_numbers_tab'),
             icon: Icons.dialpad_rounded,
             isSelected: _recipientMode == 0,
             onTap: () => _onRecipientModeChanged(0),
           ),
           const SizedBox(width: 4),
           _buildToggleTab(
-            label: '\u0645\u062C\u0645\u0648\u0639\u0627\u062A',
+            label: AppLocalizations.of(context)!.translate('msg_groups_tab'),
             icon: Icons.people_rounded,
             isSelected: _recipientMode == 1,
             onTap: () => _onRecipientModeChanged(1),
@@ -409,8 +411,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
       children: [
         Row(
           children: [
-            const Text(
-              '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A',
+            Text(
+              AppLocalizations.of(context)!.translate('msg_groups_label'),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -421,8 +423,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
             if (formState.groupIds.isNotEmpty || formState.numbers.isNotEmpty)
               Text(
                 formState.groupIds.isNotEmpty
-                    ? '${formState.groupIds.length} \u0645\u062C\u0645\u0648\u0639\u0629'
-                    : '${formState.numbers.length} \u0631\u0642\u0645',
+                    ? AppLocalizations.of(context)!.translateWithParams('msg_group_count', {'count': '${formState.groupIds.length}'})
+                    : AppLocalizations.of(context)!.translateWithParams('msg_number_count_label', {'count': '${formState.numbers.length}'}),
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.primary,
@@ -451,15 +453,15 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
               children: [
                 const Icon(Icons.error_outline, color: AppColors.error, size: 20),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '\u0641\u0634\u0644 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A',
+                    AppLocalizations.of(context)!.translate('msg_groups_load_failed'),
                     style: TextStyle(fontSize: 13, color: AppColors.error),
                   ),
                 ),
                 TextButton(
                   onPressed: () => ref.invalidate(groupsForSendProvider),
-                  child: const Text('\u0625\u0639\u0627\u062F\u0629', style: TextStyle(fontSize: 12)),
+                  child: Text(AppLocalizations.of(context)!.translate('msg_reload'), style: const TextStyle(fontSize: 12)),
                 ),
               ],
             ),
@@ -473,12 +475,12 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.warningBorder),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.info_outline, color: AppColors.warning, size: 20),
                     SizedBox(width: 8),
                     Text(
-                      '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u062C\u0645\u0648\u0639\u0627\u062A',
+                      AppLocalizations.of(context)!.translate('msg_no_groups'),
                       style: TextStyle(fontSize: 13, color: AppColors.warning),
                     ),
                   ],
@@ -539,8 +541,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
         // Show selected individual numbers from groups.
         if (formState.numbers.isNotEmpty && _recipientMode == 1) ...[
           const SizedBox(height: 12),
-          const Text(
-            '\u0623\u0631\u0642\u0627\u0645 \u0645\u062D\u062F\u062F\u0629:',
+          Text(
+            AppLocalizations.of(context)!.translate('msg_selected_numbers'),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -590,8 +592,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '\u0627\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644',
+        Text(
+          AppLocalizations.of(context)!.translate('msg_sender_name_label'),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -630,16 +632,16 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
               children: [
                 const Icon(Icons.error_outline, color: AppColors.error, size: 20),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '\u0641\u0634\u0644 \u062A\u062D\u0645\u064A\u0644 \u0623\u0633\u0645\u0627\u0621 \u0627\u0644\u0645\u0631\u0633\u0644\u064A\u0646',
+                    AppLocalizations.of(context)!.translate('msg_sender_load_failed'),
                     style: TextStyle(fontSize: 13, color: AppColors.error),
                   ),
                 ),
                 TextButton(
                   onPressed: () => ref.invalidate(sendersProvider),
-                  child: const Text(
-                    '\u0625\u0639\u0627\u062F\u0629',
+                  child: Text(
+                    AppLocalizations.of(context)!.translate('msg_reload'),
                     style: TextStyle(fontSize: 12),
                   ),
                 ),
@@ -656,12 +658,12 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.warningBorder),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.info_outline, color: AppColors.warning, size: 20),
                     SizedBox(width: 8),
                     Text(
-                      '\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0633\u0645\u0627\u0621 \u0645\u0631\u0633\u0644\u064A\u0646 \u0645\u062A\u0627\u062D\u0629',
+                      AppLocalizations.of(context)!.translate('msg_no_senders'),
                       style: TextStyle(fontSize: 13, color: AppColors.warning),
                     ),
                   ],
@@ -671,9 +673,9 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
 
             return DropdownButtonFormField<int>(
               value: formState.senderId,
-              hint: const Text(
-                '\u0627\u062E\u062A\u0631 \u0627\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644',
-                style: TextStyle(
+              hint: Text(
+                AppLocalizations.of(context)!.translate('msg_select_sender'),
+                style: const TextStyle(
                   color: AppColors.textHint,
                   fontSize: 14,
                 ),
@@ -848,7 +850,7 @@ class _GroupsListState extends ConsumerState<_GroupsList> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '${group.numbersCount} \u0631\u0642\u0645',
+                    AppLocalizations.of(context)!.translateWithParams('msg_number_count_label', {'count': '${group.numbersCount}'}),
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary,
@@ -1043,7 +1045,7 @@ class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDi
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          '${widget.numbersCount} \u0631\u0642\u0645 \u0625\u062C\u0645\u0627\u0644\u064A',
+                          AppLocalizations.of(context)!.translateWithParams('msg_total_numbers', {'count': '${widget.numbersCount}'}),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -1078,7 +1080,7 @@ class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDi
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: '\u0628\u062D\u062B \u0628\u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0627\u0644\u0631\u0642\u0645...',
+                  hintText: AppLocalizations.of(context)!.translate('msg_search_name_number'),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
@@ -1105,21 +1107,21 @@ class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDi
                 children: [
                   TextButton(
                     onPressed: _selectAll,
-                    child: const Text(
-                      '\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644',
+                    child: Text(
+                      AppLocalizations.of(context)!.translate('selectAll'),
                       style: TextStyle(fontSize: 13),
                     ),
                   ),
                   TextButton(
                     onPressed: _deselectAll,
-                    child: const Text(
-                      '\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0643\u0644',
+                    child: Text(
+                      AppLocalizations.of(context)!.translate('deselectAll'),
                       style: TextStyle(fontSize: 13),
                     ),
                   ),
                   const Spacer(),
                   Text(
-                    '\u062A\u0645 \u062A\u062D\u0645\u064A\u0644 ${_numbers.length}',
+                    AppLocalizations.of(context)!.translateWithParams('msg_loaded_count', {'count': '${_numbers.length}'}),
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textHint,
@@ -1228,7 +1230,7 @@ class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDi
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('\u0625\u0644\u063A\u0627\u0621'),
+                      child: Text(AppLocalizations.of(context)!.translate('cancel')),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1248,7 +1250,7 @@ class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDi
                         ),
                       ),
                       child: Text(
-                        '\u062D\u0641\u0638 ($groupSelectedCount)',
+                        AppLocalizations.of(context)!.translateWithParams('msg_save_count', {'count': '$groupSelectedCount'}),
                         style: const TextStyle(
                             fontWeight: FontWeight.w600),
                       ),
@@ -1294,12 +1296,12 @@ class _PreviewSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Row(
+            Row(
               children: [
                 Icon(Icons.preview, color: AppColors.primary, size: 22),
                 SizedBox(width: 8),
                 Text(
-                  '\u0645\u0639\u0627\u064A\u0646\u0629 \u0627\u0644\u0631\u0633\u0627\u0644\u0629',
+                  AppLocalizations.of(context)!.translate('msg_preview_title'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -1320,20 +1322,20 @@ class _PreviewSheet extends StatelessWidget {
                 children: [
                   _PreviewRow(
                     icon: Icons.people_outline,
-                    label: '\u0639\u062F\u062F \u0627\u0644\u0645\u0633\u062A\u0642\u0628\u0644\u064A\u0646',
+                    label: AppLocalizations.of(context)!.translate('msg_preview_recipients'),
                     value: '${preview.recipientCount}',
                   ),
                   const Divider(height: 20),
                   _PreviewRow(
                     icon: Icons.sms_outlined,
-                    label: '\u0639\u062F\u062F \u0627\u0644\u0631\u0633\u0627\u0626\u0644',
+                    label: AppLocalizations.of(context)!.translate('msg_preview_sms_count'),
                     value: '${preview.messageCount}',
                   ),
                   const Divider(height: 20),
                   _PreviewRow(
                     icon: Icons.account_balance_wallet_outlined,
-                    label: '\u0627\u0644\u062A\u0643\u0644\u0641\u0629 \u0627\u0644\u0645\u0642\u062F\u0631\u0629',
-                    value: '${preview.costEstimate.toStringAsFixed(1)} \u0631\u0633\u0627\u0644\u0629',
+                    label: AppLocalizations.of(context)!.translate('msg_preview_cost'),
+                    value: AppLocalizations.of(context)!.translateWithParams('msg_preview_cost_value', {'cost': preview.costEstimate.toStringAsFixed(1)}),
                     valueColor: AppColors.primary,
                   ),
                 ],
@@ -1350,8 +1352,8 @@ class _PreviewSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629:',
+                  Text(
+                    AppLocalizations.of(context)!.translate('msg_preview_body'),
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -1387,7 +1389,7 @@ class _PreviewSheet extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('\u0625\u0644\u063A\u0627\u0621', style: TextStyle(fontSize: 15)),
+                    child: Text(AppLocalizations.of(context)!.translate('cancel'), style: const TextStyle(fontSize: 15)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1396,9 +1398,9 @@ class _PreviewSheet extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onConfirmSend,
                     icon: const Icon(Icons.send_rounded, size: 18),
-                    label: const Text(
-                      '\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0625\u0631\u0633\u0627\u0644',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    label: Text(
+                      AppLocalizations.of(context)!.translate('msg_confirm_send'),
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,

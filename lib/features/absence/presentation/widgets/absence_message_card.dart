@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/absence/data/models/absence_message_model.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A card widget displaying an absence/tardiness message summary.
 class AbsenceMessageCard extends StatelessWidget {
@@ -93,7 +94,7 @@ class AbsenceMessageCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            message.messageTypeLabel,
+                            AppLocalizations.of(context)!.translate(message.messageTypeKey),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textHint,
@@ -112,7 +113,7 @@ class AbsenceMessageCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        message.statusLabel,
+                        AppLocalizations.of(context)!.translate(message.statusKey),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -129,13 +130,13 @@ class AbsenceMessageCard extends StatelessWidget {
                     _InfoChip(
                       icon: Icons.send_outlined,
                       label: dateFormat.format(message.sendTime),
-                      tooltip: '\u0648\u0642\u062A \u0627\u0644\u0625\u0631\u0633\u0627\u0644', // وقت الإرسال
+                      tooltip: AppLocalizations.of(context)!.translate('sendTime'),
                     ),
                     const SizedBox(width: 12),
                     _InfoChip(
                       icon: Icons.people_outline,
                       label: '${message.recipientCount}',
-                      tooltip: '\u0639\u062F\u062F \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // عدد المستلمين
+                      tooltip: AppLocalizations.of(context)!.translate('recipientCountLabel'),
                     ),
                     const Spacer(),
                     if (onView != null)
@@ -147,7 +148,7 @@ class AbsenceMessageCard extends StatelessWidget {
                         ),
                         onPressed: onView,
                         splashRadius: 20,
-                        tooltip: '\u0639\u0631\u0636', // عرض
+                        tooltip: AppLocalizations.of(context)!.translate('view'),
                       ),
                     if (onReport != null)
                       IconButton(
@@ -158,7 +159,7 @@ class AbsenceMessageCard extends StatelessWidget {
                         ),
                         onPressed: onReport,
                         splashRadius: 20,
-                        tooltip: '\u062A\u0642\u0631\u064A\u0631', // تقرير
+                        tooltip: AppLocalizations.of(context)!.translate('report'),
                       ),
                   ],
                 ),
@@ -170,7 +171,7 @@ class AbsenceMessageCard extends StatelessWidget {
                       _InfoChip(
                         icon: Icons.call_received_outlined,
                         label: dateFormat.format(message.receiveTime!),
-                        tooltip: '\u0648\u0642\u062A \u0627\u0644\u0625\u0633\u062A\u0644\u0627\u0645', // وقت الإستلام
+                        tooltip: AppLocalizations.of(context)!.translate('receiveTime'),
                       ),
                     ],
                   ),

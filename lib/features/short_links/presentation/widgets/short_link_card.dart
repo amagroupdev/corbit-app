@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/short_links/data/models/short_link_model.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A card widget displaying a short link with copy and delete actions.
 class ShortLinkCard extends StatelessWidget {
@@ -23,9 +24,9 @@ class ShortLinkCard extends StatelessWidget {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            '\u062A\u0645 \u0646\u0633\u062E \u0627\u0644\u0631\u0627\u0628\u0637', // تم نسخ الرابط
+            AppLocalizations.of(context)!.translate('linkCopiedSuccess'),
           ),
           backgroundColor: AppColors.success,
           duration: Duration(seconds: 2),
@@ -127,8 +128,8 @@ class ShortLinkCard extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: () => _copyToClipboard(context),
                         icon: const Icon(Icons.copy_rounded, size: 16),
-                        label: const Text(
-                          '\u0646\u0633\u062E', // نسخ
+                        label: Text(
+                          AppLocalizations.of(context)!.translate('copy'),
                           style: TextStyle(fontSize: 13),
                         ),
                         style: OutlinedButton.styleFrom(

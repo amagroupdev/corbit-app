@@ -7,6 +7,7 @@ import 'package:orbit_app/features/archive/presentation/controllers/archive_cont
 import 'package:orbit_app/features/archive/presentation/widgets/archive_filter_sheet.dart';
 import 'package:orbit_app/features/archive/presentation/widgets/archive_item_card.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
@@ -149,10 +150,10 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
     final ids = ref.read(archiveSelectedIdsProvider).toList();
     if (ids.isEmpty) return;
 
+    final t = AppLocalizations.of(context)!;
     final confirmed = await _showConfirmDialog(
-      title: '\u062D\u0630\u0641 \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // حذف الرسائل
-      message:
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 ${ids.length} \u0631\u0633\u0627\u0644\u0629\u061F', // هل أنت متأكد من حذف X رسالة؟
+      title: t.translate('archive_delete_messages'),
+      message: t.translateWithParams('archive_confirm_delete', {'count': '${ids.length}'}),
     );
     if (confirmed != true) return;
 
@@ -165,7 +166,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
 
     if (success && mounted) {
       _exitMultiSelect();
-      _showSnackBar('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0628\u0646\u062C\u0627\u062D'); // تم حذف الرسائل بنجاح
+      _showSnackBar(t.translate('archive_messages_deleted'));
     }
   }
 
@@ -173,10 +174,10 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
     final ids = ref.read(archiveSelectedIdsProvider).toList();
     if (ids.isEmpty) return;
 
+    final t = AppLocalizations.of(context)!;
     final confirmed = await _showConfirmDialog(
-      title: '\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // إلغاء الرسائل
-      message:
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u0625\u0644\u063A\u0627\u0621 ${ids.length} \u0631\u0633\u0627\u0644\u0629 \u0645\u0639\u0644\u0642\u0629\u061F', // هل أنت متأكد من إلغاء X رسالة معلقة؟
+      title: t.translate('archive_cancel_messages'),
+      message: t.translateWithParams('archive_confirm_cancel', {'count': '${ids.length}'}),
     );
     if (confirmed != true) return;
 
@@ -187,7 +188,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
 
     if (success && mounted) {
       _exitMultiSelect();
-      _showSnackBar('\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0628\u0646\u062C\u0627\u062D'); // تم إلغاء الرسائل بنجاح
+      _showSnackBar(t.translate('archive_messages_cancelled'));
     }
   }
 
@@ -202,7 +203,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
 
     if (success && mounted) {
       _exitMultiSelect();
-      _showSnackBar('\u062A\u0645 \u0627\u0633\u062A\u0639\u0627\u062F\u0629 \u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0628\u0646\u062C\u0627\u062D'); // تم استعادة الرسائل بنجاح
+      _showSnackBar(AppLocalizations.of(context)!.translate('archive_messages_restored'));
     }
   }
 
@@ -215,7 +216,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
         );
 
     if (mounted) {
-      _showSnackBar('\u062A\u0645 \u0637\u0644\u0628 \u0627\u0644\u062A\u0635\u062F\u064A\u0631 \u0628\u0646\u062C\u0627\u062D'); // تم طلب التصدير بنجاح
+      _showSnackBar(AppLocalizations.of(context)!.translate('archive_export_requested'));
     }
   }
 
@@ -245,16 +246,16 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621', // إلغاء
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              AppLocalizations.of(context)!.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              '\u062A\u0623\u0643\u064A\u062F', // تأكيد
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.translate('confirm'),
+              style: const TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.w600,
               ),
@@ -340,28 +341,29 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
           onPressed: _exitMultiSelect,
         ),
         title: Text(
-          '${selectedIds.length} \u0645\u062D\u062F\u062F', // X محدد
+          '${selectedIds.length} ${AppLocalizations.of(context)!.translate('select')}',
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
           TextButton(
             onPressed: _selectAll,
-            child: const Text(
-              '\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644', // تحديد الكل
-              style: TextStyle(color: Colors.white, fontSize: 14),
+            child: Text(
+              AppLocalizations.of(context)!.translate('selectAll'),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
         ],
       );
     }
 
+    final t = AppLocalizations.of(context)!;
     return AppBar(
       backgroundColor: AppColors.surface,
       foregroundColor: AppColors.textPrimary,
       elevation: 0.5,
-      title: const Text(
-        '\u0627\u0644\u0623\u0631\u0634\u064A\u0641', // الأرشيف
-        style: TextStyle(
+      title: Text(
+        t.translate('archive'),
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
@@ -375,7 +377,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
             color: AppColors.textSecondary,
           ),
           onPressed: _toggleSearch,
-          tooltip: '\u0628\u062D\u062B', // بحث
+          tooltip: t.translate('search'),
         ),
 
         // Filter button with badge
@@ -388,7 +390,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
                 color: AppColors.textSecondary,
               ),
               onPressed: () => ArchiveFilterSheet.show(context),
-              tooltip: '\u062A\u0635\u0641\u064A\u0629', // تصفية
+              tooltip: t.translate('filter'),
             ),
             if (filter.activeFilterCount > 0)
               Positioned(
@@ -433,7 +435,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
                   color: AppColors.textSecondary,
                 ),
           onPressed: actionState.isExporting ? null : _exportArchive,
-          tooltip: '\u062A\u0635\u062F\u064A\u0631', // تصدير
+          tooltip: t.translate('export'),
         ),
       ],
     );
@@ -463,7 +465,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
         dividerColor: AppColors.divider,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         tabs: _visibleTypes.map((type) {
-          return Tab(text: type.labelAr);
+          return Tab(text: AppLocalizations.of(context)!.translate(type.labelKey));
         }).toList(),
       ),
     );
@@ -479,7 +481,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
         controller: _searchController,
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
-          hintText: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0623\u0631\u0634\u064A\u0641...', // بحث في الأرشيف...
+          hintText: AppLocalizations.of(context)!.translate('archive_search_hint'),
           hintStyle: const TextStyle(
             color: AppColors.inputHint,
             fontSize: 14,
@@ -516,40 +518,45 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
     return Container(
       color: AppColors.primarySurface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: [
-          _ActionChip(
-            icon: Icons.delete_outline,
-            label: '\u062D\u0630\u0641', // حذف
-            color: AppColors.error,
-            isLoading: actionState.isDeleting,
-            onTap: selectedIds.isNotEmpty ? _deleteSelected : null,
-          ),
-          const SizedBox(width: 8),
-          _ActionChip(
-            icon: Icons.cancel_outlined,
-            label: '\u0625\u0644\u063A\u0627\u0621', // إلغاء
-            color: AppColors.warning,
-            isLoading: actionState.isCancelling,
-            onTap: selectedIds.isNotEmpty ? _cancelPendingSelected : null,
-          ),
-          const SizedBox(width: 8),
-          _ActionChip(
-            icon: Icons.restore,
-            label: '\u0627\u0633\u062A\u0639\u0627\u062F\u0629', // استعادة
-            color: AppColors.success,
-            isLoading: actionState.isRestoring,
-            onTap: selectedIds.isNotEmpty ? _restoreSelected : null,
-          ),
-          const SizedBox(width: 8),
-          _ActionChip(
-            icon: Icons.file_download_outlined,
-            label: '\u062A\u0635\u062F\u064A\u0631', // تصدير
-            color: AppColors.info,
-            isLoading: actionState.isExporting,
-            onTap: _exportArchive,
-          ),
-        ],
+      child: Builder(
+        builder: (context) {
+          final t = AppLocalizations.of(context)!;
+          return Row(
+            children: [
+              _ActionChip(
+                icon: Icons.delete_outline,
+                label: t.translate('delete'),
+                color: AppColors.error,
+                isLoading: actionState.isDeleting,
+                onTap: selectedIds.isNotEmpty ? _deleteSelected : null,
+              ),
+              const SizedBox(width: 8),
+              _ActionChip(
+                icon: Icons.cancel_outlined,
+                label: t.translate('cancel'),
+                color: AppColors.warning,
+                isLoading: actionState.isCancelling,
+                onTap: selectedIds.isNotEmpty ? _cancelPendingSelected : null,
+              ),
+              const SizedBox(width: 8),
+              _ActionChip(
+                icon: Icons.restore,
+                label: t.translate('restore'),
+                color: AppColors.success,
+                isLoading: actionState.isRestoring,
+                onTap: selectedIds.isNotEmpty ? _restoreSelected : null,
+              ),
+              const SizedBox(width: 8),
+              _ActionChip(
+                icon: Icons.file_download_outlined,
+                label: t.translate('export'),
+                color: AppColors.info,
+                isLoading: actionState.isExporting,
+                onTap: _exportArchive,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -577,12 +584,11 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
 
     // Empty state
     if (state.isEmpty && filteredItems.isEmpty) {
-      final tab = ref.read(archiveSelectedTabProvider);
+      final t = AppLocalizations.of(context)!;
       return AppEmptyState(
         icon: Icons.archive_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0633\u0627\u0626\u0644', // لا توجد رسائل
-        description:
-            '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0633\u0627\u0626\u0644 \u0641\u064A ${tab.labelAr}', // لا توجد رسائل في X
+        title: t.translate('noMessages'),
+        description: t.translate('archive_no_messages_in'),
       );
     }
 

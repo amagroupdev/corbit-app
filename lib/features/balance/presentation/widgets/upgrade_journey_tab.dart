@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 
 /// Upgrade Journey tab content.
@@ -26,12 +27,13 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
     super.build(context);
     final state = ref.watch(balanceScreenControllerProvider);
     final balance = state.balance;
+    final t = AppLocalizations.of(context)!;
     final numberFormat = NumberFormat('#,##0', 'ar');
 
     // Define upgrade levels
     final levels = [
       _UpgradeLevel(
-        name: '\u0623\u0633\u0627\u0633\u064A',
+        name: t.translate('levelBasic'),
         minPurchase: 0,
         maxPurchase: 5000,
         pricePerSms: 0.065,
@@ -39,7 +41,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
         icon: Icons.star_outline,
       ),
       _UpgradeLevel(
-        name: '\u0641\u0636\u064A',
+        name: t.translate('levelSilver'),
         minPurchase: 5000,
         maxPurchase: 20000,
         pricePerSms: 0.055,
@@ -47,7 +49,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
         icon: Icons.star_half,
       ),
       _UpgradeLevel(
-        name: '\u0630\u0647\u0628\u064A',
+        name: t.translate('levelGold'),
         minPurchase: 20000,
         maxPurchase: 50000,
         pricePerSms: 0.045,
@@ -55,7 +57,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
         icon: Icons.star,
       ),
       _UpgradeLevel(
-        name: '\u0628\u0644\u0627\u062A\u064A\u0646\u064A',
+        name: t.translate('levelPlatinum'),
         minPurchase: 50000,
         maxPurchase: 100000,
         pricePerSms: 0.035,
@@ -63,7 +65,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
         icon: Icons.workspace_premium,
       ),
       _UpgradeLevel(
-        name: '\u0645\u0627\u0633\u064A',
+        name: t.translate('levelDiamond'),
         minPurchase: 100000,
         maxPurchase: 999999,
         pricePerSms: 0.025,
@@ -132,8 +134,8 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                   color: Colors.white,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  '\u0645\u0633\u062A\u0648\u0627\u0643 \u0627\u0644\u062D\u0627\u0644\u064A',
+                Text(
+                  t.translate('currentLevel'),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white70,
@@ -150,7 +152,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '\u0633\u0639\u0631 \u0627\u0644\u0631\u0633\u0627\u0644\u0629: ${currentLevel.pricePerSms.toStringAsFixed(3)} \u0631.\u0633',
+                  '${t.translate('smsPrice')} ${currentLevel.pricePerSms.toStringAsFixed(3)} ${t.translate('sar')}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -184,8 +186,8 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        '\u0627\u0644\u062A\u0642\u062F\u0645 \u0646\u062D\u0648 \u0627\u0644\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u062A\u0627\u0644\u064A',
+                      Text(
+                        t.translate('progressToNextLevel'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -233,7 +235,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${numberFormat.format(totalPurchased.toInt())} \u0631\u0633\u0627\u0644\u0629',
+                        '${numberFormat.format(totalPurchased.toInt())} ${t.translate('messageUnit')}',
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -241,7 +243,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                         ),
                       ),
                       Text(
-                        '${numberFormat.format(nextLevel.minPurchase)} \u0631\u0633\u0627\u0644\u0629',
+                        '${numberFormat.format(nextLevel.minPurchase)} ${t.translate('messageUnit')}',
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -270,7 +272,10 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            '\u062A\u062D\u062A\u0627\u062C ${numberFormat.format(nextLevel.minPurchase - totalPurchased.toInt())} \u0631\u0633\u0627\u0644\u0629 \u0625\u0636\u0627\u0641\u064A\u0629 \u0644\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0633\u062A\u0648\u0649 ${nextLevel.name}',
+                            t.translateWithParams('needAdditionalMessages', {
+                              'count': numberFormat.format(nextLevel.minPurchase - totalPurchased.toInt()),
+                              'level': nextLevel.name,
+                            }),
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.infoDark,
@@ -287,8 +292,8 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
           ],
 
           // All levels
-          const Text(
-            '\u0645\u0633\u062A\u0648\u064A\u0627\u062A \u0627\u0644\u062A\u0631\u0642\u064A\u0629',
+          Text(
+            t.translate('upgradeLevels'),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -367,8 +372,8 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                                   color: level.color,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
-                                  '\u062D\u0627\u0644\u064A',
+                                child: Text(
+                                  t.translate('current'),
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -381,7 +386,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '\u0645\u0646 ${numberFormat.format(level.minPurchase)} \u0631\u0633\u0627\u0644\u0629',
+                          t.translateWithParams('fromMessages', {'count': numberFormat.format(level.minPurchase)}),
                           style: TextStyle(
                             fontSize: 12,
                             color: isCurrentLevel
@@ -397,8 +402,8 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
-                        '\u0633\u0639\u0631 \u0627\u0644\u0631\u0633\u0627\u0644\u0629',
+                      Text(
+                        t.translate('pricePerSms'),
                         style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -406,7 +411,7 @@ class _UpgradeJourneyTabState extends ConsumerState<UpgradeJourneyTab>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${level.pricePerSms.toStringAsFixed(3)} \u0631.\u0633',
+                        '${level.pricePerSms.toStringAsFixed(3)} ${t.translate('sar')}',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,

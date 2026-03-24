@@ -11,29 +11,22 @@
 
 /// The 8 statement types supported by the ORBIT SMS V3 API.
 enum StatementType {
-  all('all', 'الكل', 'All'),
-  short('short', 'قصيرة', 'Short'),
-  voice('voice', 'صوتية', 'Voice'),
-  long('long', 'طويلة', 'Long'),
-  unregistered('unregistered', 'أرقام غير مسجلة', 'Unregistered Numbers'),
-  absence('absence', 'غياب', 'Absence'),
-  tardiness('tardiness', 'التأخير', 'Tardiness'),
-  absenceAndTardiness('absence_and_tardiness', 'غياب وتأخير', 'Absence & Tardiness');
+  all('all', 'statement_type_all'),
+  short('short', 'statement_type_short'),
+  voice('voice', 'statement_type_voice'),
+  long('long', 'statement_type_long'),
+  unregistered('unregistered', 'statement_type_unregistered'),
+  absence('absence', 'statement_type_absence'),
+  tardiness('tardiness', 'statement_type_tardiness'),
+  absenceAndTardiness('absence_and_tardiness', 'statement_type_absence_and_tardiness');
 
-  const StatementType(this.apiValue, this.labelAr, this.labelEn);
+  const StatementType(this.apiValue, this.labelKey);
 
   /// The value sent to the API in the `type` field.
   final String apiValue;
 
-  /// Arabic display label.
-  final String labelAr;
-
-  /// English display label.
-  final String labelEn;
-
-  /// Returns the localized label based on the language code.
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
+  /// Localization key for the display label.
+  final String labelKey;
 
   /// Parses an API string value into a [StatementType].
   ///

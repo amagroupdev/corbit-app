@@ -5,6 +5,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/archive/data/models/archive_model.dart';
 import 'package:orbit_app/features/archive/presentation/controllers/archive_controller.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
 /// Bottom sheet with filter controls for the archive list.
@@ -141,14 +142,14 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
               const SizedBox(height: 20),
 
               // ── Title ─────────────────────────────────────────────
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.filter_list_rounded,
+                  const Icon(Icons.filter_list_rounded,
                       color: AppColors.primary, size: 22),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    '\u062A\u0635\u0641\u064A\u0629 \u0627\u0644\u0623\u0631\u0634\u064A\u0641', // تصفية الأرشيف
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.translate('archive_filter_title'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -161,9 +162,9 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
               const SizedBox(height: 20),
 
               // ── Send Type Filter ──────────────────────────────────
-              const Text(
-                '\u0646\u0648\u0639 \u0627\u0644\u0625\u0631\u0633\u0627\u0644', // نوع الإرسال
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('archive_send_type'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -176,7 +177,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                 children: SendAtFilter.values.map((filter) {
                   final isActive = _sendAt == filter;
                   return ChoiceChip(
-                    label: Text(filter.labelAr),
+                    label: Text(AppLocalizations.of(context)!.translate(filter.labelKey)),
                     selected: isActive,
                     onSelected: (_) => setState(() => _sendAt = filter),
                     selectedColor: AppColors.primary,
@@ -203,9 +204,9 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
               const SizedBox(height: 20),
 
               // ── Date Range ────────────────────────────────────────
-              const Text(
-                '\u0627\u0644\u0641\u062A\u0631\u0629 \u0627\u0644\u0632\u0645\u0646\u064A\u0629', // الفترة الزمنية
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('archive_date_range'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -217,7 +218,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                   // From date
                   Expanded(
                     child: _DatePickerButton(
-                      label: '\u0645\u0646', // من
+                      label: AppLocalizations.of(context)!.translate('from'),
                       value: _fromDate != null
                           ? dateFormat.format(_fromDate!)
                           : null,
@@ -231,7 +232,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                   // To date
                   Expanded(
                     child: _DatePickerButton(
-                      label: '\u0625\u0644\u0649', // إلى
+                      label: AppLocalizations.of(context)!.translate('to'),
                       value: _toDate != null
                           ? dateFormat.format(_toDate!)
                           : null,
@@ -246,9 +247,9 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
               const SizedBox(height: 20),
 
               // ── Phone Number ──────────────────────────────────────
-              const Text(
-                '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641', // رقم الهاتف
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('archive_phone_number'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -260,7 +261,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                 keyboardType: TextInputType.phone,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
-                  hintText: '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641', // أدخل رقم الهاتف
+                  hintText: AppLocalizations.of(context)!.translate('archive_enter_phone'),
                   hintStyle: const TextStyle(
                     color: AppColors.inputHint,
                     fontSize: 14,
@@ -300,7 +301,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      text: '\u0625\u0639\u0627\u062F\u0629 \u0636\u0628\u0637', // إعادة ضبط
+                      text: AppLocalizations.of(context)!.translate('archive_reset_filters'),
                       onPressed: _resetFilters,
                       icon: Icons.refresh_rounded,
                     ),
@@ -308,7 +309,7 @@ class _ArchiveFilterSheetState extends ConsumerState<ArchiveFilterSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton.primary(
-                      text: '\u062A\u0637\u0628\u064A\u0642', // تطبيق
+                      text: AppLocalizations.of(context)!.translate('apply'),
                       onPressed: _applyFilters,
                       icon: Icons.check_rounded,
                     ),

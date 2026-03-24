@@ -165,7 +165,7 @@ class StatsCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          viewAllLabel ?? '\u0639\u0631\u0636 \u062C\u0645\u064A\u0639 \u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A', // عرض جميع العمليات
+                          viewAllLabel ?? '',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,

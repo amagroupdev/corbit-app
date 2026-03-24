@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
 /// Generic filter model that holds the current state of all filters.
@@ -353,7 +354,7 @@ class _AppFilterSheetState extends State<AppFilterSheet> {
                   if (widget.showDateRange) ...[
                     Text(
                       widget.dateRangeLabel ??
-                          '\u0627\u0644\u0641\u062A\u0631\u0629 \u0627\u0644\u0632\u0645\u0646\u064A\u0629', // الفترة الزمنية
+                          AppLocalizations.instance.translate('dateRangeLabel'),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -388,7 +389,7 @@ class _AppFilterSheetState extends State<AppFilterSheet> {
                                     ? '${_formatDate(_filter.dateRange!.start)}'
                                         ' - '
                                         '${_formatDate(_filter.dateRange!.end)}'
-                                    : '\u0627\u062E\u062A\u0631 \u0627\u0644\u0641\u062A\u0631\u0629', // اختر الفترة
+                                    : AppLocalizations.instance.translate('selectDateRange'),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: _filter.dateRange != null
@@ -430,16 +431,14 @@ class _AppFilterSheetState extends State<AppFilterSheet> {
               children: [
                 Expanded(
                   child: AppButton.secondary(
-                    text:
-                        '\u0625\u0639\u0627\u062F\u0629 \u062A\u0639\u064A\u064A\u0646', // إعادة تعيين
+                    text: AppLocalizations.instance.translate('reset'),
                     onPressed: _reset,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppButton.primary(
-                    text:
-                        '\u062A\u0637\u0628\u064A\u0642', // تطبيق
+                    text: AppLocalizations.instance.translate('apply'),
                     onPressed: _apply,
                   ),
                 ),

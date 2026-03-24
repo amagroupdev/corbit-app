@@ -7,31 +7,31 @@
 
 /// All 14 message types supported by the ORBIT SMS V3 gateway.
 enum MessageType {
-  fromNumbers('from_numbers', 'إرسال إلى أرقام', 'أرقام'),
-  fromGroups('from_groups', 'إرسال إلى مجموعات', 'مجموعات'),
-  fromNoor('from_noor', 'رسائل نور', 'نور'),
-  customMessages('custom_messages', 'رسائل مخصصة', 'مخصصة'),
-  absenceLateness('absence_lateness', 'الغياب والتأخر', 'غياب'),
-  teacherMessages('teacher_messages', 'رسائل المعلمين', 'معلمين'),
-  longMessages('long_messages', 'رسائل طويلة', 'طويلة'),
-  voiceMessages('voice_messages', 'رسائل صوتية', 'صوتية'),
-  fileMessages('file_messages', 'رسائل ملفات', 'ملفات'),
-  thanksCertifications('thanks_certifications', 'شهادات شكر', 'شكر'),
-  vipCards('vip_cards', 'بطاقات VIP', 'VIP'),
-  bulkMessages('bulk_messages', 'رسائل جماعية', 'جماعية'),
-  attendanceRecords('attendance_records', 'سجل الحضور', 'حضور'),
-  certifications('certifications', 'الشهادات', 'شهادات');
+  fromNumbers('from_numbers', 'msg_type_from_numbers', 'msg_type_from_numbers_short'),
+  fromGroups('from_groups', 'msg_type_from_groups', 'msg_type_from_groups_short'),
+  fromNoor('from_noor', 'msg_type_from_noor', 'msg_type_from_noor_short'),
+  customMessages('custom_messages', 'msg_type_custom_messages', 'msg_type_custom_messages_short'),
+  absenceLateness('absence_lateness', 'msg_type_absence_lateness', 'msg_type_absence_lateness_short'),
+  teacherMessages('teacher_messages', 'msg_type_teacher_messages', 'msg_type_teacher_messages_short'),
+  longMessages('long_messages', 'msg_type_long_messages', 'msg_type_long_messages_short'),
+  voiceMessages('voice_messages', 'msg_type_voice_messages', 'msg_type_voice_messages_short'),
+  fileMessages('file_messages', 'msg_type_file_messages', 'msg_type_file_messages_short'),
+  thanksCertifications('thanks_certifications', 'msg_type_thanks_certifications', 'msg_type_thanks_certifications_short'),
+  vipCards('vip_cards', 'msg_type_vip_cards', 'msg_type_vip_cards_short'),
+  bulkMessages('bulk_messages', 'msg_type_bulk_messages', 'msg_type_bulk_messages_short'),
+  attendanceRecords('attendance_records', 'msg_type_attendance_records', 'msg_type_attendance_records_short'),
+  certifications('certifications', 'msg_type_certifications', 'msg_type_certifications_short');
 
-  const MessageType(this.value, this.arabicLabel, this.shortLabel);
+  const MessageType(this.value, this.labelKey, this.shortLabelKey);
 
   /// The API value sent to the server (e.g. 'from_numbers').
   final String value;
 
-  /// Full Arabic display label for the message type.
-  final String arabicLabel;
+  /// Localization key for the full display label.
+  final String labelKey;
 
-  /// Short Arabic label for tabs.
-  final String shortLabel;
+  /// Localization key for the short tab label.
+  final String shortLabelKey;
 
   /// The archive_type value accepted by POST /archive/list.
   ///
@@ -95,17 +95,19 @@ enum SendAtOption {
 
 /// Status of a sent message.
 enum MessageStatus {
-  sent('sent', 'مُرسل'),
-  delivered('delivered', 'تم التوصيل'),
-  pending('pending', 'قيد الانتظار'),
-  failed('failed', 'فشل'),
-  scheduled('scheduled', 'مجدولة'),
-  rejected('rejected', 'مرفوض'),
-  expired('expired', 'منتهي');
+  sent('sent', 'msg_status_sent'),
+  delivered('delivered', 'msg_status_delivered'),
+  pending('pending', 'msg_status_pending'),
+  failed('failed', 'msg_status_failed'),
+  scheduled('scheduled', 'msg_status_scheduled'),
+  rejected('rejected', 'msg_status_rejected'),
+  expired('expired', 'msg_status_expired');
 
-  const MessageStatus(this.value, this.arabicLabel);
+  const MessageStatus(this.value, this.labelKey);
   final String value;
-  final String arabicLabel;
+
+  /// Localization key for the status display label.
+  final String labelKey;
 
   static MessageStatus fromValue(String value) {
     return MessageStatus.values.firstWhere(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/addons/data/models/addon_model.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A card widget that displays an addon/service summary.
 ///
@@ -62,7 +63,7 @@ class AddonCard extends StatelessWidget {
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: _buildStatusBadge(),
+                      child: _buildStatusBadge(context),
                     ),
                 ],
               ),
@@ -95,7 +96,7 @@ class AddonCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    _buildPriceRow(),
+                    _buildPriceRow(context),
                   ],
                 ),
               ),
@@ -125,21 +126,22 @@ class AddonCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     String label;
     Color bgColor;
     Color textColor;
 
     if (addon.isActive) {
-      label = '\u0645\u0641\u0639\u0644'; // مفعل
+      label = t.translate('addonActivated');
       bgColor = AppColors.successSurface;
       textColor = AppColors.success;
     } else if (addon.isFree) {
-      label = '\u0645\u062C\u0627\u0646\u064A'; // مجاني
+      label = t.translate('addonFree');
       bgColor = AppColors.infoSurface;
       textColor = AppColors.info;
     } else if (addon.isComingSoon) {
-      label = '\u0642\u0631\u064A\u0628\u0627\u064B'; // قريباً
+      label = t.translate('addonComingSoon');
       bgColor = AppColors.warningSurface;
       textColor = AppColors.warning;
     } else {
@@ -163,10 +165,11 @@ class AddonCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceRow() {
+  Widget _buildPriceRow(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     if (addon.isFree) {
-      return const Text(
-        '\u0645\u062C\u0627\u0646\u064A', // مجاني
+      return Text(
+        t.translate('addonFree'),
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w700,
@@ -181,7 +184,7 @@ class AddonCard extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '\u064A\u0628\u062F\u0623 \u0645\u0646 ', // يبدأ من
+          t.translate('addonStartsFrom'),
           style: const TextStyle(
             fontSize: 12,
             color: AppColors.textSecondary,

@@ -69,27 +69,33 @@ class TransactionModel {
     };
   }
 
-  /// Human-readable status label in Arabic.
-  String get statusLabel {
+  /// Localization key for the status label.
+  String get statusLabelKey {
     return switch (status.toLowerCase()) {
-      'pending' => '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631',
-      'approved' => '\u0645\u0648\u0627\u0641\u0642 \u0639\u0644\u064A\u0647',
-      'waiting' => '\u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629',
-      'rejected' => '\u0645\u0631\u0641\u0648\u0636',
+      'pending' => 'statusPending',
+      'approved' => 'statusApproved',
+      'waiting' => 'statusWaiting',
+      'rejected' => 'statusRejected_',
       _ => status,
     };
   }
 
-  /// Human-readable payment method label in Arabic.
-  String get paymentMethodLabel {
+  /// Human-readable status label (uses key-based lookup).
+  String get statusLabel => statusLabelKey;
+
+  /// Localization key for the payment method label.
+  String get paymentMethodLabelKey {
     return switch (paymentMethod.toLowerCase()) {
-      'online' => 'Noon \u062F\u0641\u0639 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A',
-      'bank_transfer' || 'transfare' => '\u062A\u062D\u0648\u064A\u0644 \u0628\u0646\u0643\u064A',
-      'stc_pay' => 'STC Pay',
-      'sadad' => '\u0633\u062F\u0627\u062F',
+      'online' => 'onlinePaymentNoon',
+      'bank_transfer' || 'transfare' => 'bankTransfer',
+      'stc_pay' => 'stcPay',
+      'sadad' => 'sadad',
       _ => paymentMethod,
     };
   }
+
+  /// Human-readable payment method label (uses key-based lookup).
+  String get paymentMethodLabel => paymentMethodLabelKey;
 
   static double? _parseDouble(dynamic value) {
     if (value == null) return null;

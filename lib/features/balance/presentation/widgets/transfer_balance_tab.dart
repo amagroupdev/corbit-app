@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
@@ -55,30 +56,31 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
     if (amount <= 0) return;
 
     // Confirmation dialog
+    final t = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u062A\u062D\u0648\u064A\u0644',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('confirmTransfer'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: Text(
-          '\u0647\u0644 \u062A\u0631\u064A\u062F \u062A\u062D\u0648\u064A\u0644 $amount \u0631\u0633\u0627\u0644\u0629 \u0625\u0644\u0649 \u0627\u0644\u0631\u0642\u0645 $phone\u061F',
+          t.translateWithParams('transferConfirmMessage', {'amount': amount.toString(), 'phone': phone}),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              t.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              '\u062A\u0623\u0643\u064A\u062F',
-              style: TextStyle(
+            child: Text(
+              t.translate('confirm'),
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
               ),
@@ -98,8 +100,8 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
       _phoneController.clear();
       _amountController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u062A\u0645 \u0627\u0644\u062A\u062D\u0648\u064A\u0644 \u0628\u0646\u062C\u0627\u062D'),
+        SnackBar(
+          content: Text(t.translate('transferSuccess')),
           backgroundColor: AppColors.success,
         ),
       );
@@ -110,6 +112,7 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
   Widget build(BuildContext context) {
     super.build(context);
     final state = ref.watch(transferBalanceControllerProvider);
+    final t = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('yyyy/MM/dd HH:mm', 'ar');
     final numberFormat = NumberFormat('#,##0', 'ar');
 
@@ -154,9 +157,9 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Center(
+                  Center(
                     child: Text(
-                      '\u062A\u062D\u0648\u064A\u0644 \u0631\u0635\u064A\u062F \u0625\u0644\u0649 \u062D\u0633\u0627\u0628 \u0641\u0631\u0639\u064A',
+                      t.translate('transferToSubAccount'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -168,7 +171,7 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
 
                   // Phone field
                   AppTextField(
-                    label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0627\u0644\u0645\u0633\u062A\u0644\u0645',
+                    label: t.translate('recipientPhone'),
                     hint: '05xxxxxxxx',
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
@@ -176,7 +179,7 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
                     prefixIcon: const Icon(Icons.phone_outlined, size: 20),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628';
+                        return t.translate('phoneRequired');
                       }
                       return null;
                     },
@@ -185,18 +188,18 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
 
                   // Amount field
                   AppTextField(
-                    label: '\u0639\u062F\u062F \u0627\u0644\u0631\u0633\u0627\u0626\u0644',
-                    hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0639\u062F\u062F',
+                    label: t.translate('smsCountLabel'),
+                    hint: t.translate('enterCount'),
                     controller: _amountController,
                     keyboardType: TextInputType.number,
                     prefixIcon: const Icon(Icons.sms_outlined, size: 20),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return '\u0627\u0644\u0639\u062F\u062F \u0645\u0637\u0644\u0648\u0628';
+                        return t.translate('countRequired');
                       }
                       final amount = int.tryParse(value);
                       if (amount == null || amount <= 0) {
-                        return '\u0623\u062F\u062E\u0644 \u0639\u062F\u062F\u0627\u064B \u0635\u062D\u064A\u062D\u0627\u064B';
+                        return t.translate('enterValidCount');
                       }
                       return null;
                     },
@@ -233,7 +236,7 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
 
                   // Transfer button
                   AppButton.primary(
-                    text: '\u062A\u062D\u0648\u064A\u0644',
+                    text: t.translate('transferButton'),
                     onPressed:
                         state.isTransferring ? null : _handleTransfer,
                     isLoading: state.isTransferring,
@@ -246,9 +249,9 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
           const SizedBox(height: 28),
 
           // Transfer history
-          const Text(
-            '\u0633\u062C\u0644 \u0627\u0644\u062A\u062D\u0648\u064A\u0644\u0627\u062A',
-            style: TextStyle(
+          Text(
+            t.translate('transferHistory'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -283,8 +286,8 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
                     color: AppColors.textHint,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u062D\u0648\u064A\u0644\u0627\u062A \u0633\u0627\u0628\u0642\u0629',
+                  Text(
+                    t.translate('noPreviousTransfers'),
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
@@ -351,7 +354,7 @@ class _TransferBalanceTabState extends ConsumerState<TransferBalanceTab>
                         ),
                       ),
                       Text(
-                        '${numberFormat.format(amount)} \u0631\u0633\u0627\u0644\u0629',
+                        '${numberFormat.format(amount)} ${t.translate('messageUnit')}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,

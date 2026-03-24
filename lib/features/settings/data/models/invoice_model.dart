@@ -59,16 +59,16 @@ class InvoiceModel {
     };
   }
 
-  /// Returns the display-friendly status label in Arabic.
-  String get statusLabel {
+  /// Returns the translation key for the invoice status label.
+  String get statusLabelKey {
     return switch (status?.toLowerCase()) {
-      'paid' => 'مدفوعة',
-      'unpaid' => 'غير مدفوعة',
-      'pending' => 'قيد الانتظار',
-      'overdue' => 'متأخرة',
-      'cancelled' => 'ملغاة',
-      'refunded' => 'مستردة',
-      _ => status ?? 'غير محدد',
+      'paid' => 'invoice_status_paid',
+      'unpaid' => 'invoice_status_unpaid',
+      'pending' => 'invoice_status_pending',
+      'overdue' => 'invoice_status_overdue',
+      'cancelled' => 'invoice_status_cancelled',
+      'refunded' => 'invoice_status_refunded',
+      _ => 'invoice_status_unknown',
     };
   }
 

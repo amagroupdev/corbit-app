@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/utils/formatters.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
 
@@ -93,55 +91,44 @@ class ContactsImportSheet extends ConsumerStatefulWidget {
 class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
   bool _isLoading = false;
   bool _isImporting = false;
+  int _importProgress = 0;
+  int _importTotal = 0;
   int _skippedNonSaudi = 0;
-  int _saudiCount = 0;
-  Map<String, dynamic>? _importResult;
+  Map<String, int>? _importResult;
   String? _error;
 
   @override
   void dispose() {
-    // تأكد من إيقاف WakeLock إذا انغلق الشيت
     WakelockPlus.disable();
     super.dispose();
   }
 
-  /// Builds a CSV from entries and uploads it in ONE request.
-  Future<void> _uploadEntriesAsCsv(List<_ContactEntry> entries) async {
-    // تفعيل WakeLock - منع السليب
+  /// Sends entries one by one via API with WakeLock to prevent sleep.
+  Future<void> _sendEntriesToApi(List<_ContactEntry> entries) async {
     await WakelockPlus.enable();
 
     setState(() {
       _isImporting = true;
+      _importTotal = entries.length;
+      _importProgress = 0;
       _error = null;
     });
 
     try {
-      // Get the group name for the CSV
-      final state = ref.read(groupDetailControllerProvider);
-      final groupName = state.group?.name ?? '';
+      final contactMaps = entries
+          .map((e) => {'name': e.name, 'number': e.phone})
+          .toList();
 
-      // Build CSV: group,name,phone
-      final buffer = StringBuffer();
-      buffer.writeln('group,name,phone');
-      for (final entry in entries) {
-        final name = entry.name.replaceAll(',', ' ');
-        buffer.writeln('$groupName,$name,${entry.phone}');
-      }
-
-      // Write to temp file
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/contacts_import_${DateTime.now().millisecondsSinceEpoch}.csv');
-      await file.writeAsString(buffer.toString());
-
-      // Upload via custom import (one request for all contacts)
       final result = await ref
-          .read(importControllerProvider.notifier)
-          .importCustomForContacts(
-            filePath: file.path,
-            fileName: 'contacts_import.csv',
-            phoneColumn: 'phone',
-            groupColumn: 'group',
-            nameColumn: 'name',
+          .read(groupDetailControllerProvider.notifier)
+          .addNumbersBatch(
+            groupId: widget.groupId,
+            contacts: contactMaps,
+            onProgress: (current, total) {
+              if (mounted) {
+                setState(() => _importProgress = current);
+              }
+            },
           );
 
       if (mounted) {
@@ -150,18 +137,15 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
           _importResult = result;
         });
       }
-
-      // Clean up temp file
-      try { await file.delete(); } catch (_) {}
     } catch (e) {
       if (mounted) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isImporting = false;
-          _error = 'خطأ في رفع جهات الاتصال: $e';
+          _error = '${t.translate('contactsAddError')}: $e';
         });
       }
     } finally {
-      // إيقاف WakeLock
       await WakelockPlus.disable();
     }
   }
@@ -175,9 +159,10 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
     try {
       final permGranted = await FlutterContacts.requestPermission(readonly: true);
       if (!permGranted) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
-          _error = 'يجب السماح بالوصول إلى جهات الاتصال';
+          _error = t.translate('contactsPermissionRequired');
         });
         return;
       }
@@ -190,9 +175,10 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
       final expandResult = _expandContacts(contacts);
 
       if (expandResult.entries.isEmpty) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
-          _error = 'لا توجد أرقام جوال سعودية في جهات الاتصال';
+          _error = t.translate('noSaudiNumbers');
         });
         return;
       }
@@ -200,17 +186,17 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
       setState(() {
         _isLoading = false;
         _skippedNonSaudi = expandResult.skippedNonSaudi;
-        _saudiCount = expandResult.entries.length;
       });
 
-      await _uploadEntriesAsCsv(expandResult.entries);
+      await _sendEntriesToApi(expandResult.entries);
     } catch (e) {
       await WakelockPlus.disable();
       if (mounted) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
           _isImporting = false;
-          _error = 'خطأ في قراءة جهات الاتصال: $e';
+          _error = '${t.translate('contactsReadError')}: $e';
         });
       }
     }
@@ -225,9 +211,10 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
     try {
       final permGranted = await FlutterContacts.requestPermission(readonly: true);
       if (!permGranted) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
-          _error = 'يجب السماح بالوصول إلى جهات الاتصال';
+          _error = t.translate('contactsPermissionRequired');
         });
         return;
       }
@@ -240,9 +227,10 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
       final expandResult = _expandContacts(contacts);
 
       if (expandResult.entries.isEmpty) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
-          _error = 'لا توجد أرقام جوال سعودية في جهات الاتصال';
+          _error = t.translate('noSaudiNumbers');
         });
         return;
       }
@@ -264,16 +252,15 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
       if (selected == null || selected.isEmpty || !mounted) return;
 
-      setState(() => _saudiCount = selected.length);
-
-      await _uploadEntriesAsCsv(selected);
+      await _sendEntriesToApi(selected);
     } catch (e) {
       await WakelockPlus.disable();
       if (mounted) {
+        final t = AppLocalizations.of(context)!;
         setState(() {
           _isLoading = false;
           _isImporting = false;
-          _error = 'خطأ في قراءة جهات الاتصال: $e';
+          _error = '${t.translate('contactsReadError')}: $e';
         });
       }
     }
@@ -282,6 +269,7 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final t = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.only(
@@ -312,9 +300,9 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
           const SizedBox(height: 20),
 
           // Title
-          const Text(
-            'إضافة من جهات الاتصال',
-            style: TextStyle(
+          Text(
+            t.translate('addFromContactsTitle'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -330,14 +318,14 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.infoBorder),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppColors.info, size: 18),
-                SizedBox(width: 10),
+                const Icon(Icons.info_outline, color: AppColors.info, size: 18),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'سيتم إضافة أرقام الجوال السعودية فقط بجميع صيغها (05xx, +966xx, 966xx)',
-                    style: TextStyle(fontSize: 12, color: AppColors.infoDark),
+                    t.translate('saudiNumbersOnlyInfo'),
+                    style: const TextStyle(fontSize: 12, color: AppColors.infoDark),
                   ),
                 ),
               ],
@@ -363,16 +351,16 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
             // Option 1: Import all
             _buildOptionTile(
               icon: Icons.contacts,
-              title: 'إضافة جميع جهات الاتصال',
-              subtitle: 'سحب كل أرقام الجوال السعودية من جهازك',
+              title: t.translate('importAllContacts'),
+              subtitle: t.translate('importAllContactsSubtitle'),
               onTap: _importAllContacts,
             ),
             const SizedBox(height: 12),
             // Option 2: Select specific
             _buildOptionTile(
               icon: Icons.person_search,
-              title: 'اختيار جهات اتصال محددة',
-              subtitle: 'اختر الأرقام التي تريد إضافتها',
+              title: t.translate('selectSpecificContacts'),
+              subtitle: t.translate('selectSpecificContactsSubtitle'),
               onTap: _importSelectedContacts,
             ),
           ],
@@ -444,54 +432,45 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
   }
 
   Widget _buildUploading() {
-    final importState = ref.watch(importControllerProvider);
+    final progress = _importTotal > 0 ? _importProgress / _importTotal : 0.0;
+    final t = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
-          const Text(
-            'جاري رفع جهات الاتصال...',
-            style: TextStyle(
+          Text(
+            t.translate('addingContacts'),
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '$_saudiCount رقم سعودي',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: importState.progress > 0 ? importState.progress : null,
+              value: progress,
               backgroundColor: AppColors.borderLight,
               valueColor:
                   const AlwaysStoppedAnimation<Color>(AppColors.primary),
               minHeight: 8,
             ),
           ),
-          if (importState.progress > 0) ...[
-            const SizedBox(height: 8),
-            Text(
-              '${(importState.progress * 100).toInt()}%',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
+          const SizedBox(height: 8),
+          Text(
+            '$_importProgress / $_importTotal',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
             ),
-          ],
+          ),
           const SizedBox(height: 12),
-          const Text(
-            'لا تغلق التطبيق',
-            style: TextStyle(
+          Text(
+            t.translate('screenWontSleep'),
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textHint,
             ),
@@ -503,9 +482,10 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
   Widget _buildResult() {
     final result = _importResult!;
-    final successCount = result['success_count'] ?? result['imported'] ?? 0;
-    final failedCount = result['failed_count'] ?? result['failed'] ?? 0;
-    final message = result['message'] as String? ?? '';
+    final success = result['success'] ?? 0;
+    final failed = result['failed'] ?? 0;
+    final duplicate = result['duplicate'] ?? 0;
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       children: [
@@ -518,13 +498,13 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
           ),
           child: Column(
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.check_circle, color: AppColors.success, size: 24),
-                  SizedBox(width: 8),
+                  const Icon(Icons.check_circle, color: AppColors.success, size: 24),
+                  const SizedBox(width: 8),
                   Text(
-                    'اكتملت الإضافة',
-                    style: TextStyle(
+                    t.translate('additionCompleted'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.successDark,
@@ -532,32 +512,30 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
                   ),
                 ],
               ),
-              if (message.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  message,
-                  style: const TextStyle(fontSize: 13, color: AppColors.successDark),
-                ),
-              ],
               const SizedBox(height: 12),
               Row(
                 children: [
-                  if (successCount is int && successCount > 0)
-                    _buildStatChip(
-                        'تمت إضافته', successCount.toString(), AppColors.success),
+                  _buildStatChip(
+                      t.translate('addedSuccessfully'), success.toString(), AppColors.success),
                   if (_skippedNonSaudi > 0) ...[
                     const SizedBox(width: 8),
                     _buildStatChip(
-                        'غير سعودي', _skippedNonSaudi.toString(), AppColors.textSecondary),
+                        t.translate('nonSaudi'), _skippedNonSaudi.toString(), AppColors.textSecondary),
                   ],
                 ],
               ),
-              if (failedCount is int && failedCount > 0) ...[
+              if (duplicate > 0 || failed > 0) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildStatChip(
-                        'موجود بالفعل', failedCount.toString(), AppColors.info),
+                    if (duplicate > 0)
+                      _buildStatChip(
+                          t.translate('alreadyExists'), duplicate.toString(), AppColors.info),
+                    if (duplicate > 0 && failed > 0)
+                      const SizedBox(width: 8),
+                    if (failed > 0)
+                      _buildStatChip(
+                          t.translate('error'), failed.toString(), AppColors.error),
                   ],
                 ),
               ],
@@ -577,9 +555,9 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              'تم',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            child: Text(
+              t.translate('done'),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -688,6 +666,7 @@ class _ContactEntryPickerDialogState
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredEntries;
+    final t = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -701,10 +680,10 @@ class _ContactEntryPickerDialogState
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'اختر الأرقام',
-                      style: TextStyle(
+                      t.translate('selectNumbers'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -736,7 +715,7 @@ class _ContactEntryPickerDialogState
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'بحث بالاسم أو الرقم...',
+                  hintText: t.translate('searchByNameOrNumber'),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
@@ -769,9 +748,9 @@ class _ContactEntryPickerDialogState
                             .addAll(filtered.map((e) => e.key));
                       });
                     },
-                    child: const Text(
-                      'تحديد الكل',
-                      style: TextStyle(fontSize: 13),
+                    child: Text(
+                      t.translate('selectAll'),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                   TextButton(
@@ -782,9 +761,9 @@ class _ContactEntryPickerDialogState
                         }
                       });
                     },
-                    child: const Text(
-                      'إلغاء الكل',
-                      style: TextStyle(fontSize: 13),
+                    child: Text(
+                      t.translate('deselectAllFiltered'),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                   const Spacer(),
@@ -792,7 +771,7 @@ class _ContactEntryPickerDialogState
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${_entries.length} رقم سعودي',
+                        t.translateWithParams('saudiNumberCount', {'count': '${_entries.length}'}),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -800,7 +779,7 @@ class _ContactEntryPickerDialogState
                       ),
                       if (widget.skippedNonSaudi > 0)
                         Text(
-                          '${widget.skippedNonSaudi} غير سعودي (تم تجاوزه)',
+                          t.translateWithParams('nonSaudiSkipped', {'count': '${widget.skippedNonSaudi}'}),
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textHint,
@@ -832,7 +811,7 @@ class _ContactEntryPickerDialogState
                       });
                     },
                     title: Text(
-                      entry.value.name.isNotEmpty ? entry.value.name : 'بدون اسم',
+                      entry.value.name.isNotEmpty ? entry.value.name : t.translate('noName'),
                       style: const TextStyle(fontSize: 14),
                     ),
                     subtitle: Text(
@@ -878,7 +857,7 @@ class _ContactEntryPickerDialogState
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('إلغاء'),
+                      child: Text(t.translate('cancel')),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -901,7 +880,7 @@ class _ContactEntryPickerDialogState
                         ),
                       ),
                       child: Text(
-                        'إضافة (${_selectedIndices.length})',
+                        t.translateWithParams('addCount', {'count': '${_selectedIndices.length}'}),
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),

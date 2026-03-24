@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 
 /// Input widget for adding recipient phone numbers.
@@ -55,7 +56,7 @@ class _RecipientInputState extends ConsumerState<RecipientInput> {
 
     if (invalidCount > 0) {
       setState(() {
-        _errorText = 'الرقم يجب أن يبدأ بـ 5 ويكون 9 أرقام';
+        _errorText = AppLocalizations.of(context)!.translate('msg_number_validation');
       });
     } else {
       setState(() {
@@ -89,9 +90,9 @@ class _RecipientInputState extends ConsumerState<RecipientInput> {
         // ─── Label ──────────────────────────────────────────────
         Row(
           children: [
-            const Text(
-              'أرقام المستقبلين',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('msg_recipient_numbers'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -100,7 +101,7 @@ class _RecipientInputState extends ConsumerState<RecipientInput> {
             const Spacer(),
             if (numbers.isNotEmpty)
               Text(
-                '${numbers.length} رقم',
+                AppLocalizations.of(context)!.translateWithParams('msg_number_count', {'count': '${numbers.length}'}),
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
@@ -196,7 +197,7 @@ class _RecipientInputState extends ConsumerState<RecipientInput> {
           padding: const EdgeInsets.only(right: 4),
           child: Text(
             _errorText == null
-                ? 'أدخل رقم يبدأ بـ 5 ويتكون من 9 أرقام (مثال: 512345678)'
+                ? AppLocalizations.of(context)!.translate('msg_number_hint')
                 : '',
             style: const TextStyle(
               fontSize: 11,
@@ -228,13 +229,13 @@ class _RecipientInputState extends ConsumerState<RecipientInput> {
                     InkWell(
                       onTap: _clearAll,
                       borderRadius: BorderRadius.circular(6),
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
                         child: Text(
-                          'مسح الكل',
+                          AppLocalizations.of(context)!.translate('msg_clear_all'),
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.error,

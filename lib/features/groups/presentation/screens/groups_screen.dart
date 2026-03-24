@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
 import 'package:orbit_app/features/groups/presentation/widgets/group_card.dart';
@@ -69,23 +70,24 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   }
 
   void _showDeleteDialog(int groupId, String groupName) {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('deleteGroup'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 "$groupName"\u061F',
+          '${t.translate('confirmDeleteGroupNamed')} "$groupName"\u061F',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              t.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -96,16 +98,16 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                   .deleteGroup(groupId);
               if (mounted && success) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0628\u0646\u062C\u0627\u062D'),
+                  SnackBar(
+                    content: Text(t.translate('groupDeleted')),
                     backgroundColor: AppColors.success,
                   ),
                 );
               }
             },
-            child: const Text(
-              '\u062D\u0630\u0641',
-              style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+            child: Text(
+              t.translate('delete'),
+              style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -115,20 +117,21 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
 
   void _showEditDialog(int groupId, String currentName) {
     final controller = TextEditingController(text: currentName);
+    final t = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('editGroup'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: TextField(
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: '\u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
+            hintText: t.translate('groupName'),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -141,9 +144,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              t.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -163,24 +166,24 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                       .read(groupsListControllerProvider.notifier)
                       .loadGroups();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0627\u0633\u0645 \u0628\u0646\u062C\u0627\u062D'),
+                    SnackBar(
+                      content: Text(t.translate('groupNameUpdated')),
                       backgroundColor: AppColors.success,
                     ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('\u0641\u0634\u0644 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0627\u0633\u0645'),
+                    SnackBar(
+                      content: Text(t.translate('groupNameUpdateFailed')),
                       backgroundColor: AppColors.error,
                     ),
                   );
                 }
               }
             },
-            child: const Text(
-              '\u062D\u0641\u0638',
-              style: TextStyle(
+            child: Text(
+              t.translate('save'),
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
               ),
@@ -194,13 +197,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(groupsListControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('groups'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -215,8 +219,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                 await repo.exportGroups();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('\u062C\u0627\u0631\u064A \u062A\u0635\u062F\u064A\u0631 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A...'),
+                    SnackBar(
+                      content: Text(t.translate('exportingGroups')),
                       backgroundColor: AppColors.info,
                     ),
                   );
@@ -224,15 +228,15 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
               } catch (_) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('\u0641\u0634\u0644 \u0627\u0644\u062A\u0635\u062F\u064A\u0631'),
+                    SnackBar(
+                      content: Text(t.translate('exportFailed')),
                       backgroundColor: AppColors.error,
                     ),
                   );
                 }
               }
             },
-            tooltip: '\u062A\u0635\u062F\u064A\u0631',
+            tooltip: t.translate('export'),
           ),
         ],
       ),
@@ -249,7 +253,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: '\u0628\u062D\u062B \u0639\u0646 \u0645\u062C\u0645\u0648\u0639\u0629...',
+                    hintText: t.translate('searchGroups'),
                     hintStyle: const TextStyle(
                       color: AppColors.inputHint,
                       fontSize: 14,
@@ -285,7 +289,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                 Row(
                   children: [
                     Text(
-                      '\u0639\u0631\u0636 \u0627\u0644\u0645\u062D\u0630\u0648\u0641\u0629',
+                      t.translate('showTrashed'),
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -306,7 +310,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     ),
                     const Spacer(),
                     Text(
-                      '${state.total} \u0645\u062C\u0645\u0648\u0639\u0629',
+                      '${state.total} ${t.translate('groupUnit')}',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -380,9 +384,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                                     if (mounted && success) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content: Text(
-                                              '\u062A\u0645 \u0627\u0633\u062A\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629'),
+                                              t.translate('groupRestored')),
                                           backgroundColor: AppColors.success,
                                         ),
                                       );
@@ -406,6 +410,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -426,19 +431,19 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u062C\u0645\u0648\u0639\u0627\u062A',
-              style: TextStyle(
+            Text(
+              t.translate('noGroups'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0627\u0628\u062F\u0623 \u0628\u0625\u0646\u0634\u0627\u0621 \u0645\u062C\u0645\u0648\u0639\u0629 \u062C\u062F\u064A\u062F\u0629 \u0644\u062A\u0646\u0638\u064A\u0645 \u0623\u0631\u0642\u0627\u0645\u0643',
+            Text(
+              t.translate('startCreatingGroup'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
@@ -450,6 +455,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   }
 
   Widget _buildErrorState(String error) {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -474,7 +480,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
             TextButton.icon(
               onPressed: _onRefresh,
               icon: const Icon(Icons.refresh),
-              label: const Text('\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629'),
+              label: Text(t.translate('retry')),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/shared/widgets/otp_input.dart';
 
@@ -45,6 +46,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
   @override
   Widget build(BuildContext context) {
     final otpState = ref.watch(otpControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     ref.listen<OtpState>(otpControllerProvider, (prev, next) {
       if (next.error != null) {
@@ -109,9 +111,9 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
-                  '\u0627\u0644\u062a\u062d\u0642\u0642 \u0628\u062e\u0637\u0648\u062a\u064a\u0646',
-                  style: TextStyle(
+                Text(
+                  t.translate('twoStepVerification'),
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -119,9 +121,9 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '\u0623\u062f\u062e\u0644 \u0631\u0645\u0632 \u0627\u0644\u062a\u062d\u0642\u0642 \u0627\u0644\u0645\u0631\u0633\u0644 \u0625\u0644\u0649 \u062c\u0647\u0627\u0632\u0643',
-                  style: TextStyle(
+                Text(
+                  t.translate('enterCodeSentToDevice'),
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -130,7 +132,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // PIN code fields – 4 visible boxes, accepts more silently
+                // PIN code fields
                 OtpInput(
                   controller: _otpController,
                   boxCount: 4,
@@ -161,7 +163,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                           size: 18, color: AppColors.textSecondary),
                       const SizedBox(width: 6),
                       Text(
-                        '\u0635\u0644\u0627\u062d\u064a\u0629 \u0627\u0644\u0631\u0645\u0632 \u062a\u0646\u062a\u0647\u064a \u0628\u0639\u062f ${otpState.formattedTime} \u062f\u0642\u064a\u0642\u0629',
+                        '${t.translate('codeValidityExpires')} ${otpState.formattedTime} ${t.translate('minuteUnit')}',
                         style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 13,
@@ -199,9 +201,9 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            '\u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u0631\u0645\u0632',
-                            style: TextStyle(
+                        : Text(
+                            t.translate('verifyCode'),
+                            style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -215,9 +217,9 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      '\u0644\u0645 \u064a\u0635\u0644\u0643 \u0631\u0645\u0632 \u0627\u0644\u062a\u062d\u0642\u0642\u061f',
-                      style: TextStyle(
+                    Text(
+                      t.translate('didNotReceiveCode'),
+                      style: const TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -227,7 +229,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                     GestureDetector(
                       onTap: otpState.canResend ? () => context.pop() : null,
                       child: Text(
-                        '\u0625\u0639\u0627\u062f\u0629 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
+                        t.translate('reLogin'),
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 14,

@@ -7,6 +7,7 @@ import 'package:orbit_app/features/settings/presentation/controllers/settings_co
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for changing the user's password with strength indicator.
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -61,11 +62,12 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     return AppColors.success;
   }
 
-  String get _strengthLabel {
-    if (_passwordStrength < 0.3) return 'ضعيفة';
-    if (_passwordStrength < 0.6) return 'متوسطة';
-    if (_passwordStrength < 0.8) return 'جيدة';
-    return 'قوية';
+  String _strengthLabel(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    if (_passwordStrength < 0.3) return t.translate('password_strength_weak');
+    if (_passwordStrength < 0.6) return t.translate('password_strength_medium');
+    if (_passwordStrength < 0.8) return t.translate('password_strength_good');
+    return t.translate('password_strength_strong');
   }
 
   @override
@@ -73,7 +75,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('تغيير كلمة المرور'),
+        title: Text(AppLocalizations.of(context)!.translate('changePassword')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -109,8 +111,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'تأكد من اختيار كلمة مرور قوية',
+                  Text(
+                    AppLocalizations.of(context)!.translate('password_choose_strong'),
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
@@ -122,20 +124,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
             // ── Current Password ──────────────────────────────────
             AppTextField(
-              label: 'كلمة المرور الحالية',
-              hint: 'أدخل كلمة المرور الحالية',
+              label: AppLocalizations.of(context)!.translate('password_current_label'),
+              hint: AppLocalizations.of(context)!.translate('password_current_hint'),
               controller: _currentPasswordController,
               obscureText: true,
               validator: (v) =>
-                  Validators.validateRequired(v, fieldName: 'كلمة المرور الحالية'),
+                  Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('password_current_label')),
               textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 16),
 
             // ── New Password ──────────────────────────────────────
             AppTextField(
-              label: 'كلمة المرور الجديدة',
-              hint: 'أدخل كلمة المرور الجديدة',
+              label: AppLocalizations.of(context)!.translate('password_new_label'),
+              hint: AppLocalizations.of(context)!.translate('password_new_hint'),
               controller: _newPasswordController,
               obscureText: true,
               validator: Validators.validatePassword,
@@ -161,7 +163,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    _strengthLabel,
+                    _strengthLabel(context),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -178,8 +180,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
             // ── Confirm Password ──────────────────────────────────
             AppTextField(
-              label: 'تأكيد كلمة المرور',
-              hint: 'أعد إدخال كلمة المرور الجديدة',
+              label: AppLocalizations.of(context)!.translate('password_confirm_label'),
+              hint: AppLocalizations.of(context)!.translate('password_confirm_hint'),
               controller: _confirmPasswordController,
               obscureText: true,
               validator: (v) => Validators.validateConfirmPassword(
@@ -192,7 +194,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
             // ── Save Button ───────────────────────────────────────
             AppButton.primary(
-              text: 'تغيير كلمة المرور',
+              text: AppLocalizations.of(context)!.translate('changePassword'),
               onPressed: _isLoading ? null : _changePassword,
               isLoading: _isLoading,
               icon: Icons.lock_rounded,
@@ -208,12 +210,12 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _requirementRow('8 أحرف على الأقل', password.length >= 8),
-        _requirementRow('حرف كبير واحد', RegExp(r'[A-Z]').hasMatch(password)),
-        _requirementRow('حرف صغير واحد', RegExp(r'[a-z]').hasMatch(password)),
-        _requirementRow('رقم واحد على الأقل', RegExp(r'[0-9]').hasMatch(password)),
+        _requirementRow(AppLocalizations.of(context)!.translate('password_req_min_chars'), password.length >= 8),
+        _requirementRow(AppLocalizations.of(context)!.translate('password_req_uppercase'), RegExp(r'[A-Z]').hasMatch(password)),
+        _requirementRow(AppLocalizations.of(context)!.translate('password_req_lowercase'), RegExp(r'[a-z]').hasMatch(password)),
+        _requirementRow(AppLocalizations.of(context)!.translate('password_req_digit'), RegExp(r'[0-9]').hasMatch(password)),
         _requirementRow(
-          'رمز خاص واحد',
+          AppLocalizations.of(context)!.translate('password_req_special'),
           RegExp(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;]')
               .hasMatch(password),
         ),
@@ -259,7 +261,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
       final success = result['success'] as bool? ?? false;
       final message =
-          result['message'] as String? ?? 'تم تغيير كلمة المرور بنجاح';
+          result['message'] as String? ?? AppLocalizations.of(context)!.translate('password_changed_success');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -280,7 +282,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );

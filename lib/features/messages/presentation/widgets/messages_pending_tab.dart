@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 import 'package:orbit_app/features/messages/presentation/widgets/message_card.dart';
@@ -28,7 +29,7 @@ class MessagesPendingTab extends ConsumerWidget {
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: 12),
             Text(
-              'فشل تحميل الرسائل المعلقة',
+              AppLocalizations.of(context)!.translate('msg_pending_load_failed'),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -42,7 +43,7 @@ class MessagesPendingTab extends ConsumerWidget {
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('إعادة المحاولة'),
+              child: Text(AppLocalizations.of(context)!.translate('retry')),
             ),
           ],
         ),
@@ -64,18 +65,18 @@ class MessagesPendingTab extends ConsumerWidget {
                     size: 64,
                     color: AppColors.textHint.withOpacity(0.5)),
                 const SizedBox(height: 16),
-                const Text(
-                  'لا توجد رسائل معلقة',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.translate('msg_no_pending'),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'جميع الرسائل تمت معالجتها',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.translate('msg_all_processed'),
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),

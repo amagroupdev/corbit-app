@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/data/models/bank_model.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 
@@ -53,17 +54,17 @@ class _BankInfoTabState extends ConsumerState<BankInfoTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          const Text(
-            '\u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0627\u0644\u0628\u0646\u0643',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.translate('bankInfoTitle'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u062A\u062D\u0648\u064A\u0644 \u0625\u0644\u0649 \u0623\u062D\u062F \u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u062A\u0627\u0644\u064A\u0629',
+          Text(
+            AppLocalizations.of(context)!.translate('bankInfoSubtitle'),
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -99,17 +100,17 @@ class _BankInfoTabState extends ConsumerState<BankInfoTab>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0628\u0646\u0643\u064A\u0629',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('noBankInfo'),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0644\u0645 \u064A\u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0628\u0646\u0643\u064A\u0629 \u0628\u0639\u062F',
+            Text(
+              AppLocalizations.of(context)!.translate('bankInfoNotAdded'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -132,7 +133,7 @@ class _BankCard extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('\u062A\u0645 \u0646\u0633\u062E $label'),
+        content: Text('${AppLocalizations.of(context)!.translate('copiedLabel')} $label'),
         backgroundColor: AppColors.success,
         duration: const Duration(seconds: 2),
       ),
@@ -211,7 +212,7 @@ class _BankCard extends StatelessWidget {
           _buildInfoRow(
             context,
             icon: Icons.person_outline,
-            label: '\u0627\u0633\u0645 \u0627\u0644\u062D\u0633\u0627\u0628',
+            label: AppLocalizations.of(context)!.translate('accountName'),
             value: bank.accountName,
           ),
           const SizedBox(height: 14),
@@ -220,7 +221,7 @@ class _BankCard extends StatelessWidget {
           _buildInfoRow(
             context,
             icon: Icons.numbers_outlined,
-            label: '\u0631\u0642\u0645 \u0627\u0644\u062D\u0633\u0627\u0628',
+            label: AppLocalizations.of(context)!.translate('accountNumber'),
             value: bank.accountNumber,
             copiable: true,
           ),
@@ -283,7 +284,7 @@ class _BankCard extends StatelessWidget {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             onPressed: () => _copyToClipboard(context, value, label),
-            tooltip: '\u0646\u0633\u062E',
+            tooltip: AppLocalizations.of(context)!.translate('copyTooltip'),
           ),
       ],
     );

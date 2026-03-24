@@ -9,6 +9,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing reusable SMS message templates.
 ///
@@ -140,25 +141,25 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0642\u0627\u0644\u0628', // حذف القالب
+        title: Text(
+          AppLocalizations.of(context)!.translate('deleteTemplate'),
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 \u0627\u0644\u0642\u0627\u0644\u0628 "${template.name}"\u061F', // هل أنت متأكد من حذف القالب "..."؟
+          '${AppLocalizations.of(context)!.translate("confirmDeleteTemplate")} "${template.name}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621', // إلغاء
+            child: Text(
+              AppLocalizations.of(context)!.translate('cancel'),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text(
-              '\u062D\u0630\u0641', // حذف
+            child: Text(
+              AppLocalizations.of(context)!.translate('delete'),
             ),
           ),
         ],
@@ -172,9 +173,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       await repository.deleteTemplate(template.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              '\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0642\u0627\u0644\u0628 \u0628\u0646\u062C\u0627\u062D', // تم حذف القالب بنجاح
+              AppLocalizations.of(context)!.translate('templateDeleted'),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -201,7 +202,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: AppSearchBar(
-            hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0642\u0648\u0627\u0644\u0628...', // بحث في القوالب...
+            hint: AppLocalizations.of(context)!.translate('searchTemplates'),
             onChanged: _onSearchChanged,
           ),
         ),
@@ -215,14 +216,14 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0642\u0648\u0627\u0644\u0628', // القوالب
+        title: Text(
+          AppLocalizations.of(context)!.translate('templatesTitle'),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded),
             onPressed: _createTemplate,
-            tooltip: '\u0625\u0646\u0634\u0627\u0621 \u0642\u0627\u0644\u0628', // إنشاء قالب
+            tooltip: AppLocalizations.of(context)!.translate('createTemplateTooltip'),
           ),
         ],
       ),
@@ -250,9 +251,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     if (_templates.isEmpty) {
       return AppEmptyState(
         icon: Icons.description_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0642\u0648\u0627\u0644\u0628', // لا توجد قوالب
-        description: '\u0642\u0645 \u0628\u0625\u0646\u0634\u0627\u0621 \u0642\u0627\u0644\u0628 \u062C\u062F\u064A\u062F \u0644\u062A\u0633\u0647\u064A\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // قم بإنشاء قالب جديد لتسهيل إرسال الرسائل
-        actionText: '\u0625\u0646\u0634\u0627\u0621 \u0642\u0627\u0644\u0628', // إنشاء قالب
+        title: AppLocalizations.of(context)!.translate('noTemplates'),
+        description: AppLocalizations.of(context)!.translate('createTemplateDesc'),
+        actionText: AppLocalizations.of(context)!.translate('createTemplateTooltip'),
         onAction: _createTemplate,
       );
     }
@@ -360,27 +361,27 @@ class _TemplateListTile extends StatelessWidget {
                         if (value == 'delete') onDelete();
                       },
                       itemBuilder: (_) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'edit',
                           child: Row(
                             children: [
-                              Icon(Icons.edit_outlined, size: 20,
+                              const Icon(Icons.edit_outlined, size: 20,
                                   color: AppColors.textSecondary),
-                              SizedBox(width: 8),
-                              Text('\u062A\u0639\u062F\u064A\u0644'), // تعديل
+                              const SizedBox(width: 8),
+                              Text(AppLocalizations.of(context)!.translate('edit')),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(Icons.delete_outline, size: 20,
+                              const Icon(Icons.delete_outline, size: 20,
                                   color: AppColors.error),
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
                               Text(
-                                '\u062D\u0630\u0641', // حذف
-                                style: TextStyle(color: AppColors.error),
+                                AppLocalizations.of(context)!.translate('delete'),
+                                style: const TextStyle(color: AppColors.error),
                               ),
                             ],
                           ),

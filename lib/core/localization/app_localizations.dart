@@ -23,6 +23,14 @@ class AppLocalizations {
   final Locale locale;
 
   // ---------------------------------------------------------------------------
+  // Static instance for non-widget code (validators, formatters, etc.)
+  // ---------------------------------------------------------------------------
+
+  /// The current [AppLocalizations] instance, updated whenever the delegate
+  /// loads a new locale. Defaults to Arabic.
+  static AppLocalizations instance = const AppLocalizations(Locale('ar'));
+
+  // ---------------------------------------------------------------------------
   // Accessor
   // ---------------------------------------------------------------------------
 
@@ -120,7 +128,9 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return SynchronousFuture<AppLocalizations>(AppLocalizations(locale));
+    final localizations = AppLocalizations(locale);
+    AppLocalizations.instance = localizations;
+    return SynchronousFuture<AppLocalizations>(localizations);
   }
 
   @override

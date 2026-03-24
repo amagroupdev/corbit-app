@@ -118,14 +118,18 @@ class UserModel {
   // Convenience
   // ---------------------------------------------------------------------------
 
-  /// Human-readable label for the account type.
-  String get userTypeLabel {
+  /// Returns the translation key for the account type.
+  ///
+  /// Use with `AppLocalizations.of(context)!.translate(user.userTypeLabelKey)`
+  /// to get the localized label.
+  String get userTypeLabelKey {
     return switch (userTypeId) {
-      1 => 'فرد',
-      2 => 'مدرسة',
-      3 => 'شركة',
-      4 => 'جهة حكومية',
-      _ => 'غير محدد',
+      1 => 'userTypeIndividual',
+      2 => 'userTypeSchool',
+      3 => 'userTypeCompany',
+      4 => 'userTypeGovernment',
+      5 => 'userTypeCharity',
+      _ => 'userTypeUnknown',
     };
   }
 

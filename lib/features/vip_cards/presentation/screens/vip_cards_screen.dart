@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for sending and viewing VIP card messages.
 class VipCardsScreen extends ConsumerStatefulWidget {
@@ -95,8 +96,8 @@ class _VipCardsScreenState extends ConsumerState<VipCardsScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0628\u0637\u0627\u0642\u0627\u062A VIP \u0628\u0646\u062C\u0627\u062D'), // تم إرسال بطاقات VIP بنجاح
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('vipCardsSent')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -119,15 +120,15 @@ class _VipCardsScreenState extends ConsumerState<VipCardsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0628\u0637\u0627\u0642\u0627\u062A VIP'), // بطاقات VIP
+        title: Text(AppLocalizations.of(context)!.translate('vipCards')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0625\u0631\u0633\u0627\u0644'), // إرسال
-            Tab(text: '\u0627\u0644\u0623\u0631\u0634\u064A\u0641'), // الأرشيف
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('sendTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('archiveTab')),
           ],
         ),
       ),
@@ -157,17 +158,17 @@ class _VipCardsScreenState extends ConsumerState<VipCardsScreen>
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Icon(Icons.card_membership_rounded, size: 48, color: Colors.white),
-                  SizedBox(height: 8),
+                  const Icon(Icons.card_membership_rounded, size: 48, color: Colors.white),
+                  const SizedBox(height: 8),
                   Text(
-                    '\u0628\u0637\u0627\u0642\u0627\u062A VIP', // بطاقات VIP
+                    AppLocalizations.of(context)!.translate('vipCards'),
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    '\u0623\u0631\u0633\u0644 \u0628\u0637\u0627\u0642\u0627\u062A \u0645\u0645\u064A\u0632\u0629 \u0644\u0639\u0645\u0644\u0627\u0626\u0643', // أرسل بطاقات مميزة لعملائك
+                    AppLocalizations.of(context)!.translate('vipCardsDesc'),
                     style: TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
@@ -175,28 +176,28 @@ class _VipCardsScreenState extends ConsumerState<VipCardsScreen>
             ),
             const SizedBox(height: 24),
             AppTextField(
-              label: '\u0623\u0631\u0642\u0627\u0645 \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // أرقام المستلمين
-              hint: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645 \u0645\u0641\u0635\u0648\u0644\u0629 \u0628\u0641\u0627\u0635\u0644\u0629', // أدخل الأرقام مفصولة بفاصلة
+              label: AppLocalizations.of(context)!.translate('recipientNumbers'),
+              hint: AppLocalizations.of(context)!.translate('enterNumbersSeparated'),
               controller: _numbersController,
               maxLines: 3,
               keyboardType: TextInputType.phone,
               validator: (v) => v == null || v.trim().isEmpty
-                  ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645'
+                  ? AppLocalizations.of(context)!.translate('enterNumbersValidation')
                   : null,
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: '\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // نص الرسالة
-              hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // أدخل نص الرسالة
+              label: AppLocalizations.of(context)!.translate('messageBody'),
+              hint: AppLocalizations.of(context)!.translate('enterMessageHint'),
               controller: _messageController,
               maxLines: 4,
               validator: (v) => v == null || v.trim().isEmpty
-                  ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629'
+                  ? AppLocalizations.of(context)!.translate('enterMessageBodyValidation')
                   : null,
             ),
             const SizedBox(height: 24),
             AppButton.primary(
-              text: '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0628\u0637\u0627\u0642\u0627\u062A', // إرسال البطاقات
+              text: AppLocalizations.of(context)!.translate('sendCards'),
               onPressed: _send,
               isLoading: _isSending,
               icon: Icons.send_rounded,
@@ -213,9 +214,9 @@ class _VipCardsScreenState extends ConsumerState<VipCardsScreen>
       return AppErrorWidget(message: _archiveError!, onRetry: _loadArchive);
     }
     if (_archive.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.card_membership_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u0637\u0627\u0642\u0627\u062A', // لا توجد بطاقات
+        title: AppLocalizations.of(context)!.translate('noVipCards'),
       );
     }
 

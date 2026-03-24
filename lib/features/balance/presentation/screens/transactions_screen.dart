@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/transaction_card.dart';
 
@@ -97,13 +98,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(transactionsControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('transactions'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -117,7 +119,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           IconButton(
             icon: const Icon(Icons.date_range_outlined),
             onPressed: _showDateRangePicker,
-            tooltip: '\u0641\u0644\u062A\u0631 \u0628\u0627\u0644\u062A\u0627\u0631\u064A\u062E',
+            tooltip: t.translate('filterByDateBalance'),
           ),
         ],
       ),
@@ -134,7 +136,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A...',
+                    hintText: t.translate('searchTransactions'),
                     hintStyle: const TextStyle(
                       color: AppColors.inputHint,
                       fontSize: 14,
@@ -173,31 +175,31 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                     scrollDirection: Axis.horizontal,
                     children: [
                       _buildFilterChip(
-                        '\u0627\u0644\u0643\u0644',
+                        t.translate('all'),
                         null,
                         state.statusFilter,
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631',
+                        t.translate('statusPending'),
                         'pending',
                         state.statusFilter,
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        '\u0645\u0648\u0627\u0641\u0642 \u0639\u0644\u064A\u0647',
+                        t.translate('statusApproved'),
                         'approved',
                         state.statusFilter,
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        '\u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629',
+                        t.translate('statusWaiting'),
                         'waiting',
                         state.statusFilter,
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        '\u0645\u0631\u0641\u0648\u0636',
+                        t.translate('statusRejected_'),
                         'rejected',
                         state.statusFilter,
                       ),
@@ -246,7 +248,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '${state.total} \u0639\u0645\u0644\u064A\u0629',
+                    '${state.total} ${t.translate('transactionCount')}',
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -362,18 +364,18 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0639\u0645\u0644\u064A\u0627\u062A',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('noTransactionsFound'),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0639\u0645\u0644\u064A\u0627\u062A \u0645\u0637\u0627\u0628\u0642\u0629',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate('noTransactionsMatchFound'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
@@ -409,7 +411,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             TextButton.icon(
               onPressed: _onRefresh,
               icon: const Icon(Icons.refresh),
-              label: const Text('\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629'),
+              label: Text(AppLocalizations.of(context)!.translate('retry')),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],

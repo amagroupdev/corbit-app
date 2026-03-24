@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
@@ -48,7 +49,7 @@ class AppPaginationList<T> extends StatefulWidget {
     required this.onRefresh,
     required this.itemBuilder,
     this.emptyIcon = Icons.inbox_outlined,
-    this.emptyTitle = '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u064A\u0627\u0646\u0627\u062A', // لا توجد بيانات
+    this.emptyTitle,
     this.emptyDescription,
     this.emptyActionText,
     this.onEmptyAction,
@@ -82,7 +83,7 @@ class AppPaginationList<T> extends StatefulWidget {
   final IconData emptyIcon;
 
   /// Title for the empty state.
-  final String emptyTitle;
+  final String? emptyTitle;
 
   /// Optional description for the empty state.
   final String? emptyDescription;
@@ -162,7 +163,7 @@ class _AppPaginationListState<T> extends State<AppPaginationList<T>> {
     if (widget.status == PaginationStatus.error && widget.items.isEmpty) {
       return AppErrorWidget(
         message: widget.errorMessage ??
-            '\u062D\u062F\u062B \u062E\u0637\u0623 \u0623\u062B\u0646\u0627\u0621 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A', // حدث خطأ أثناء تحميل البيانات
+            AppLocalizations.instance.translate('loadingError'),
         onRetry: () => widget.onRefresh(),
       );
     }
@@ -181,7 +182,7 @@ class _AppPaginationListState<T> extends State<AppPaginationList<T>> {
             SliverFillRemaining(
               child: AppEmptyState(
                 icon: widget.emptyIcon,
-                title: widget.emptyTitle,
+                title: widget.emptyTitle ?? AppLocalizations.instance.translate('noData'),
                 description: widget.emptyDescription,
                 actionText: widget.emptyActionText,
                 onAction: widget.onEmptyAction,
@@ -271,7 +272,7 @@ class _AppPaginationListState<T> extends State<AppPaginationList<T>> {
               color: AppColors.primary,
             ),
             label: Text(
-              '\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629', // إعادة المحاولة
+              AppLocalizations.instance.translate('retry'),
               style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.primary,

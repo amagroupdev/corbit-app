@@ -11,6 +11,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for managing API keys: list, create, copy, delete.
 class ApiKeysScreen extends ConsumerWidget {
   const ApiKeysScreen({super.key});
@@ -22,7 +23,7 @@ class ApiKeysScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('مفاتيح API'),
+        title: Text(AppLocalizations.of(context)!.translate('apiKeys')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -39,8 +40,8 @@ class ApiKeysScreen extends ConsumerWidget {
           if (keys.isEmpty) {
             return AppEmptyState(
               icon: Icons.vpn_key_rounded,
-              title: 'لا توجد مفاتيح API',
-              description: 'اضغط على زر + لإنشاء مفتاح جديد',
+              title: AppLocalizations.of(context)!.translate('api_keys_empty'),
+              description: AppLocalizations.of(context)!.translate('api_keys_empty_desc'),
             );
           }
 
@@ -79,25 +80,25 @@ class ApiKeysScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'إنشاء مفتاح API',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          AppLocalizations.of(context)!.translate('api_keys_create_title'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: Form(
           key: formKey,
           child: AppTextField(
-            label: 'اسم المفتاح',
-            hint: 'مثال: تطبيق الجوال',
+            label: AppLocalizations.of(context)!.translate('api_keys_name_label'),
+            hint: AppLocalizations.of(context)!.translate('api_keys_name_hint'),
             controller: nameController,
             validator: (v) =>
-                Validators.validateRequired(v, fieldName: 'اسم المفتاح'),
+                Validators.validateRequired(v, fieldName: AppLocalizations.of(context)!.translate('api_keys_name_label')),
             textInputAction: TextInputAction.done,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -117,7 +118,7 @@ class ApiKeysScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('خطأ: $e'),
+                      content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
                       backgroundColor: AppColors.error,
                     ),
                   );
@@ -131,7 +132,7 @@ class ApiKeysScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('إنشاء'),
+            child: Text(AppLocalizations.of(context)!.translate('sub_accounts_create_btn')),
           ),
         ],
       ),
@@ -144,13 +145,13 @@ class ApiKeysScreen extends ConsumerWidget {
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppColors.success),
-            SizedBox(width: 8),
+            const Icon(Icons.check_circle_rounded, color: AppColors.success),
+            const SizedBox(width: 8),
             Text(
-              'تم إنشاء المفتاح',
-              style: TextStyle(fontWeight: FontWeight.w700),
+              AppLocalizations.of(context)!.translate('api_keys_created'),
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -158,8 +159,8 @@ class ApiKeysScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'احفظ هذا المفتاح الآن. لن يتم عرضه مرة أخرى.',
+            Text(
+              AppLocalizations.of(context)!.translate('api_keys_save_warning'),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.warning,
@@ -190,8 +191,8 @@ class ApiKeysScreen extends ConsumerWidget {
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: key.key ?? ''));
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(
-                          content: Text('تم نسخ المفتاح'),
+                        SnackBar(
+                          content: Text(AppLocalizations.of(dialogContext)!.translate('api_keys_copied')),
                           duration: Duration(seconds: 2),
                           backgroundColor: AppColors.success,
                         ),
@@ -220,7 +221,7 @@ class ApiKeysScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('فهمت'),
+            child: Text(AppLocalizations.of(context)!.translate('api_keys_understood')),
           ),
         ],
       ),
@@ -230,8 +231,8 @@ class ApiKeysScreen extends ConsumerWidget {
   void _copyKey(BuildContext context, ApiKeyModel key) {
     Clipboard.setData(ClipboardData(text: key.key ?? ''));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم نسخ المفتاح'),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.translate('api_keys_copied')),
         duration: Duration(seconds: 2),
         backgroundColor: AppColors.success,
       ),
@@ -246,20 +247,20 @@ class ApiKeysScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف المفتاح'),
+        title: Text(AppLocalizations.of(context)!.translate('api_keys_delete_title')),
         content: Text(
-          'هل أنت متأكد من حذف المفتاح "${key.name}"؟\n'
-          'لن تتمكن من استخدامه بعد الحذف.',
+          '${AppLocalizations.of(context)!.translate('api_keys_delete_confirm_prefix')} "${key.name}"?\n'
+          '${AppLocalizations.of(context)!.translate('api_keys_delete_confirm_suffix')}',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('حذف'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -270,8 +271,8 @@ class ApiKeysScreen extends ConsumerWidget {
         await ref.read(apiKeysProvider.notifier).delete(key.id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حذف المفتاح'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('api_keys_deleted')),
               backgroundColor: AppColors.success,
             ),
           );
@@ -280,7 +281,7 @@ class ApiKeysScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ: $e'),
+              content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -343,7 +344,7 @@ class _ApiKeyCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      apiKey.name ?? 'مفتاح بدون اسم',
+                      apiKey.name ?? AppLocalizations.of(context)!.translate('api_keys_no_name'),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -370,7 +371,7 @@ class _ApiKeyCard extends StatelessWidget {
               if (apiKey.createdAt != null)
                 Expanded(
                   child: Text(
-                    'تاريخ الإنشاء: ${apiKey.createdAt}',
+                    '${AppLocalizations.of(context)!.translate('api_keys_created_at')}: ${apiKey.createdAt}',
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textHint,
@@ -381,7 +382,7 @@ class _ApiKeyCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onCopy,
                 icon: const Icon(Icons.copy_rounded, size: 16),
-                label: const Text('نسخ'),
+                label: Text(AppLocalizations.of(context)!.translate('copy')),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   textStyle: const TextStyle(fontSize: 12),
@@ -395,7 +396,7 @@ class _ApiKeyCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onDelete,
                 icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                label: const Text('حذف'),
+                label: Text(AppLocalizations.of(context)!.translate('delete')),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.error,
                   textStyle: const TextStyle(fontSize: 12),

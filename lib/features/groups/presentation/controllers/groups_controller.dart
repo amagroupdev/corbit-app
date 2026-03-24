@@ -570,7 +570,7 @@ class ImportController extends StateNotifier<ImportState> {
     } catch (e) {
       state = state.copyWith(
         isUploading: false,
-        error: 'فشل الرفع. حاول مرة أخرى.',
+        error: 'Upload failed. Please try again.',
       );
       rethrow;
     }

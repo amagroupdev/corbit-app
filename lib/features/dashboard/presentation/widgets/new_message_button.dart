@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
 /// The "New Message" dropdown button shown on the dashboard.
@@ -39,9 +40,9 @@ class NewMessageButton extends StatelessWidget {
                 color: Colors.white,
               ),
               const SizedBox(width: 6),
-              const Text(
-                '\u0631\u0633\u0627\u0644\u0629 \u062C\u062F\u064A\u062F\u0629', // رسالة جديدة
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)?.translate('newMessage') ?? 'New Message',
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -109,15 +110,15 @@ class _MessageTypeSheet extends StatelessWidget {
             const SizedBox(height: 16),
 
             // ── Title ──────────────────────────────────────────────
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
               child: Row(
                 children: [
-                  Icon(Icons.email_outlined, color: AppColors.primary, size: 22),
-                  SizedBox(width: 8),
+                  const Icon(Icons.email_outlined, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
                   Text(
-                    '\u0627\u062E\u062A\u0631 \u0646\u0648\u0639 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // اختر نوع الرسالة
-                    style: TextStyle(
+                    AppLocalizations.of(context)?.translate('selectMessageType') ?? 'Select Message Type',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -133,41 +134,49 @@ class _MessageTypeSheet extends StatelessWidget {
             const SizedBox(height: 4),
 
             // ── Options ────────────────────────────────────────────
-            _MessageTypeOption(
-              icon: Icons.sms_outlined,
-              title: '\u0631\u0633\u0627\u0626\u0644 \u0639\u0627\u062F\u064A\u0629', // رسائل عادية
-              subtitle: '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0646\u0635\u064A\u0629 \u0642\u0635\u064A\u0631\u0629', // إرسال رسائل نصية قصيرة
-              color: AppColors.primary,
-              onTap: () => _navigateToSendMessage(context, 'from_numbers'),
-            ),
-            _MessageTypeOption(
-              icon: Icons.people_outlined,
-              title: '\u0631\u0633\u0627\u0626\u0644 \u0644\u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A', // رسائل للمجموعات
-              subtitle: '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0644\u0645\u062C\u0645\u0648\u0639\u0627\u062A \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644', // إرسال رسائل لمجموعات جهات الاتصال
-              color: AppColors.success,
-              onTap: () => _navigateToSendMessage(context, 'to_groups'),
-            ),
-            _MessageTypeOption(
-              icon: Icons.text_snippet_outlined,
-              title: '\u0631\u0633\u0627\u0626\u0644 \u0637\u0648\u064A\u0644\u0629', // رسائل طويلة
-              subtitle: '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0646\u0635\u064A\u0629 \u0637\u0648\u064A\u0644\u0629', // إرسال رسائل نصية طويلة
-              color: AppColors.info,
-              onTap: () => _navigateToSendMessage(context, 'long_sms'),
-            ),
-            _MessageTypeOption(
-              icon: Icons.mic_outlined,
-              title: '\u0631\u0633\u0627\u0626\u0644 \u0635\u0648\u062A\u064A\u0629', // رسائل صوتية
-              subtitle: '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0635\u0648\u062A\u064A\u0629 \u0645\u0633\u062C\u0644\u0629', // إرسال رسائل صوتية مسجلة
-              color: AppColors.warning,
-              onTap: () => _navigateToSendMessage(context, 'voice_sms'),
-            ),
-            _MessageTypeOption(
-              icon: Icons.attach_file_outlined,
-              title: '\u0631\u0633\u0627\u0626\u0644 \u0645\u0644\u0641', // رسائل ملف
-              subtitle: '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0645\u0639 \u0645\u0644\u0641\u0627\u062A \u0645\u0631\u0641\u0642\u0629', // إرسال رسائل مع ملفات مرفقة
-              color: AppColors.balancePurpleStart,
-              onTap: () => _navigateToSendMessage(context, 'file_sms'),
-            ),
+            Builder(builder: (ctx) {
+              final t = AppLocalizations.of(ctx);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _MessageTypeOption(
+                    icon: Icons.sms_outlined,
+                    title: t?.translate('normalSms') ?? 'Normal SMS',
+                    subtitle: t?.translate('normalSmsDesc') ?? 'Send short text messages',
+                    color: AppColors.primary,
+                    onTap: () => _navigateToSendMessage(context, 'from_numbers'),
+                  ),
+                  _MessageTypeOption(
+                    icon: Icons.people_outlined,
+                    title: t?.translate('groupSms') ?? 'Group SMS',
+                    subtitle: t?.translate('groupSmsDesc') ?? 'Send messages to contact groups',
+                    color: AppColors.success,
+                    onTap: () => _navigateToSendMessage(context, 'to_groups'),
+                  ),
+                  _MessageTypeOption(
+                    icon: Icons.text_snippet_outlined,
+                    title: t?.translate('longSms') ?? 'Long SMS',
+                    subtitle: t?.translate('longSmsDesc') ?? 'Send long text messages',
+                    color: AppColors.info,
+                    onTap: () => _navigateToSendMessage(context, 'long_sms'),
+                  ),
+                  _MessageTypeOption(
+                    icon: Icons.mic_outlined,
+                    title: t?.translate('voiceSms') ?? 'Voice SMS',
+                    subtitle: t?.translate('voiceSmsDesc') ?? 'Send recorded voice messages',
+                    color: AppColors.warning,
+                    onTap: () => _navigateToSendMessage(context, 'voice_sms'),
+                  ),
+                  _MessageTypeOption(
+                    icon: Icons.attach_file_outlined,
+                    title: t?.translate('fileSms') ?? 'File SMS',
+                    subtitle: t?.translate('fileSmsDesc') ?? 'Send messages with attached files',
+                    color: AppColors.balancePurpleStart,
+                    onTap: () => _navigateToSendMessage(context, 'file_sms'),
+                  ),
+                ],
+              );
+            }),
 
             const SizedBox(height: 16),
           ],

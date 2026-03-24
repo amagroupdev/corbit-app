@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 
 /// Reset password screen.
@@ -68,18 +69,19 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     return AppColors.success;
   }
 
-  String _strengthLabel(double strength) {
+  String _strengthLabel(double strength, AppLocalizations t) {
     if (strength <= 0) return '';
-    if (strength <= 0.25) return '\u0636\u0639\u064a\u0641\u0629';
-    if (strength <= 0.5) return '\u0645\u0642\u0628\u0648\u0644\u0629';
-    if (strength <= 0.75) return '\u062c\u064a\u062f\u0629';
-    return '\u0642\u0648\u064a\u0629';
+    if (strength <= 0.25) return t.translate('strengthWeak');
+    if (strength <= 0.5) return t.translate('strengthAcceptable');
+    if (strength <= 0.75) return t.translate('strengthGood');
+    return t.translate('strengthStrong');
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(resetPasswordControllerProvider);
     final strength = _getPasswordStrength(_passwordController.text);
+    final t = AppLocalizations.of(context)!;
 
     ref.listen<ResetPasswordState>(resetPasswordControllerProvider,
         (prev, next) {
@@ -121,8 +123,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: state.successMessage != null
-                ? _buildSuccessView(state.successMessage!)
-                : _buildFormView(state, strength),
+                ? _buildSuccessView(state.successMessage!, t)
+                : _buildFormView(state, strength, t),
           ),
         ),
       ),
@@ -133,7 +135,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   // Form view
   // ---------------------------------------------------------------------------
 
-  Widget _buildFormView(ResetPasswordState state, double strength) {
+  Widget _buildFormView(ResetPasswordState state, double strength, AppLocalizations t) {
     return Column(
       children: [
         // Icon
@@ -154,9 +156,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         const SizedBox(height: 24),
 
         // Title
-        const Text(
-          '\u0625\u0639\u0627\u062f\u0629 \u062a\u0639\u064a\u064a\u0646 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-          style: TextStyle(
+        Text(
+          t.translate('resetPassword'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -164,9 +166,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629',
-          style: TextStyle(
+        Text(
+          t.translate('enterNewPassword'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -196,9 +198,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // New password
-                const Text(
-                  '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629',
-                  style: TextStyle(
+                Text(
+                  t.translate('newPassword'),
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -212,10 +214,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   onChanged: (_) => setState(() {}),
                   validator: (v) {
                     if (v == null || v.isEmpty) {
-                      return '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629';
+                      return t.translate('passwordRequiredMsg');
                     }
                     if (v.length < 8) {
-                      return '8 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
+                      return t.translate('passwordMinLength8');
                     }
                     return null;
                   },
@@ -225,7 +227,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     color: AppColors.textPrimary,
                   ),
                   decoration: _buildPasswordDecoration(
-                    hint: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629',
+                    hint: t.translate('enterNewPasswordHint'),
                     obscure: _obscurePassword,
                     onToggle: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
@@ -250,7 +252,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\u0642\u0648\u0629 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631: ${_strengthLabel(strength)}',
+                        '${t.translate('passwordStrengthLabel')} ${_strengthLabel(strength, t)}',
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 12,
@@ -266,9 +268,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 const SizedBox(height: 8),
 
                 // Confirm password
-                const Text(
-                  '\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-                  style: TextStyle(
+                Text(
+                  t.translate('confirmPassword'),
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -281,7 +283,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   obscureText: _obscureConfirmPassword,
                   validator: (v) {
                     if (v != _passwordController.text) {
-                      return '\u0643\u0644\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u0629';
+                      return t.translate('passwordsDoNotMatch');
                     }
                     return null;
                   },
@@ -291,7 +293,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     color: AppColors.textPrimary,
                   ),
                   decoration: _buildPasswordDecoration(
-                    hint: '\u0623\u0639\u062f \u0625\u062f\u062e\u0627\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+                    hint: t.translate('reEnterPassword'),
                     obscure: _obscureConfirmPassword,
                     onToggle: () => setState(
                         () => _obscureConfirmPassword = !_obscureConfirmPassword),
@@ -325,9 +327,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            '\u0625\u0639\u0627\u062f\u0629 \u062a\u0639\u064a\u064a\u0646 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-                            style: TextStyle(
+                        : Text(
+                            t.translate('resetPassword'),
+                            style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -347,7 +349,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   // Success view
   // ---------------------------------------------------------------------------
 
-  Widget _buildSuccessView(String message) {
+  Widget _buildSuccessView(String message, AppLocalizations t) {
     return Column(
       children: [
         Container(
@@ -366,9 +368,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         ),
         const SizedBox(height: 24),
 
-        const Text(
-          '\u062a\u0645 \u0628\u0646\u062c\u0627\u062d!',
-          style: TextStyle(
+        Text(
+          t.translate('doneSuccess'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -401,9 +403,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
-              style: TextStyle(
+            child: Text(
+              t.translate('login'),
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

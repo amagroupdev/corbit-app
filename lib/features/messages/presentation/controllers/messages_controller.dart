@@ -76,19 +76,20 @@ class MessageFormState {
   }
 
   /// Basic validation of the form before sending.
+  /// Returns a localization key for the error message, or null if valid.
   String? validate() {
     if (senderId == null || senderId == 0) {
-      return 'الرجاء اختيار اسم المرسل';
+      return 'msg_validate_select_sender';
     }
     if (messageBody.trim().isEmpty) {
-      return 'الرجاء كتابة نص الرسالة';
+      return 'msg_validate_write_body';
     }
     // Must have either numbers or groups selected.
     if (numbers.isEmpty && groupIds.isEmpty) {
-      return 'الرجاء إضافة أرقام أو اختيار مجموعة';
+      return 'msg_validate_add_recipients';
     }
     if (sendAtOption == SendAtOption.later && sendAt == null) {
-      return 'الرجاء تحديد تاريخ ووقت الإرسال';
+      return 'msg_validate_select_datetime';
     }
     return null;
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
@@ -34,6 +35,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final name = _nameController.text.trim();
+    final t = AppLocalizations.of(context)!;
 
     setState(() => _isLoading = true);
 
@@ -46,10 +48,8 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              '\u062A\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0628\u0646\u062C\u0627\u062D',
-            ),
+          SnackBar(
+            content: Text(t.translate('groupCreated')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -67,8 +67,8 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062D\u062F\u062B \u062E\u0637\u0623 \u063A\u064A\u0631 \u0645\u062A\u0648\u0642\u0639'),
+          SnackBar(
+            content: Text(t.translate('unexpectedError')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -80,12 +80,14 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0625\u0646\u0634\u0627\u0621 \u0645\u062C\u0645\u0648\u0639\u0629 \u062C\u062F\u064A\u062F\u0629',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('createNewGroup'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -123,18 +125,18 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
 
               // Group name field
               AppTextField(
-                label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
-                hint: '\u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
+                label: t.translate('groupName'),
+                hint: t.translate('enterGroupName'),
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _handleCreate(),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '\u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0645\u0637\u0644\u0648\u0628';
+                    return t.translate('groupNameRequired');
                   }
                   if (value.trim().length < 2) {
-                    return '\u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u062D\u0631\u0641\u064A\u0646 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
+                    return t.translate('groupNameMinLength');
                   }
                   return null;
                 },
@@ -143,7 +145,7 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
 
               // Create button
               AppButton.primary(
-                text: '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
+                text: t.translate('createGroupButton'),
                 onPressed: _isLoading ? null : _handleCreate,
                 isLoading: _isLoading,
                 icon: Icons.add,
@@ -151,10 +153,10 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
               const SizedBox(height: 16),
 
               // Helper text
-              const Center(
+              Center(
                 child: Text(
-                  '\u064A\u0645\u0643\u0646\u0643 \u0625\u0636\u0627\u0641\u0629 \u0623\u0631\u0642\u0627\u0645 \u0644\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0628\u0639\u062F \u0625\u0646\u0634\u0627\u0626\u0647\u0627',
-                  style: TextStyle(
+                  t.translate('addNumbersAfterCreate'),
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),

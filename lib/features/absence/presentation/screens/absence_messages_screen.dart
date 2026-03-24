@@ -9,6 +9,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing absence & tardiness messages (رسائل الغياب والتأخر).
 ///
@@ -162,8 +163,8 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u063A\u064A\u0627\u0628 \u0648\u0627\u0644\u062A\u0623\u062E\u0631', // رسائل الغياب والتأخر
+        title: Text(
+          AppLocalizations.of(context)!.translate('absenceMessages'),
         ),
         actions: [
           IconButton(
@@ -176,7 +177,7 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
             onPressed: () {
               setState(() => _showFilters = !_showFilters);
             },
-            tooltip: '\u062A\u0635\u0641\u064A\u0629', // تصفية
+            tooltip: AppLocalizations.of(context)!.translate('filter'),
           ),
         ],
         bottom: TabBar(
@@ -185,11 +186,11 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
           isScrollable: true,
-          tabs: const [
-            Tab(text: '\u0627\u0644\u0643\u0644'), // الكل
-            Tab(text: '\u062A\u0645 \u0627\u0644\u0625\u0631\u0633\u0627\u0644'), // تم الإرسال
-            Tab(text: '\u0641\u0634\u0644'), // فشل
-            Tab(text: '\u0642\u064A\u062F \u0627\u0644\u0625\u0646\u062A\u0638\u0627\u0631'), // قيد الإنتظار
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('allMessages')),
+            Tab(text: AppLocalizations.of(context)!.translate('sentMessages')),
+            Tab(text: AppLocalizations.of(context)!.translate('failedMessages_')),
+            Tab(text: AppLocalizations.of(context)!.translate('pendingMessages_')),
           ],
         ),
       ),
@@ -205,8 +206,8 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
                   // TODO: Navigate to send absence message flow
                 },
                 icon: const Icon(Icons.send_rounded, size: 18),
-                label: const Text(
-                  '\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0644\u0629 \u063A\u064A\u0627\u0628', // إرسال رسالة غياب
+                label: Text(
+                  AppLocalizations.of(context)!.translate('sendAbsenceMessage'),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -224,7 +225,7 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Text(
-              '\u0625\u062F\u0627\u0631\u0629 \u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u063A\u064A\u0627\u0628 \u0648\u0627\u0644\u062A\u0623\u062E\u0631 \u0627\u0644\u0645\u0631\u0633\u0644\u0629 \u0644\u0623\u0648\u0644\u064A\u0627\u0621 \u0627\u0644\u0623\u0645\u0648\u0631', // إدارة رسائل الغياب والتأخر المرسلة لأولياء الأمور
+              AppLocalizations.of(context)!.translate('absenceManageDesc'),
               style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
@@ -240,7 +241,7 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppSearchBar(
-              hint: '\u0628\u062D\u062B \u0641\u064A \u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u063A\u064A\u0627\u0628 \u0648\u0627\u0644\u062A\u0623\u062E\u0631...', // بحث في رسائل الغياب والتأخر...
+              hint: AppLocalizations.of(context)!.translate('searchAbsenceMessages'),
               onChanged: _onSearchChanged,
             ),
           ),
@@ -266,39 +267,39 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
         children: [
           // Sender Name dropdown
           _buildFilterDropdown(
-            label: '\u0625\u0633\u0645 \u0627\u0644\u0645\u0631\u0633\u0644', // إسم المرسل
+            label: AppLocalizations.of(context)!.translate('senderNameFilter'),
             value: _selectedSenderName,
             items: const [], // Populated from API
-            hint: '\u0627\u062E\u062A\u0631 \u0627\u0644\u0645\u0631\u0633\u0644', // اختر المرسل
+            hint: AppLocalizations.of(context)!.translate('selectSender'),
             onChanged: (value) => setState(() => _selectedSenderName = value),
           ),
           const SizedBox(height: 12),
 
           // Message Type dropdown
           _buildFilterDropdown(
-            label: '\u0646\u0648\u0639 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // نوع الرسالة
+            label: AppLocalizations.of(context)!.translate('messageTypeFilter'),
             value: _selectedMessageType,
-            items: const [
+            items: [
               DropdownMenuItem(
                 value: 'absence',
-                child: Text('\u063A\u064A\u0627\u0628'), // غياب
+                child: Text(AppLocalizations.of(context)!.translate('absenceType')),
               ),
               DropdownMenuItem(
                 value: 'tardiness',
-                child: Text('\u062A\u0623\u062E\u0631'), // تأخر
+                child: Text(AppLocalizations.of(context)!.translate('tardinessType')),
               ),
             ],
-            hint: '\u0627\u062E\u062A\u0631 \u0627\u0644\u0646\u0648\u0639', // اختر النوع
+            hint: AppLocalizations.of(context)!.translate('selectType'),
             onChanged: (value) => setState(() => _selectedMessageType = value),
           ),
           const SizedBox(height: 12),
 
           // Message Classification dropdown
           _buildFilterDropdown(
-            label: '\u062A\u0635\u0646\u064A\u0641 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // تصنيف الرسالة
+            label: AppLocalizations.of(context)!.translate('messageClassification'),
             value: _selectedClassification,
             items: const [], // Populated from API
-            hint: '\u0627\u062E\u062A\u0631 \u0627\u0644\u062A\u0635\u0646\u064A\u0641', // اختر التصنيف
+            hint: AppLocalizations.of(context)!.translate('selectClassification'),
             onChanged: (value) =>
                 setState(() => _selectedClassification = value),
           ),
@@ -313,8 +314,8 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
                     setState(() => _useHijriDate = value ?? false),
                 activeColor: AppColors.primary,
               ),
-              const Text(
-                '\u0627\u0644\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0647\u062C\u0631\u064A', // التاريخ الهجري
+              Text(
+                AppLocalizations.of(context)!.translate('hijriDate'),
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,
@@ -329,7 +330,7 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
             children: [
               Expanded(
                 child: _buildDatePickerButton(
-                  label: '\u0645\u0646 \u062A\u0627\u0631\u064A\u062E', // من تاريخ
+                  label: AppLocalizations.of(context)!.translate('fromDate'),
                   date: _dateFrom,
                   onTap: () => _pickDate(isFrom: true),
                 ),
@@ -337,7 +338,7 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
               const SizedBox(width: 12),
               Expanded(
                 child: _buildDatePickerButton(
-                  label: '\u0625\u0644\u0649 \u062A\u0627\u0631\u064A\u062E', // إلى تاريخ
+                  label: AppLocalizations.of(context)!.translate('toDate'),
                   date: _dateTo,
                   onTap: () => _pickDate(isFrom: false),
                 ),
@@ -359,8 +360,8 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    '\u062A\u0637\u0628\u064A\u0642', // تطبيق
+                  child: Text(
+                    AppLocalizations.of(context)!.translate('apply'),
                   ),
                 ),
               ),
@@ -375,8 +376,8 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    '\u062A\u0635\u0641\u064A\u0629', // تصفية
+                  child: Text(
+                    AppLocalizations.of(context)!.translate('resetFilter'),
                   ),
                 ),
               ),
@@ -493,9 +494,9 @@ class _AbsenceMessagesScreenState extends ConsumerState<AbsenceMessagesScreen>
       );
     }
     if (_messages.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.person_off_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0633\u0627\u0626\u0644', // لا توجد رسائل
+        title: AppLocalizations.of(context)!.translate('noAbsenceMessages'),
       );
     }
     return RefreshIndicator(

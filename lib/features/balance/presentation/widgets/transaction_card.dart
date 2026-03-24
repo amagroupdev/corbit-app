@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/balance/data/models/transaction_model.dart';
 
 /// A card widget displaying a single transaction in the list.
@@ -21,6 +22,8 @@ class TransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('yyyy/MM/dd HH:mm', 'ar');
     final numberFormat = NumberFormat('#,##0', 'ar');
+
+    final t = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: onTap,
@@ -59,7 +62,7 @@ class TransactionCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          '${numberFormat.format(transaction.amount.toInt())} \u0631.\u0633',
+                          '${numberFormat.format(transaction.amount.toInt())} ${AppLocalizations.of(context)!.translate('sar')}',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -67,7 +70,7 @@ class TransactionCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      _buildStatusBadge(),
+                      _buildStatusBadge(t),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -80,7 +83,7 @@ class TransactionCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        transaction.paymentMethodLabel,
+                        t.translate(transaction.paymentMethodLabelKey),
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -117,7 +120,7 @@ class TransactionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -125,7 +128,7 @@ class TransactionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        transaction.statusLabel,
+        t.translate(transaction.statusLabelKey),
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,

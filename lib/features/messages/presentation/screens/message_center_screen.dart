@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 import 'package:orbit_app/features/messages/presentation/widgets/message_card.dart';
@@ -43,12 +44,12 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
   String _selectedStatus = 'all'; // all, sent, failed, pending
 
   static const List<_TabItem> _tabs = [
-    _TabItem(label: 'جميع الرسائل', icon: Icons.mail_outline_rounded),
-    _TabItem(label: 'الرسائل المعلقة', icon: Icons.pending_outlined),
-    _TabItem(label: 'المرفقات', icon: Icons.attach_file_rounded),
-    _TabItem(label: 'القوالب', icon: Icons.description_outlined),
-    _TabItem(label: 'أسماء المرسلين', icon: Icons.badge_outlined),
-    _TabItem(label: 'اختصار الروابط', icon: Icons.link_rounded),
+    _TabItem(labelKey: 'msg_tab_all_messages', icon: Icons.mail_outline_rounded),
+    _TabItem(labelKey: 'msg_tab_pending', icon: Icons.pending_outlined),
+    _TabItem(labelKey: 'msg_tab_attachments', icon: Icons.attach_file_rounded),
+    _TabItem(labelKey: 'msg_tab_templates', icon: Icons.description_outlined),
+    _TabItem(labelKey: 'msg_tab_sender_names', icon: Icons.badge_outlined),
+    _TabItem(labelKey: 'msg_tab_short_links', icon: Icons.link_rounded),
   ];
 
   @override
@@ -112,7 +113,7 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
           SliverAppBar(
             title: _showSearch
                 ? _buildSearchField()
-                : const Text('مركز الرسائل'),
+                : Text(AppLocalizations.of(context)!.translate('messageCenter')),
             centerTitle: true,
             backgroundColor: AppColors.surface,
             foregroundColor: AppColors.textPrimary,
@@ -177,9 +178,9 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.send_rounded, size: 20),
-        label: const Text(
-          'رسالة جديدة',
-          style: TextStyle(fontWeight: FontWeight.w600),
+        label: Text(
+          AppLocalizations.of(context)!.translate('msg_new_message'),
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         elevation: 4,
       ),
@@ -198,7 +199,7 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
             child: OutlinedButton.icon(
               onPressed: _navigateToSendMessage,
               icon: const Icon(Icons.send_rounded, size: 16),
-              label: const Text('إرسال متقدم', style: TextStyle(fontSize: 13)),
+              label: Text(AppLocalizations.of(context)!.translate('msg_advanced_send'), style: const TextStyle(fontSize: 13)),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary),
@@ -213,14 +214,14 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
           OutlinedButton.icon(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('جاري تصدير السجل...'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.translate('msg_exporting_log')),
                   backgroundColor: AppColors.info,
                 ),
               );
             },
             icon: const Icon(Icons.file_download_outlined, size: 16),
-            label: const Text('تصدير السجل', style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.translate('msg_export_log'), style: const TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
               side: const BorderSide(color: AppColors.border),
@@ -244,11 +245,11 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
       autofocus: true,
       textDirection: TextDirection.rtl,
       style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
-      decoration: const InputDecoration(
-        hintText: 'بحث عام (بالنص: الرسالة اسم المرسل)',
-        hintStyle: TextStyle(color: AppColors.textHint, fontSize: 13),
+      decoration: InputDecoration(
+        hintText: AppLocalizations.of(context)!.translate('msg_search_hint'),
+        hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 13),
         border: InputBorder.none,
-        contentPadding: EdgeInsets.symmetric(vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
       ),
     );
   }
@@ -289,7 +290,7 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                     children: [
                       Icon(tab.icon, size: 16),
                       const SizedBox(width: 6),
-                      Text(tab.label),
+                      Text(AppLocalizations.of(context)!.translate(tab.labelKey)),
                     ],
                   ),
                 ))
@@ -323,13 +324,13 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.tune, color: AppColors.primary, size: 22),
-                    SizedBox(width: 8),
+                    const Icon(Icons.tune, color: AppColors.primary, size: 22),
+                    const SizedBox(width: 8),
                     Text(
-                      'تصفية الرسائل',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.translate('msg_filter_title'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -340,10 +341,10 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                 const SizedBox(height: 20),
 
                 // Sender Name filter
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
-                  child: Text('إسم المرسل',
-                      style: TextStyle(
+                  child: Text(AppLocalizations.of(context)!.translate('msg_filter_sender_name'),
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary)),
@@ -359,8 +360,8 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      hint: const Text('اختر إسم المرسل',
-                          style: TextStyle(
+                      hint: Text(AppLocalizations.of(context)!.translate('msg_filter_select_sender'),
+                          style: const TextStyle(
                               fontSize: 14, color: AppColors.textHint)),
                       items: const [],
                       onChanged: (_) {},
@@ -370,10 +371,10 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                 const SizedBox(height: 16),
 
                 // Message Type filter
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
-                  child: Text('نوع الرسالة',
-                      style: TextStyle(
+                  child: Text(AppLocalizations.of(context)!.translate('msg_filter_message_type'),
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary)),
@@ -389,13 +390,13 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      hint: const Text('نوع الرسالة',
-                          style: TextStyle(
+                      hint: Text(AppLocalizations.of(context)!.translate('msg_filter_message_type'),
+                          style: const TextStyle(
                               fontSize: 14, color: AppColors.textHint)),
                       items: MessageType.values
                           .map((type) => DropdownMenuItem<String>(
                                 value: type.value,
-                                child: Text(type.shortLabel,
+                                child: Text(AppLocalizations.of(context)!.translate(type.shortLabelKey),
                                     style: const TextStyle(fontSize: 14)),
                               ))
                           .toList(),
@@ -419,8 +420,8 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('مع المرفقات',
-                        style: TextStyle(
+                    Text(AppLocalizations.of(context)!.translate('msg_filter_with_attachments'),
+                        style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary)),
@@ -435,10 +436,10 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                 const SizedBox(height: 16),
 
                 // Status filter chips
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
-                  child: Text('حالة الرسالة',
-                      style: TextStyle(
+                  child: Text(AppLocalizations.of(context)!.translate('msg_filter_message_status'),
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary)),
@@ -449,7 +450,7 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                   runSpacing: 8,
                   children: MessageStatus.values.map((status) {
                     return FilterChip(
-                      label: Text(status.arabicLabel,
+                      label: Text(AppLocalizations.of(context)!.translate(status.labelKey),
                           style: const TextStyle(fontSize: 12)),
                       selected: false,
                       onSelected: (_) => Navigator.pop(context),
@@ -486,8 +487,8 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('إعادة تعيين الفلاتر',
-                        style: TextStyle(fontSize: 14)),
+                    child: Text(AppLocalizations.of(context)!.translate('msg_filter_reset'),
+                        style: const TextStyle(fontSize: 14)),
                   ),
                 ),
               ],
@@ -504,8 +505,8 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
 // ═══════════════════════════════════════════════════════════════════════════
 
 class _TabItem {
-  const _TabItem({required this.label, required this.icon});
-  final String label;
+  const _TabItem({required this.labelKey, required this.icon});
+  final String labelKey;
   final IconData icon;
 }
 
@@ -533,7 +534,7 @@ class _AllMessagesTab extends ConsumerWidget {
     return Column(
       children: [
         // ── Status Filter Chips ─────────────────────────────────
-        _buildStatusChips(),
+        _buildStatusChips(context),
 
         // ── Message List ────────────────────────────────────────
         Expanded(
@@ -557,12 +558,13 @@ class _AllMessagesTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChips() {
+  Widget _buildStatusChips(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final statuses = [
-      ('all', 'الكل'),
-      ('sent', 'تم الإرسال'),
-      ('failed', 'فشل'),
-      ('pending', 'قيد الإنتظار'),
+      ('all', t.translate('msg_status_chip_all')),
+      ('sent', t.translate('msg_status_chip_sent')),
+      ('failed', t.translate('msg_status_chip_failed')),
+      ('pending', t.translate('msg_status_chip_pending')),
     ];
 
     return Container(
@@ -665,6 +667,7 @@ class _AllMessagesTab extends ConsumerWidget {
   }
 
   Widget _buildErrorState(BuildContext context, Object error) {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -674,8 +677,8 @@ class _AllMessagesTab extends ConsumerWidget {
             const Icon(Icons.cloud_off_outlined,
                 size: 64, color: AppColors.textHint),
             const SizedBox(height: 16),
-            const Text('فشل تحميل الرسائل',
-                style: TextStyle(
+            Text(t.translate('msg_load_failed'),
+                style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary)),
@@ -688,7 +691,7 @@ class _AllMessagesTab extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: onRefresh,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('إعادة المحاولة'),
+              label: Text(t.translate('retry')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -705,6 +708,7 @@ class _AllMessagesTab extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
@@ -717,20 +721,20 @@ class _AllMessagesTab extends ConsumerWidget {
                 const Icon(Icons.mail_outline,
                     size: 64, color: AppColors.textHint),
                 const SizedBox(height: 16),
-                const Text('لا توجد رسائل',
-                    style: TextStyle(
+                Text(t.translate('msg_no_messages'),
+                    style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary)),
                 const SizedBox(height: 8),
-                const Text('ابدأ بإرسال رسالتك الأولى',
-                    style: TextStyle(
+                Text(t.translate('msg_start_first'),
+                    style: const TextStyle(
                         fontSize: 13, color: AppColors.textSecondary)),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: onNavigateToSend,
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('إرسال رسالة'),
+                  label: Text(t.translate('sendMessage')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

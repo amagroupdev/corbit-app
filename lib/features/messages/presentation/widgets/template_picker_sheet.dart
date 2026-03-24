@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/data/models/template_model.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
 
@@ -106,9 +107,9 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                 size: 22,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'اختر قالب',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.translate('msg_select_template'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -122,9 +123,9 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                   widget.onCreateNew?.call();
                 },
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text(
-                  'جديد',
-                  style: TextStyle(fontSize: 13),
+                label: Text(
+                  AppLocalizations.of(context)!.translate('msg_new_template'),
+                  style: const TextStyle(fontSize: 13),
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
@@ -146,7 +147,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
               setState(() => _searchQuery = value);
             },
             decoration: InputDecoration(
-              hintText: 'ابحث عن قالب...',
+              hintText: AppLocalizations.of(context)!.translate('msg_search_template'),
               hintStyle: const TextStyle(
                 color: AppColors.textHint,
                 fontSize: 14,
@@ -200,8 +201,8 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                     size: 48,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'فشل تحميل القوالب',
+                  Text(
+                    AppLocalizations.of(context)!.translate('msg_templates_load_failed'),
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14,
@@ -210,7 +211,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: () => ref.invalidate(templatesProvider),
-                    child: const Text('إعادة المحاولة'),
+                    child: Text(AppLocalizations.of(context)!.translate('retry')),
                   ),
                 ],
               ),
@@ -233,8 +234,8 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                       const SizedBox(height: 12),
                       Text(
                         _searchQuery.isNotEmpty
-                            ? 'لا توجد نتائج مطابقة'
-                            : 'لا توجد قوالب محفوظة',
+                            ? AppLocalizations.of(context)!.translate('msg_no_matching_results')
+                            : AppLocalizations.of(context)!.translate('msg_no_saved_templates'),
                         style: const TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,

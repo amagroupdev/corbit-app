@@ -10,24 +10,17 @@
 
 /// The three statistics types supported by the API.
 enum StatisticsType {
-  absenceLateness('absence_lateness', 'الغياب والتأخر', 'Absence & Lateness'),
-  customMessages('custom_messages', 'الرسائل المخصصة', 'Custom Messages'),
-  teacherMessages('teacher_messages', 'رسائل المعلمين', 'Teacher Messages');
+  absenceLateness('absence_lateness', 'stat_type_absence_lateness'),
+  customMessages('custom_messages', 'stat_type_custom_messages'),
+  teacherMessages('teacher_messages', 'stat_type_teacher_messages');
 
-  const StatisticsType(this.apiValue, this.labelAr, this.labelEn);
+  const StatisticsType(this.apiValue, this.labelKey);
 
   /// The value sent to the API in `statistics_type`.
   final String apiValue;
 
-  /// Arabic display label.
-  final String labelAr;
-
-  /// English display label.
-  final String labelEn;
-
-  /// Returns the localized label based on language code.
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
+  /// Localization key for the display label.
+  final String labelKey;
 
   /// Parses an API string value into a [StatisticsType].
   static StatisticsType fromApiValue(String value) {
@@ -41,21 +34,21 @@ enum StatisticsType {
   List<StatisticsSubType> get subTypes {
     return switch (this) {
       StatisticsType.absenceLateness => [
-          const StatisticsSubType(apiValue: 'all', labelAr: 'الكل', labelEn: 'All'),
-          const StatisticsSubType(apiValue: 'latency', labelAr: 'التأخر', labelEn: 'Lateness'),
-          const StatisticsSubType(apiValue: 'absence', labelAr: 'الغياب', labelEn: 'Absence'),
+          const StatisticsSubType(apiValue: 'all', labelKey: 'stat_sub_all'),
+          const StatisticsSubType(apiValue: 'latency', labelKey: 'stat_sub_lateness'),
+          const StatisticsSubType(apiValue: 'absence', labelKey: 'stat_sub_absence'),
         ],
       StatisticsType.customMessages => [
-          const StatisticsSubType(apiValue: 'all', labelAr: 'الكل', labelEn: 'All'),
-          const StatisticsSubType(apiValue: 'Academic Weakness', labelAr: 'ضعف دراسي', labelEn: 'Academic Weakness'),
-          const StatisticsSubType(apiValue: 'Behavourial Offence', labelAr: 'مخالفة سلوكية', labelEn: 'Behavioural Offence'),
-          const StatisticsSubType(apiValue: 'Distinction', labelAr: 'تميز', labelEn: 'Distinction'),
-          const StatisticsSubType(apiValue: 'Others', labelAr: 'أخرى', labelEn: 'Others'),
+          const StatisticsSubType(apiValue: 'all', labelKey: 'stat_sub_all'),
+          const StatisticsSubType(apiValue: 'Academic Weakness', labelKey: 'stat_sub_academic_weakness'),
+          const StatisticsSubType(apiValue: 'Behavourial Offence', labelKey: 'stat_sub_behavioural_offence'),
+          const StatisticsSubType(apiValue: 'Distinction', labelKey: 'stat_sub_distinction'),
+          const StatisticsSubType(apiValue: 'Others', labelKey: 'stat_sub_others'),
         ],
       StatisticsType.teacherMessages => [
-          const StatisticsSubType(apiValue: 'all', labelAr: 'الكل', labelEn: 'All'),
-          const StatisticsSubType(apiValue: 'Guidance', labelAr: 'إرشاد', labelEn: 'Guidance'),
-          const StatisticsSubType(apiValue: 'Note', labelAr: 'ملاحظة', labelEn: 'Note'),
+          const StatisticsSubType(apiValue: 'all', labelKey: 'stat_sub_all'),
+          const StatisticsSubType(apiValue: 'Guidance', labelKey: 'stat_sub_guidance'),
+          const StatisticsSubType(apiValue: 'Note', labelKey: 'stat_sub_note'),
         ],
     };
   }
@@ -78,16 +71,11 @@ enum StatisticsType {
 class StatisticsSubType {
   const StatisticsSubType({
     required this.apiValue,
-    required this.labelAr,
-    required this.labelEn,
+    required this.labelKey,
   });
 
   final String apiValue;
-  final String labelAr;
-  final String labelEn;
-
-  String label(String languageCode) =>
-      languageCode == 'ar' ? labelAr : labelEn;
+  final String labelKey;
 
   @override
   bool operator ==(Object other) =>

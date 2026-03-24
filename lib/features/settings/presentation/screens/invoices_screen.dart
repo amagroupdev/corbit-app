@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 
+import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Screen for viewing invoices with filtering and PDF download.
 class InvoicesScreen extends ConsumerStatefulWidget {
   const InvoicesScreen({super.key});
@@ -21,13 +22,16 @@ class InvoicesScreen extends ConsumerStatefulWidget {
 class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
   String? _selectedStatus;
 
-  final List<Map<String, String>> _statusFilters = [
-    {'value': '', 'label': 'الكل'},
-    {'value': 'paid', 'label': 'مدفوعة'},
-    {'value': 'unpaid', 'label': 'غير مدفوعة'},
-    {'value': 'pending', 'label': 'قيد الانتظار'},
-    {'value': 'overdue', 'label': 'متأخرة'},
-  ];
+  List<Map<String, String>> _getStatusFilters(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    return [
+      {'value': '', 'label': t.translate('all')},
+      {'value': 'paid', 'label': t.translate('invoice_status_paid')},
+      {'value': 'unpaid', 'label': t.translate('invoice_status_unpaid')},
+      {'value': 'pending', 'label': t.translate('invoice_status_pending')},
+      {'value': 'overdue', 'label': t.translate('invoice_status_overdue')},
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text('الفواتير'),
+        title: Text(AppLocalizations.of(context)!.translate('invoices')),
         centerTitle: true,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
@@ -51,10 +55,10 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _statusFilters.length,
+              itemCount: _getStatusFilters(context).length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final filter = _statusFilters[index];
+                final filter = _getStatusFilters(context)[index];
                 final isSelected = _selectedStatus == filter['value'] ||
                     (_selectedStatus == null && filter['value']!.isEmpty);
 
@@ -100,8 +104,8 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
                 if (paginated.isEmpty) {
                   return AppEmptyState(
                     icon: Icons.receipt_long_rounded,
-                    title: 'لا توجد فواتير',
-                    description: 'لا توجد فواتير مطابقة للبحث',
+                    title: AppLocalizations.of(context)!.translate('invoices_no_invoices'),
+                    description: AppLocalizations.of(context)!.translate('invoices_no_match'),
                   );
                 }
 
@@ -157,8 +161,8 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لا يمكن تحميل الفاتورة'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('invoices_download_error')),
               backgroundColor: AppColors.error,
             ),
           );
@@ -168,7 +172,7 @@ class _InvoicesScreenState extends ConsumerState<InvoicesScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ: $e'),
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -248,7 +252,7 @@ class _InvoiceCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'فاتورة #${invoice.number ?? invoice.id}',
+                          '${AppLocalizations.of(context)!.translate('invoices_invoice_prefix')} #${invoice.number ?? invoice.id}',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -277,7 +281,7 @@ class _InvoiceCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      invoice.statusLabel,
+                      AppLocalizations.of(context)!.translate(invoice.statusLabelKey),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -307,7 +311,7 @@ class _InvoiceCard extends StatelessWidget {
                       Icons.download_rounded,
                       color: AppColors.primary,
                     ),
-                    tooltip: 'تحميل PDF',
+                    tooltip: AppLocalizations.of(context)!.translate('invoices_download_pdf'),
                     constraints: const BoxConstraints(
                       minWidth: 40,
                       minHeight: 40,
@@ -358,7 +362,7 @@ class _InvoiceDetailSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'فاتورة #${invoice.number ?? invoice.id}',
+              '${AppLocalizations.of(context)!.translate('invoices_invoice_prefix')} #${invoice.number ?? invoice.id}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -373,30 +377,30 @@ class _InvoiceDetailSheet extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               shrinkWrap: true,
               children: [
-                _detailRow('رقم الفاتورة', invoice.number ?? '-'),
-                _detailRow('التاريخ', invoice.date ?? '-'),
-                _detailRow('الحالة', invoice.statusLabel),
+                _detailRow(AppLocalizations.of(context)!.translate('invoices_invoice_number'), invoice.number ?? '-'),
+                _detailRow(AppLocalizations.of(context)!.translate('invoices_invoice_date'), invoice.date ?? '-'),
+                _detailRow(AppLocalizations.of(context)!.translate('invoices_invoice_status'), AppLocalizations.of(context)!.translate(invoice.statusLabelKey)),
                 _detailRow(
-                  'المبلغ',
+                  AppLocalizations.of(context)!.translate('invoices_invoice_amount'),
                   Formatters.formatCurrency(invoice.amount ?? 0),
                 ),
                 _detailRow(
-                  'الضريبة',
+                  AppLocalizations.of(context)!.translate('invoices_invoice_tax'),
                   Formatters.formatCurrency(invoice.tax ?? 0),
                 ),
                 _detailRow(
-                  'الإجمالي',
+                  AppLocalizations.of(context)!.translate('invoices_invoice_total'),
                   Formatters.formatCurrency(invoice.totalAmount ?? 0),
                 ),
                 if (invoice.paymentMethod != null)
-                  _detailRow('طريقة الدفع', invoice.paymentMethod!),
+                  _detailRow(AppLocalizations.of(context)!.translate('invoices_payment_method'), invoice.paymentMethod!),
                 if (invoice.notes != null)
-                  _detailRow('ملاحظات', invoice.notes!),
+                  _detailRow(AppLocalizations.of(context)!.translate('invoices_notes'), invoice.notes!),
 
                 if (invoice.items.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  const Text(
-                    'البنود',
+                  Text(
+                    AppLocalizations.of(context)!.translate('invoices_items'),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

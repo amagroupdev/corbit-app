@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
@@ -62,20 +63,21 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   void _showEditGroupNameDialog() {
     final state = ref.read(groupDetailControllerProvider);
     final controller = TextEditingController(text: state.group?.name ?? '');
+    final t = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u062A\u0639\u062F\u064A\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('editGroupName'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: TextField(
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: '\u0627\u0633\u0645 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629',
+            hintText: t.translate('groupName'),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -88,9 +90,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              t.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -107,16 +109,16 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(success
-                        ? '\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0627\u0633\u0645'
-                        : '\u0641\u0634\u0644 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0627\u0633\u0645'),
+                        ? t.translate('groupNameUpdated')
+                        : t.translate('groupNameUpdateFailed')),
                     backgroundColor: success ? AppColors.success : AppColors.error,
                   ),
                 );
               }
             },
-            child: const Text(
-              '\u062D\u0641\u0638',
-              style: TextStyle(
+            child: Text(
+              t.translate('save'),
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
               ),
@@ -128,6 +130,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   void _showAddOptionsSheet() {
+    final t = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -153,9 +156,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0625\u0636\u0627\u0641\u0629 \u0623\u0631\u0642\u0627\u0645', // إضافة أرقام
-              style: TextStyle(
+            Text(
+              t.translate('addNumbers'),
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -165,8 +168,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             // Option 1: Manual add
             _buildOptionTile(
               icon: Icons.dialpad,
-              title: '\u0625\u0636\u0627\u0641\u0629 \u0631\u0642\u0645 \u064A\u062F\u0648\u064A', // إضافة رقم يدوي
-              subtitle: '\u0623\u062F\u062E\u0644 \u0627\u0644\u0627\u0633\u0645 \u0648\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u064A\u062F\u0648\u064A\u0627\u064B', // أدخل الاسم ورقم الهاتف يدوياً
+              title: t.translate('addNumberManual'),
+              subtitle: t.translate('addNumberManualSubtitle'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _showAddNumberSheet();
@@ -176,8 +179,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             // Option 2: Import from contacts
             _buildOptionTile(
               icon: Icons.contacts,
-              title: '\u0625\u0636\u0641 \u0645\u0646 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644', // إضف من جهات الاتصال
-              subtitle: '\u0627\u0633\u062A\u064A\u0631\u062F \u0623\u0631\u0642\u0627\u0645 \u062C\u0648\u0627\u0644 \u0633\u0639\u0648\u062F\u064A\u0629 \u0645\u0646 \u062C\u0647\u0627\u0632\u0643', // استيرد أرقام جوال سعودية من جهازك
+              title: t.translate('addFromContacts'),
+              subtitle: t.translate('addFromContactsSubtitle'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _showContactsImportSheet();
@@ -261,6 +264,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   void _showAddNumberSheet({NumberModel? existingNumber}) {
+    final t = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -302,8 +306,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(existingNumber != null
-                          ? '\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0631\u0642\u0645'
-                          : '\u062A\u0645\u062A \u0627\u0644\u0625\u0636\u0627\u0641\u0629 \u0628\u0646\u062C\u0627\u062D'),
+                          ? t.translate('numberUpdated')
+                          : t.translate('numberAdded')),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -317,23 +321,24 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   void _showDeleteNumberDialog(NumberModel numberModel) {
+    final t = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0631\u0642\u0645',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('deleteNumber'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         content: Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 "${numberModel.number}"\u061F',
+          '${t.translate('confirmDeleteNumber')} "${numberModel.number}"\u061F',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              t.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -344,16 +349,16 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                   .deleteNumber(numberModel.id);
               if (mounted && success) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0631\u0642\u0645'),
+                  SnackBar(
+                    content: Text(t.translate('numberDeleted')),
                     backgroundColor: AppColors.success,
                   ),
                 );
               }
             },
-            child: const Text(
-              '\u062D\u0630\u0641',
-              style: TextStyle(
+            child: Text(
+              t.translate('delete'),
+              style: const TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.w600,
               ),
@@ -367,6 +372,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(groupDetailControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -378,7 +384,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             children: [
               Flexible(
                 child: Text(
-                  state.group?.name ?? '\u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644...',
+                  state.group?.name ?? t.translate('loading'),
                   style: const TextStyle(fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -400,7 +406,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           IconButton(
             icon: const Icon(Icons.file_upload_outlined),
             onPressed: () => context.pushNamed(RouteNames.importNumbers),
-            tooltip: '\u0627\u0633\u062A\u064A\u0631\u0627\u062F',
+            tooltip: t.translate('import'),
           ),
         ],
       ),
@@ -426,7 +432,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                             .read(groupDetailControllerProvider.notifier)
                             .loadGroup(widget.groupId),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629'),
+                        label: Text(t.translate('retry')),
                         style: TextButton.styleFrom(
                             foregroundColor: AppColors.primary),
                       ),
@@ -461,7 +467,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  '${state.numbersCount} \u0631\u0642\u0645',
+                                  '${state.numbersCount} ${t.translate('numberUnit')}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -479,8 +485,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                 await repo.exportGroups();
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('\u062C\u0627\u0631\u064A \u0627\u0644\u062A\u0635\u062F\u064A\u0631...'),
+                                    SnackBar(
+                                      content: Text(t.translate('exporting')),
                                       backgroundColor: AppColors.info,
                                     ),
                                   );
@@ -488,9 +494,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               } catch (_) {}
                             },
                             icon: const Icon(Icons.download_outlined, size: 18),
-                            label: const Text(
-                              '\u062A\u0635\u062F\u064A\u0631',
-                              style: TextStyle(fontSize: 13),
+                            label: Text(
+                              t.translate('export'),
+                              style: const TextStyle(fontSize: 13),
                             ),
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.primary,
@@ -565,6 +571,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   Widget _buildEmptyNumbers() {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -585,19 +592,19 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0631\u0642\u0627\u0645',
-              style: TextStyle(
+            Text(
+              t.translate('noNumbers'),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '\u0623\u0636\u0641 \u0623\u0631\u0642\u0627\u0645\u0627\u064B \u0644\u0647\u0630\u0647 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0623\u0648 \u0627\u0633\u062A\u0648\u0631\u062F\u0647\u0627 \u0645\u0646 \u0645\u0644\u0641 Excel',
+            Text(
+              t.translate('addNumbersOrImport'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

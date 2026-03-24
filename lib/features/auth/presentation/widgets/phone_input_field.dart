@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A phone number input field with a country code prefix selector.
 ///
@@ -50,19 +51,20 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
   late final TextEditingController _controller;
   String _selectedCode = '+966';
 
+  /// Country code entries with their translation keys instead of hardcoded names.
   static const List<_CountryCode> _countryCodes = [
-    _CountryCode(code: '+966', flag: '\u{1F1F8}\u{1F1E6}', name: 'السعودية'),
-    _CountryCode(code: '+971', flag: '\u{1F1E6}\u{1F1EA}', name: 'الإمارات'),
-    _CountryCode(code: '+973', flag: '\u{1F1E7}\u{1F1ED}', name: 'البحرين'),
-    _CountryCode(code: '+965', flag: '\u{1F1F0}\u{1F1FC}', name: 'الكويت'),
-    _CountryCode(code: '+968', flag: '\u{1F1F4}\u{1F1F2}', name: 'عُمان'),
-    _CountryCode(code: '+974', flag: '\u{1F1F6}\u{1F1E6}', name: 'قطر'),
-    _CountryCode(code: '+20', flag: '\u{1F1EA}\u{1F1EC}', name: 'مصر'),
-    _CountryCode(code: '+962', flag: '\u{1F1EF}\u{1F1F4}', name: 'الأردن'),
-    _CountryCode(code: '+964', flag: '\u{1F1EE}\u{1F1F6}', name: 'العراق'),
-    _CountryCode(code: '+961', flag: '\u{1F1F1}\u{1F1E7}', name: 'لبنان'),
-    _CountryCode(code: '+967', flag: '\u{1F1FE}\u{1F1EA}', name: 'اليمن'),
-    _CountryCode(code: '+249', flag: '\u{1F1F8}\u{1F1E9}', name: 'السودان'),
+    _CountryCode(code: '+966', flag: '\u{1F1F8}\u{1F1E6}', nameKey: 'countrySaudiArabia'),
+    _CountryCode(code: '+971', flag: '\u{1F1E6}\u{1F1EA}', nameKey: 'countryUAE'),
+    _CountryCode(code: '+973', flag: '\u{1F1E7}\u{1F1ED}', nameKey: 'countryBahrain'),
+    _CountryCode(code: '+965', flag: '\u{1F1F0}\u{1F1FC}', nameKey: 'countryKuwait'),
+    _CountryCode(code: '+968', flag: '\u{1F1F4}\u{1F1F2}', nameKey: 'countryOman'),
+    _CountryCode(code: '+974', flag: '\u{1F1F6}\u{1F1E6}', nameKey: 'countryQatar'),
+    _CountryCode(code: '+20', flag: '\u{1F1EA}\u{1F1EC}', nameKey: 'countryEgypt'),
+    _CountryCode(code: '+962', flag: '\u{1F1EF}\u{1F1F4}', nameKey: 'countryJordan'),
+    _CountryCode(code: '+964', flag: '\u{1F1EE}\u{1F1F6}', nameKey: 'countryIraq'),
+    _CountryCode(code: '+961', flag: '\u{1F1F1}\u{1F1E7}', nameKey: 'countryLebanon'),
+    _CountryCode(code: '+967', flag: '\u{1F1FE}\u{1F1EA}', nameKey: 'countryYemen'),
+    _CountryCode(code: '+249', flag: '\u{1F1F8}\u{1F1E9}', nameKey: 'countrySudan'),
   ];
 
   @override
@@ -171,6 +173,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
   }
 
   Widget _buildCountryCodeDropdown() {
+    final t = AppLocalizations.of(context)!;
     final selected = _countryCodes.firstWhere(
       (c) => c.code == _selectedCode,
       orElse: () => _countryCodes.first,
@@ -205,7 +208,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      c.name,
+                      t.translate(c.nameKey),
                       style: const TextStyle(
                         fontSize: 13,
                         fontFamily: 'Cairo',
@@ -258,10 +261,11 @@ class _CountryCode {
   const _CountryCode({
     required this.code,
     required this.flag,
-    required this.name,
+    required this.nameKey,
   });
 
   final String code;
   final String flag;
-  final String name;
+  /// Translation key for the country name (resolved at build time).
+  final String nameKey;
 }

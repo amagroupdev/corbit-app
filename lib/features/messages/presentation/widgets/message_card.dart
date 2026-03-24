@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
 
 /// Card displaying a sent message's summary in the message center list.
@@ -75,7 +76,7 @@ class MessageCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _formatDate(message.createdAt),
+                        _formatDate(context, message.createdAt),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -112,14 +113,14 @@ class MessageCard extends StatelessWidget {
                 _StatChip(
                   icon: Icons.people_outline,
                   label: '${message.recipientCount}',
-                  tooltip: 'عدد المستقبلين',
+                  tooltip: AppLocalizations.of(context)!.translate('msg_recipients_count_tooltip'),
                 ),
                 const SizedBox(width: 16),
                 if (message.deliveredCount != null)
                   _StatChip(
                     icon: Icons.check_circle_outline,
                     label: '${message.deliveredCount}',
-                    tooltip: 'تم التوصيل',
+                    tooltip: AppLocalizations.of(context)!.translate('msg_delivered_tooltip'),
                     color: AppColors.success,
                   ),
                 if (message.deliveredCount != null) const SizedBox(width: 16),
@@ -127,13 +128,13 @@ class MessageCard extends StatelessWidget {
                   _StatChip(
                     icon: Icons.error_outline,
                     label: '${message.failedCount}',
-                    tooltip: 'فشل',
+                    tooltip: AppLocalizations.of(context)!.translate('msg_failed_tooltip'),
                     color: AppColors.error,
                   ),
                 const Spacer(),
                 if (message.cost != null)
                   Text(
-                    '${message.cost!.toStringAsFixed(1)} رسالة',
+                    '${message.cost!.toStringAsFixed(1)} ${AppLocalizations.of(context)!.translate('msg_cost_unit')}',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -148,17 +149,19 @@ class MessageCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
+    final t = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final diff = now.difference(date);
 
-    if (diff.inMinutes < 1) return 'الآن';
-    if (diff.inHours < 1) return 'منذ ${diff.inMinutes} دقيقة';
-    if (diff.inDays < 1) return 'منذ ${diff.inHours} ساعة';
-    if (diff.inDays == 1) return 'أمس';
-    if (diff.inDays < 7) return 'منذ ${diff.inDays} أيام';
+    if (diff.inMinutes < 1) return t.translate('msg_time_now');
+    if (diff.inHours < 1) return t.translateWithParams('msg_time_minutes_ago', {'count': '${diff.inMinutes}'});
+    if (diff.inDays < 1) return t.translateWithParams('msg_time_hours_ago', {'count': '${diff.inHours}'});
+    if (diff.inDays == 1) return t.translate('msg_time_yesterday');
+    if (diff.inDays < 7) return t.translateWithParams('msg_time_days_ago', {'count': '${diff.inDays}'});
 
-    return DateFormat('yyyy/MM/dd - HH:mm', 'ar').format(date);
+    final locale = t.currentLocaleCode;
+    return DateFormat('yyyy/MM/dd - HH:mm', locale).format(date);
   }
 }
 
@@ -179,7 +182,7 @@ class _StatusBadge extends StatelessWidget {
         border: Border.all(color: _statusColor.withOpacity(0.3)),
       ),
       child: Text(
-        status.arabicLabel,
+        AppLocalizations.of(context)!.translate(status.labelKey),
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,

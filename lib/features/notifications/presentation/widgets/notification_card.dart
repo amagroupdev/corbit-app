@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/notifications/data/models/notification_model.dart';
 
 /// A card widget displaying a notification archive entry.
@@ -27,19 +28,20 @@ class NotificationCard extends StatelessWidget {
     }
   }
 
-  String get _statusLabel {
+  String _statusLabelKey() {
     switch (notification.status) {
       case 'sent':
-        return '\u0645\u0631\u0633\u0644'; // مرسل
+        return 'notifStatusSent';
       case 'failed':
-        return '\u0641\u0634\u0644'; // فشل
+        return 'notifStatusFailed';
       default:
-        return '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631'; // قيد الانتظار
+        return 'notifStatusPending';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final dateFormat = intl.DateFormat('yyyy/MM/dd HH:mm', 'ar');
 
     return Container(
@@ -108,7 +110,7 @@ class NotificationCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  _statusLabel,
+                                  t.translate(_statusLabelKey()),
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -161,7 +163,7 @@ class NotificationCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${notification.recipientCount} \u0645\u0633\u062A\u0644\u0645', // مستلم
+                      '${notification.recipientCount} ${t.translate('recipientLabel')}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textHint,

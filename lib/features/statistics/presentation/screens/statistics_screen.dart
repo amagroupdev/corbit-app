@@ -6,6 +6,7 @@ import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/statistics/data/models/statistics_model.dart';
 import 'package:orbit_app/features/statistics/presentation/controllers/statistics_controller.dart';
 import 'package:orbit_app/features/statistics/presentation/widgets/statistics_card.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
@@ -167,7 +168,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         SnackBar(
           content: Text(
             result ??
-                '\u062A\u0645 \u0637\u0644\u0628 \u0627\u0644\u062A\u0635\u062F\u064A\u0631 \u0628\u0646\u062C\u0627\u062D', // تم طلب التصدير بنجاح
+                AppLocalizations.of(context)!.translate('stat_export_requested'),
           ),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
@@ -214,9 +215,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
       backgroundColor: AppColors.surface,
       foregroundColor: AppColors.textPrimary,
       elevation: 0.5,
-      title: const Text(
-        '\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A', // الإحصائيات
-        style: TextStyle(
+      title: Text(
+        AppLocalizations.of(context)!.translate('statistics'),
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
@@ -240,7 +241,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                   color: AppColors.textSecondary,
                 ),
           onPressed: exportState.isLoading ? null : _exportStatistics,
-          tooltip: '\u062A\u0635\u062F\u064A\u0631', // تصدير
+          tooltip: AppLocalizations.of(context)!.translate('export'),
         ),
       ],
     );
@@ -268,7 +269,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         indicatorWeight: 3,
         dividerColor: AppColors.divider,
         tabs: StatisticsType.values.map((type) {
-          return Tab(text: type.labelAr);
+          return Tab(text: AppLocalizations.of(context)!.translate(type.labelKey));
         }).toList(),
       ),
     );
@@ -301,7 +302,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                 final isActive = selectedSubType == subType.apiValue;
 
                 return ChoiceChip(
-                  label: Text(subType.labelAr),
+                  label: Text(AppLocalizations.of(context)!.translate(subType.labelKey)),
                   selected: isActive,
                   onSelected: (_) => _onSubTypeChanged(subType.apiValue),
                   selectedColor: AppColors.primary,
@@ -365,7 +366,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           child: Text(
                             hasDateFilter
                                 ? '${filter.fromDate != null ? dateFormat.format(filter.fromDate!) : '...'} - ${filter.toDate != null ? dateFormat.format(filter.toDate!) : '...'}'
-                                : '\u0627\u062E\u062A\u0631 \u0627\u0644\u0641\u062A\u0631\u0629', // اختر الفترة
+                                : AppLocalizations.of(context)!.translate('stat_select_period'),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -437,11 +438,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
 
     // Empty state
     if (state.isEmpty) {
+      final t = AppLocalizations.of(context)!;
       return AppEmptyState(
         icon: Icons.analytics_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A', // لا توجد إحصائيات
-        description:
-            '\u0644\u0627 \u062A\u0648\u062C\u062F \u0628\u064A\u0627\u0646\u0627\u062A \u0641\u064A ${selectedTab.labelAr}', // لا توجد بيانات في X
+        title: t.translate('stat_no_statistics'),
+        description: t.translate('stat_no_data_in'),
       );
     }
 
@@ -515,7 +516,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
           ),
           const SizedBox(width: 8),
           Text(
-            '\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0646\u062A\u0627\u0626\u062C: ${state.total}', // إجمالي النتائج: X
+            AppLocalizations.of(context)!.translateWithParams('stat_total_results', {'count': '${state.total}'}),
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -524,7 +525,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
           ),
           const Spacer(),
           Text(
-            '\u0635\u0641\u062D\u0629 ${state.currentPage}/${state.lastPage}', // صفحة X/Y
+            AppLocalizations.of(context)!.translateWithParams('stat_page_info', {'current': '${state.currentPage}', 'last': '${state.lastPage}'}),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -551,10 +552,10 @@ class _SemesterDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   static const List<_SemesterOption> _semesters = [
-    _SemesterOption(value: null, labelAr: '\u0627\u0644\u0641\u0635\u0644'), // الفصل
-    _SemesterOption(value: '1', labelAr: '\u0627\u0644\u0641\u0635\u0644 \u0627\u0644\u0623\u0648\u0644'), // الفصل الأول
-    _SemesterOption(value: '2', labelAr: '\u0627\u0644\u0641\u0635\u0644 \u0627\u0644\u062B\u0627\u0646\u064A'), // الفصل الثاني
-    _SemesterOption(value: '3', labelAr: '\u0627\u0644\u0641\u0635\u0644 \u0627\u0644\u062B\u0627\u0644\u062B'), // الفصل الثالث
+    _SemesterOption(value: null, labelKey: 'stat_semester'),
+    _SemesterOption(value: '1', labelKey: 'stat_semester_first'),
+    _SemesterOption(value: '2', labelKey: 'stat_semester_second'),
+    _SemesterOption(value: '3', labelKey: 'stat_semester_third'),
   ];
 
   @override
@@ -587,11 +588,13 @@ class _SemesterDropdown extends StatelessWidget {
           items: _semesters.map((semester) {
             return DropdownMenuItem<String?>(
               value: semester.value,
-              child: Text(
-                semester.labelAr,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textPrimary,
+              child: Builder(
+                builder: (ctx) => Text(
+                  AppLocalizations.of(ctx)!.translate(semester.labelKey),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             );
@@ -604,7 +607,7 @@ class _SemesterDropdown extends StatelessWidget {
 }
 
 class _SemesterOption {
-  const _SemesterOption({required this.value, required this.labelAr});
+  const _SemesterOption({required this.value, required this.labelKey});
   final String? value;
-  final String labelAr;
+  final String labelKey;
 }

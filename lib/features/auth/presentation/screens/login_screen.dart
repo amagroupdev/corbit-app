@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/login_tab_toggle.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
@@ -97,6 +98,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     // Auto-redirect to dashboard if already authenticated (e.g. has stored token).
     ref.listen<AsyncValue<bool>>(authStateProvider, (prev, next) {
@@ -181,9 +183,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Title
-                        const Text(
-                          '\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0639\u0648\u062f\u062a\u0643!',
-                          style: TextStyle(
+                        Text(
+                          t.translate('welcomeBackTitle'),
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -192,9 +194,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          '\u0633\u062c\u0644 \u062f\u062e\u0648\u0644 \u0625\u0644\u0649 \u062d\u0633\u0627\u0628\u0643 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629',
-                          style: TextStyle(
+                        Text(
+                          t.translate('signInToAccount'),
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -215,25 +217,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
                           child: _loginMode == LoginMode.phone
-                              ? _buildPhoneField()
-                              : _buildUsernameField(),
+                              ? _buildPhoneField(t)
+                              : _buildUsernameField(t),
                         ),
                         const SizedBox(height: 16),
 
                         // Password field
-                        _buildPasswordField(),
+                        _buildPasswordField(t),
                         const SizedBox(height: 12),
 
                         // Remember me + Forgot password
-                        _buildRememberRow(),
+                        _buildRememberRow(t),
                         const SizedBox(height: 24),
 
                         // Login button
-                        _buildLoginButton(loginState.isLoading),
+                        _buildLoginButton(loginState.isLoading, t),
                         const SizedBox(height: 16),
 
                         // Terms
-                        _buildTermsText(),
+                        _buildTermsText(t),
                       ],
                     ),
                   ),
@@ -242,7 +244,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 24),
 
                 // Create account link
-                _buildCreateAccountLink(),
+                _buildCreateAccountLink(t),
               ],
             ),
           ),
@@ -262,14 +264,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildPhoneField() {
+  Widget _buildPhoneField(AppLocalizations t) {
     return Column(
       key: const ValueKey('phone_field'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '\u0631\u0642\u0645 \u0627\u0644\u062c\u0648\u0627\u0644',
-          style: TextStyle(
+        Text(
+          t.translate('phone'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -292,14 +294,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildUsernameField() {
+  Widget _buildUsernameField(AppLocalizations t) {
     return Column(
       key: const ValueKey('username_field'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '\u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
-          style: TextStyle(
+        Text(
+          t.translate('username'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -313,7 +315,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           onChanged: (_) => _clearFieldError('username'),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return '\u0627\u0644\u0631\u062c\u0627\u0621 \u0625\u062f\u062e\u0627\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645';
+              return t.translate('pleaseEnterUsername');
             }
             return null;
           },
@@ -323,7 +325,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: '\u0623\u062f\u062e\u0644 \u0625\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+            hintText: t.translate('enterUsername'),
             hintStyle: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
@@ -366,13 +368,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(AppLocalizations t) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-          style: TextStyle(
+        Text(
+          t.translate('password'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -388,10 +390,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           onChanged: (_) => _clearFieldError('password'),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '\u0627\u0644\u0631\u062c\u0627\u0621 \u0625\u062f\u062e\u0627\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631';
+              return t.translate('pleaseEnterPassword');
             }
             if (value.length < 6) {
-              return '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u064a\u062c\u0628 \u0623\u0646 \u062a\u0643\u0648\u0646 6 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644';
+              return t.translate('passwordMinLength6');
             }
             return null;
           },
@@ -401,7 +403,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+            hintText: t.translate('enterPassword'),
             hintStyle: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
@@ -455,7 +457,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildRememberRow() {
+  Widget _buildRememberRow(AppLocalizations t) {
     return Row(
       children: [
         // Remember me
@@ -481,9 +483,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(width: 6),
-              const Text(
-                '\u062a\u0630\u0643\u0631\u0646\u064a',
-                style: TextStyle(
+              Text(
+                t.translate('rememberMe'),
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 13,
                   color: AppColors.textSecondary,
@@ -498,9 +500,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Forgot password
         GestureDetector(
           onTap: () => context.push('/forgot-password'),
-          child: const Text(
-            '\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f',
-            style: TextStyle(
+          child: Text(
+            t.translate('forgotPassword'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -512,7 +514,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildLoginButton(bool isLoading) {
+  Widget _buildLoginButton(bool isLoading, AppLocalizations t) {
     return SizedBox(
       height: 50,
       child: ElevatedButton(
@@ -535,9 +537,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
-                style: TextStyle(
+            : Text(
+                t.translate('login'),
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -547,10 +549,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildTermsText() {
+  Widget _buildTermsText(AppLocalizations t) {
     return Text.rich(
       TextSpan(
-        text: '\u0628\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0641\u0623\u0646\u062a \u062a\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 ',
+        text: t.translate('loginBySigningIn'),
         style: const TextStyle(
           fontFamily: 'Cairo',
           fontSize: 12,
@@ -558,7 +560,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         children: [
           TextSpan(
-            text: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
+            text: t.translate('usagePolicy'),
             style: const TextStyle(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.w600,
@@ -575,13 +577,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildCreateAccountLink() {
+  Widget _buildCreateAccountLink(AppLocalizations t) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          '\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f',
-          style: TextStyle(
+        Text(
+          t.translate('dontHaveAccount'),
+          style: const TextStyle(
             fontFamily: 'Cairo',
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -590,9 +592,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(width: 4),
         GestureDetector(
           onTap: () => context.push('/register'),
-          child: const Text(
-            '\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628',
-            style: TextStyle(
+          child: Text(
+            t.translate('createAccount'),
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 14,
               fontWeight: FontWeight.w700,

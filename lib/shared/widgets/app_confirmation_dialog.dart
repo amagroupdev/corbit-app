@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A reusable confirmation dialog that returns `true` if the user
 /// taps the confirm button and `false` (or `null`) otherwise.
@@ -137,7 +138,7 @@ class AppConfirmationDialog extends StatelessWidget {
                       ),
                       child: Text(
                         cancelText ??
-                            '\u0625\u0644\u063A\u0627\u0621', // إلغاء
+                            AppLocalizations.instance.translate('cancel'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -163,7 +164,7 @@ class AppConfirmationDialog extends StatelessWidget {
                       ),
                       child: Text(
                         confirmText ??
-                            '\u062A\u0623\u0643\u064A\u062F', // تأكيد
+                            AppLocalizations.instance.translate('confirm'),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

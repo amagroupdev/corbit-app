@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/features/questionnaires/data/models/questionnaire_model.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A card widget displaying a questionnaire summary.
 class QuestionnaireCard extends StatelessWidget {
@@ -29,14 +30,15 @@ class QuestionnaireCard extends StatelessWidget {
     }
   }
 
-  String get _statusLabel {
+  String _statusLabel(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     switch (questionnaire.status) {
       case 'sent':
-        return '\u0645\u0631\u0633\u0644'; // مرسل
+        return t.translate('questionnaireSent');
       case 'draft':
-        return '\u0645\u0633\u0648\u062F\u0629'; // مسودة
+        return t.translate('questionnaireDraft');
       default:
-        return '\u063A\u064A\u0631 \u0645\u0631\u0633\u0644'; // غير مرسل
+        return t.translate('questionnaireUnsent');
     }
   }
 
@@ -117,7 +119,7 @@ class QuestionnaireCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        _statusLabel,
+                        _statusLabel(context),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -134,13 +136,13 @@ class QuestionnaireCard extends StatelessWidget {
                     _StatChip(
                       icon: Icons.people_outline,
                       label: '${questionnaire.recipientCount}',
-                      tooltip: '\u0627\u0644\u0645\u0633\u062A\u0644\u0645\u064A\u0646', // المستلمين
+                      tooltip: AppLocalizations.of(context)!.translate('recipientsLabel'),
                     ),
                     const SizedBox(width: 12),
                     _StatChip(
                       icon: Icons.check_circle_outline,
                       label: '${questionnaire.responseCount}',
-                      tooltip: '\u0627\u0644\u0631\u062F\u0648\u062F', // الردود
+                      tooltip: AppLocalizations.of(context)!.translate('repliesLabel'),
                     ),
                     const Spacer(),
                     if (onSend != null && !questionnaire.isSent)
@@ -152,7 +154,7 @@ class QuestionnaireCard extends StatelessWidget {
                         ),
                         onPressed: onSend,
                         splashRadius: 20,
-                        tooltip: '\u0625\u0631\u0633\u0627\u0644', // إرسال
+                        tooltip: AppLocalizations.of(context)!.translate('submit'),
                       ),
                     if (onDelete != null)
                       IconButton(
@@ -163,7 +165,7 @@ class QuestionnaireCard extends StatelessWidget {
                         ),
                         onPressed: onDelete,
                         splashRadius: 20,
-                        tooltip: '\u062D\u0630\u0641', // حذف
+                        tooltip: AppLocalizations.of(context)!.translate('delete'),
                       ),
                   ],
                 ),

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/presentation/controllers/groups_controller.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
@@ -91,11 +92,12 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
     final phoneColumn = _phoneColumnController.text.trim();
     final groupColumn = _groupNameController.text.trim();
+    final t = AppLocalizations.of(context)!;
 
     if (phoneColumn.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u0639\u0645\u0648\u062F \u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628'),
+        SnackBar(
+          content: Text(t.translate('phoneColumnRequired')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -104,8 +106,8 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
     if (groupColumn.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u0639\u0645\u0648\u062F \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 \u0645\u0637\u0644\u0648\u0628'),
+        SnackBar(
+          content: Text(t.translate('groupColumnRequired')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -129,6 +131,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
   Future<void> _pickContacts() async {
     setState(() => _isLoadingContacts = true);
+    final t = AppLocalizations.of(context)!;
 
     try {
       // Request permission
@@ -136,8 +139,8 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
       if (!permGranted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u064A\u062C\u0628 \u0627\u0644\u0633\u0645\u0627\u062D \u0628\u0627\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644'), // يجب السماح بالوصول إلى جهات الاتصال
+            SnackBar(
+              content: Text(t.translate('contactsPermissionRequired')),
               backgroundColor: AppColors.error,
             ),
           );
@@ -176,7 +179,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('\u062E\u0637\u0623 \u0641\u064A \u0642\u0631\u0627\u0621\u0629 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644: $e'), // خطأ في قراءة جهات الاتصال
+            content: Text('${t.translate('contactsReadError')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -188,6 +191,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
   Future<void> _startContactsImport() async {
     if (_selectedContacts.isEmpty) return;
+    final t = AppLocalizations.of(context)!;
 
     // Create a CSV file from selected contacts
     final buffer = StringBuffer();
@@ -215,7 +219,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0645\u0644\u0641 \u0627\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F: $e'), // خطأ في إنشاء ملف الاستيراد
+            content: Text('${t.translate('importFileError')}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -226,13 +230,14 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   @override
   Widget build(BuildContext context) {
     final importState = ref.watch(importControllerProvider);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u0623\u0631\u0642\u0627\u0645',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          t.translate('importNumbers'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -252,10 +257,10 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
-          tabs: const [
-            Tab(text: '\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u0639\u0627\u062F\u064A'), // استيراد عادي
-            Tab(text: '\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u0645\u062E\u0635\u0635'), // استيراد مخصص
-            Tab(text: '\u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644'), // جهات الاتصال
+          tabs: [
+            Tab(text: t.translate('standardImport')),
+            Tab(text: t.translate('customImport')),
+            Tab(text: t.translate('contactsTab')),
           ],
         ),
       ),
@@ -276,6 +281,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   }
 
   Widget _buildStandardTab(ImportState importState) {
+    final t = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -295,7 +301,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u0642\u0635\u0649 5000 \u0633\u0637\u0631. \u0627\u0644\u0645\u0644\u0641 \u064A\u062C\u0628 \u0623\u0646 \u064A\u062D\u062A\u0648\u064A \u0639\u0644\u0649 \u0623\u0639\u0645\u062F\u0629: \u0627\u0644\u0627\u0633\u0645\u060C \u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641',
+                    t.translate('standardImportInfo'),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColors.infoDark,
@@ -314,7 +320,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
           // Upload button
           if (_filePath != null && !importState.isComplete)
             AppButton.primary(
-              text: '\u0631\u0641\u0639 \u0627\u0644\u0645\u0644\u0641',
+              text: t.translate('uploadFileButton'),
               onPressed: importState.isUploading ? null : _startStandardImport,
               isLoading: importState.isUploading,
               icon: Icons.cloud_upload_outlined,
@@ -343,6 +349,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   }
 
   Widget _buildCustomTab(ImportState importState) {
+    final t = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -362,7 +369,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '\u062D\u062F\u062F \u0623\u0639\u0645\u062F\u0629 \u0627\u0644\u0645\u0644\u0641 \u0644\u0631\u0628\u0637\u0647\u0627 \u0628\u0627\u0644\u062D\u0642\u0648\u0644 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629',
+                    t.translate('customImportInfo'),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColors.infoDark,
@@ -380,32 +387,32 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
 
           // Column mapping fields
           AppTextField(
-            label: '\u0639\u0645\u0648\u062F \u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 *',
-            hint: '\u0645\u062B\u0627\u0644: A \u0623\u0648 phone',
+            label: t.translate('phoneColumnLabel'),
+            hint: t.translate('phoneColumnHint'),
             controller: _phoneColumnController,
             textInputAction: TextInputAction.next,
           ),
           const SizedBox(height: 16),
 
           AppTextField(
-            label: '\u0639\u0645\u0648\u062F \u0627\u0644\u0627\u0633\u0645 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)',
-            hint: '\u0645\u062B\u0627\u0644: B \u0623\u0648 name',
+            label: t.translate('nameColumnLabel'),
+            hint: t.translate('nameColumnHint'),
             controller: _nameColumnController,
             textInputAction: TextInputAction.next,
           ),
           const SizedBox(height: 16),
 
           AppTextField(
-            label: '\u0639\u0645\u0648\u062F \u0627\u0644\u0645\u0639\u0631\u0641 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)',
-            hint: '\u0645\u062B\u0627\u0644: C \u0623\u0648 identifier',
+            label: t.translate('identifierColumnLabel'),
+            hint: t.translate('identifierColumnHint'),
             controller: _identifierColumnController,
             textInputAction: TextInputAction.next,
           ),
           const SizedBox(height: 16),
 
           AppTextField(
-            label: '\u0639\u0645\u0648\u062F \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629 *',
-            hint: '\u0645\u062B\u0627\u0644: D \u0623\u0648 group',
+            label: t.translate('groupColumnLabel'),
+            hint: t.translate('groupColumnHint'),
             controller: _groupNameController,
             textInputAction: TextInputAction.done,
           ),
@@ -414,7 +421,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
           // Upload button
           if (_filePath != null && !importState.isComplete)
             AppButton.primary(
-              text: '\u0631\u0641\u0639 \u0627\u0644\u0645\u0644\u0641',
+              text: t.translate('uploadFileButton'),
               onPressed: importState.isUploading ? null : _startCustomImport,
               isLoading: importState.isUploading,
               icon: Icons.cloud_upload_outlined,
@@ -443,6 +450,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   }
 
   Widget _buildContactsTab(ImportState importState) {
+    final t = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -462,7 +470,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '\u0627\u062E\u062A\u0631 \u062C\u0647\u0627\u062A \u0627\u062A\u0635\u0627\u0644 \u0645\u0646 \u062C\u0647\u0627\u0632\u0643 \u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F\u0647\u0627 \u0625\u0644\u0649 \u0627\u0644\u0645\u062C\u0645\u0648\u0639\u0629', // اختر جهات اتصال من جهازك لاستيرادها إلى المجموعة
+                    t.translate('contactsImportInfo'),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColors.infoDark,
@@ -511,8 +519,8 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
                   const SizedBox(height: 12),
                   Text(
                     _selectedContacts.isNotEmpty
-                        ? '\u062A\u0645 \u0627\u062E\u062A\u064A\u0627\u0631 ${_selectedContacts.length} \u062C\u0647\u0629 \u0627\u062A\u0635\u0627\u0644' // تم اختيار X جهة اتصال
-                        : '\u0627\u0636\u063A\u0637 \u0644\u0627\u062E\u062A\u064A\u0627\u0631 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644', // اضغط لاختيار جهات الاتصال
+                        ? t.translateWithParams('selectedContactsCount', {'count': '${_selectedContacts.length}'})
+                        : t.translate('tapToSelectContacts'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: _selectedContacts.isNotEmpty
@@ -526,7 +534,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
                   if (_selectedContacts.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      '\u0627\u0636\u063A\u0637 \u0644\u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0627\u062E\u062A\u064A\u0627\u0631', // اضغط لتعديل الاختيار
+                      t.translate('tapToEditSelection'),
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textHint,
@@ -604,7 +612,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
           // Import button
           if (_selectedContacts.isNotEmpty && !importState.isComplete)
             AppButton.primary(
-              text: '\u0627\u0633\u062A\u064A\u0631\u0627\u062F ${_selectedContacts.length} \u062C\u0647\u0629 \u0627\u062A\u0635\u0627\u0644', // استيراد X جهة اتصال
+              text: t.translateWithParams('importContactsCount', {'count': '${_selectedContacts.length}'}),
               onPressed: importState.isUploading ? null : _startContactsImport,
               isLoading: importState.isUploading,
               icon: Icons.cloud_upload_outlined,
@@ -633,6 +641,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   }
 
   Widget _buildFilePicker() {
+    final t = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _pickFile,
       child: Container(
@@ -657,7 +666,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              _fileName ?? '\u0627\u0636\u063A\u0637 \u0644\u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u0644\u0641 Excel',
+              _fileName ?? t.translate('tapToSelectExcel'),
               style: TextStyle(
                 fontSize: 15,
                 fontWeight:
@@ -669,7 +678,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
             ),
             const SizedBox(height: 4),
             Text(
-              '\u0627\u0644\u0635\u064A\u063A \u0627\u0644\u0645\u062F\u0639\u0648\u0645\u0629: xlsx, xls, csv',
+              t.translate('supportedFormats'),
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textHint,
@@ -708,6 +717,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
   }
 
   Widget _buildResultCard(Map<String, dynamic> result) {
+    final t = AppLocalizations.of(context)!;
     final successCount = result['success_count'] ?? result['imported'] ?? 0;
     final failedCount = result['failed_count'] ?? result['failed'] ?? 0;
     final totalCount = result['total'] ?? (successCount + failedCount);
@@ -727,9 +737,9 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
             children: [
               const Icon(Icons.check_circle, color: AppColors.success, size: 24),
               const SizedBox(width: 8),
-              const Text(
-                '\u0627\u0643\u062A\u0645\u0644 \u0627\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F',
-                style: TextStyle(
+              Text(
+                t.translate('importCompleted'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.successDark,
@@ -748,19 +758,19 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
           Row(
             children: [
               _buildStatChip(
-                '\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A',
+                t.translate('total'),
                 totalCount.toString(),
                 AppColors.info,
               ),
               const SizedBox(width: 8),
               _buildStatChip(
-                '\u0646\u0627\u062C\u062D',
+                t.translate('importSuccessful'),
                 successCount.toString(),
                 AppColors.success,
               ),
               const SizedBox(width: 8),
               _buildStatChip(
-                '\u0641\u0627\u0634\u0644',
+                t.translate('importFailed'),
                 failedCount.toString(),
                 AppColors.error,
               ),
@@ -770,7 +780,7 @@ class _ImportNumbersScreenState extends ConsumerState<ImportNumbersScreen>
           SizedBox(
             width: double.infinity,
             child: AppButton.secondary(
-              text: '\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u0622\u062E\u0631', // استيراد آخر
+              text: t.translate('importAnother'),
               onPressed: () {
                 ref.read(importControllerProvider.notifier).reset();
                 setState(() {
@@ -891,6 +901,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredContacts;
+    final t = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -904,10 +915,10 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      '\u0627\u062E\u062A\u0631 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644', // اختر جهات الاتصال
-                      style: TextStyle(
+                      t.translate('selectContactsTitle'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -931,7 +942,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: '\u0628\u062D\u062B...', // بحث...
+                  hintText: t.translate('searchHint'),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
@@ -965,9 +976,9 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
                         );
                       });
                     },
-                    child: const Text(
-                      '\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644', // تحديد الكل
-                      style: TextStyle(fontSize: 13),
+                    child: Text(
+                      t.translate('selectAll'),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                   TextButton(
@@ -978,9 +989,9 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
                         }
                       });
                     },
-                    child: const Text(
-                      '\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0643\u0644', // إلغاء الكل
-                      style: TextStyle(fontSize: 13),
+                    child: Text(
+                      t.translate('deselectAllFiltered'),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
                 ],
@@ -1051,7 +1062,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('\u0625\u0644\u063A\u0627\u0621'), // إلغاء
+                      child: Text(t.translate('cancel')),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1068,7 +1079,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
                         foregroundColor: Colors.white,
                       ),
                       child: Text(
-                        '\u062A\u0623\u0643\u064A\u062F (${_selectedIds.length})', // تأكيد (X)
+                        t.translateWithParams('confirmCount', {'count': '${_selectedIds.length}'}),
                       ),
                     ),
                   ),

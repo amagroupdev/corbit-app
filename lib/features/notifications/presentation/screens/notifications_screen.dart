@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/notifications/data/models/notification_model.dart';
 import 'package:orbit_app/features/notifications/data/repositories/notifications_repository.dart';
@@ -120,22 +121,22 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0625\u0634\u0639\u0627\u0631', // حذف الإشعار
-          style: TextStyle(fontWeight: FontWeight.w600),
+        title: Text(
+          AppLocalizations.of(context)!.translate('deleteNotification'),
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        content: const Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u061F', // هل أنت متأكد من حذف هذا الإشعار؟
+        content: Text(
+          AppLocalizations.of(context)!.translate('confirmDeleteNotification'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('\u0625\u0644\u063A\u0627\u0621'), // إلغاء
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'), // حذف
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -148,8 +149,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       await repository.deleteArchiveItem(notification.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0625\u0634\u0639\u0627\u0631'), // تم حذف الإشعار
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('notificationDeleted')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -168,7 +169,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A'), // الإشعارات
+        title: Text(AppLocalizations.of(context)!.translate('notifications')),
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download_outlined),
@@ -178,8 +179,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 await repo.exportArchive();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('\u062C\u0627\u0631\u064A \u062A\u0635\u062F\u064A\u0631 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A'), // جاري تصدير البيانات
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!.translate('exportingData')),
                       backgroundColor: AppColors.info,
                     ),
                   );
@@ -192,7 +193,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 }
               }
             },
-            tooltip: '\u062A\u0635\u062F\u064A\u0631', // تصدير
+            tooltip: AppLocalizations.of(context)!.translate('export'),
           ),
         ],
       ),
@@ -201,7 +202,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppSearchBar(
-              hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A...', // بحث في الإشعارات...
+              hint: AppLocalizations.of(context)!.translate('searchNotifications'),
               onChanged: _onSearchChanged,
             ),
           ),
@@ -212,9 +213,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         onPressed: () => context.pushNamed(RouteNames.sendNotification),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.send_rounded, color: Colors.white),
-        label: const Text(
-          '\u0625\u0631\u0633\u0627\u0644', // إرسال
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        label: Text(
+          AppLocalizations.of(context)!.translate('sendButton'),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -233,9 +234,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (_notifications.isEmpty) {
       return AppEmptyState(
         icon: Icons.notifications_none_rounded,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u0634\u0639\u0627\u0631\u0627\u062A', // لا توجد إشعارات
-        description: '\u0623\u0631\u0633\u0644 \u0625\u0634\u0639\u0627\u0631\u0627\u062A \u0641\u0648\u0631\u064A\u0629 \u0644\u0639\u0645\u0644\u0627\u0626\u0643', // أرسل إشعارات فورية لعملائك
-        actionText: '\u0625\u0631\u0633\u0627\u0644 \u0625\u0634\u0639\u0627\u0631', // إرسال إشعار
+        title: AppLocalizations.of(context)!.translate('noNotificationsFound'),
+        description: AppLocalizations.of(context)!.translate('sendInstantNotifications'),
+        actionText: AppLocalizations.of(context)!.translate('sendNotificationAction'),
         onAction: () => context.pushNamed(RouteNames.sendNotification),
       );
     }

@@ -1,4 +1,5 @@
 /// Model representing an attendance record in the ORBIT platform.
+import 'package:orbit_app/core/localization/app_localizations.dart';
 ///
 /// Attendance records track student presence/absence and are sent
 /// via the messages/send endpoint with message_type=attendance_records.
@@ -28,12 +29,12 @@ class AttendanceModel {
   bool get isLate => status == 'late';
   bool get isExcused => status == 'excused';
 
-  String get statusLabel {
+  String get statusKey {
     return switch (status) {
-      'present' => '\u062D\u0627\u0636\u0631', // حاضر
-      'absent' => '\u063A\u0627\u0626\u0628', // غائب
-      'late' => '\u0645\u062A\u0623\u062E\u0631', // متأخر
-      'excused' => '\u0645\u0639\u062A\u0630\u0631', // معتذر
+      'present' => 'statusPresent',
+      'absent' => 'statusAbsent',
+      'late' => 'statusLate',
+      'excused' => 'statusExcused',
       _ => status,
     };
   }

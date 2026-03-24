@@ -9,6 +9,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing uploaded files.
 ///
@@ -89,22 +90,22 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(
-          '\u062D\u0630\u0641 \u0627\u0644\u0645\u0644\u0641', // حذف الملف
+        title: Text(
+          AppLocalizations.of(context)!.translate('deleteFileTitle'),
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 "${file.name}"\u061F', // هل أنت متأكد من حذف "..."؟
+          '${AppLocalizations.of(context)!.translate("confirmDeleteFile")} "${file.name}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('\u0625\u0644\u063A\u0627\u0621'),
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -117,8 +118,8 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
       await repo.deleteFile(file.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0645\u0644\u0641'), // تم حذف الملف
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('fileDeleted')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -139,14 +140,14 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('\u062D\u0630\u0641 \u0627\u0644\u0645\u0644\u0641\u0627\u062A', style: TextStyle(fontWeight: FontWeight.w600)), // حذف الملفات
-        content: Text('\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 ${_selectedIds.length} \u0645\u0644\u0641\u0627\u062A\u061F'), // هل أنت متأكد من حذف ... ملفات؟
+        title: Text(AppLocalizations.of(context)!.translate('deleteFiles'), style: const TextStyle(fontWeight: FontWeight.w600)),
+        content: Text('${AppLocalizations.of(context)!.translate("confirmDeleteFiles")} ${_selectedIds.length} ${AppLocalizations.of(context)!.translate("filesWord")}?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('\u0625\u0644\u063A\u0627\u0621')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -160,8 +161,8 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
       if (mounted) {
         setState(() => _selectedIds.clear());
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0645\u0644\u0641\u0627\u062A'), // تم حذف الملفات
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('filesDeleted')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -182,8 +183,8 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
       final url = await repo.getDownloadUrl(file.id);
       if (mounted && url.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062C\u0627\u0631\u064A \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0644\u0641'), // جاري تحميل الملف
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('downloadingFile')),
             backgroundColor: AppColors.info,
           ),
         );
@@ -223,7 +224,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u0645\u0644\u0641\u0627\u062A'), // الملفات
+        title: Text(AppLocalizations.of(context)!.translate('files')),
         actions: [
           if (_isMultiSelect) ...[
             Text(
@@ -233,12 +234,12 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
             IconButton(
               icon: const Icon(Icons.delete_outline, color: AppColors.error),
               onPressed: _bulkDelete,
-              tooltip: '\u062D\u0630\u0641 \u0627\u0644\u0645\u062D\u062F\u062F', // حذف المحدد
+              tooltip: AppLocalizations.of(context)!.translate('deleteSelected'),
             ),
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => setState(() => _selectedIds.clear()),
-              tooltip: '\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u062A\u062D\u062F\u064A\u062F', // إلغاء التحديد
+              tooltip: AppLocalizations.of(context)!.translate('cancelSelection'),
             ),
           ],
         ],
@@ -248,7 +249,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppSearchBar(
-              hint: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0645\u0644\u0641\u0627\u062A...', // بحث في الملفات...
+              hint: AppLocalizations.of(context)!.translate('searchFiles'),
               onChanged: _onSearchChanged,
             ),
           ),
@@ -258,8 +259,8 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('\u0627\u062E\u062A\u0631 \u0645\u0644\u0641 \u0644\u0644\u0631\u0641\u0639'), // اختر ملف للرفع
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.translate('selectFileToUpload')),
               backgroundColor: AppColors.info,
             ),
           );
@@ -276,10 +277,10 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
       return AppErrorWidget(message: _errorMessage!, onRetry: () => _loadFiles(refresh: true));
     }
     if (_files.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.folder_open_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0644\u0641\u0627\u062A', // لا توجد ملفات
-        description: '\u0627\u0631\u0641\u0639 \u0645\u0644\u0641\u0627\u062A \u062C\u062F\u064A\u062F\u0629 \u0628\u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u0632\u0631 \u0627\u0644\u0631\u0641\u0639', // ارفع ملفات جديدة باستخدام زر الرفع
+        title: AppLocalizations.of(context)!.translate('noFiles'),
+        description: AppLocalizations.of(context)!.translate('noFilesDesc'),
       );
     }
 
@@ -355,23 +356,23 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
                           if (value == 'delete') _deleteFile(file);
                         },
                         itemBuilder: (_) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'download',
                             child: Row(
                               children: [
-                                Icon(Icons.download_outlined, size: 20, color: AppColors.textSecondary),
-                                SizedBox(width: 8),
-                                Text('\u062A\u062D\u0645\u064A\u0644'), // تحميل
+                                const Icon(Icons.download_outlined, size: 20, color: AppColors.textSecondary),
+                                const SizedBox(width: 8),
+                                Text(AppLocalizations.of(context)!.translate('download')),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete_outline, size: 20, color: AppColors.error),
-                                SizedBox(width: 8),
-                                Text('\u062D\u0630\u0641', style: TextStyle(color: AppColors.error)),
+                                const Icon(Icons.delete_outline, size: 20, color: AppColors.error),
+                                const SizedBox(width: 8),
+                                Text(AppLocalizations.of(context)!.translate('delete'), style: const TextStyle(color: AppColors.error)),
                               ],
                             ),
                           ),

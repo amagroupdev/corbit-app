@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
@@ -76,6 +77,7 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final t = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.only(
@@ -110,8 +112,8 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
             // Title
             Text(
               _isEditing
-                  ? '\u062A\u0639\u062F\u064A\u0644 \u0631\u0642\u0645'
-                  : '\u0625\u0636\u0627\u0641\u0629 \u0631\u0642\u0645 \u062C\u062F\u064A\u062F',
+                  ? t.translate('editNumber')
+                  : t.translate('addNewNumber'),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -122,8 +124,8 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
 
             // Name field
             AppTextField(
-              label: '\u0627\u0644\u0627\u0633\u0645',
-              hint: '\u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u062C\u0647\u0629 \u0627\u0644\u0627\u062A\u0635\u0627\u0644',
+              label: t.translate('contactNameLabel'),
+              hint: t.translate('enterContactName'),
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.next,
@@ -132,14 +134,14 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
 
             // Phone number field
             AppTextField(
-              label: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641',
+              label: t.translate('phoneNumber'),
               hint: '05xxxxxxxx',
               controller: _numberController,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.next,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628';
+                  return t.translate('phoneNumberRequired');
                 }
                 return null;
               },
@@ -148,8 +150,8 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
 
             // Identifier field (optional)
             AppTextField(
-              label: '\u0627\u0644\u0645\u0639\u0631\u0641 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)',
-              hint: '\u0631\u0642\u0645 \u0627\u0644\u0647\u0648\u064A\u0629 \u0623\u0648 \u0631\u0642\u0645 \u0627\u0644\u0645\u0648\u0638\u0641',
+              label: t.translate('identifierOptional'),
+              hint: t.translate('identifierHint'),
               controller: _identifierController,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (_) => _handleSave(),
@@ -159,8 +161,8 @@ class _AddNumberSheetState extends State<AddNumberSheet> {
             // Save button
             AppButton.primary(
               text: _isEditing
-                  ? '\u062A\u062D\u062F\u064A\u062B'
-                  : '\u0625\u0636\u0627\u0641\u0629',
+                  ? t.translate('update')
+                  : t.translate('add'),
               onPressed: widget.isLoading ? null : _handleSave,
               isLoading: widget.isLoading,
               icon: _isEditing ? Icons.check : Icons.add,

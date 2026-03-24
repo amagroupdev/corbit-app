@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
@@ -279,7 +280,7 @@ class _LanguageToggle extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                isArabic ? 'En' : '\u0639\u0631', // عر
+                isArabic ? 'En' : (AppLocalizations.of(context)?.translate('langToggleAr') ?? 'Ar'),
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

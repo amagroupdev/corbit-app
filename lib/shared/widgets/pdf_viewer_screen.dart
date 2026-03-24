@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A screen that displays a bundled PDF asset.
 ///
@@ -102,7 +103,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
               if (mounted) {
                 setState(() {
                   _isLoading = false;
-                  _error = '\u062A\u0639\u0630\u0631 \u0639\u0631\u0636 \u0627\u0644\u0645\u0644\u0641'; // تعذر عرض الملف
+                  _error = AppLocalizations.instance.translate('fileDisplayError');
                 });
               }
             },
@@ -120,7 +121,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _error = '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0644\u0641'; // تعذر تحميل الملف
+          _error = AppLocalizations.instance.translate('fileLoadError');
         });
       }
     }
@@ -148,15 +149,15 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
             onPressed: () => context.pop(),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(color: AppColors.primary),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(color: AppColors.primary),
+              const SizedBox(height: 16),
               Text(
-                '\u062C\u0627\u0631\u064A \u0641\u062A\u062D \u0627\u0644\u0645\u0644\u0641...', // جاري فتح الملف...
-                style: TextStyle(
+                AppLocalizations.instance.translate('openingFile'),
+                style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.textSecondary,
                 ),
@@ -187,7 +188,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
             IconButton(
               icon: const Icon(Icons.open_in_new_rounded),
               onPressed: _openExternally,
-              tooltip: '\u0641\u062A\u062D \u062E\u0627\u0631\u062C\u064A\u0627\u064B', // فتح خارجياً
+              tooltip: AppLocalizations.instance.translate('openExternally'),
             ),
         ],
       ),
@@ -221,8 +222,8 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
               ElevatedButton.icon(
                 onPressed: _openExternally,
                 icon: const Icon(Icons.open_in_new_rounded),
-                label: const Text(
-                  '\u0641\u062A\u062D \u0628\u062A\u0637\u0628\u064A\u0642 \u062E\u0627\u0631\u062C\u064A', // فتح بتطبيق خارجي
+                label: Text(
+                  AppLocalizations.instance.translate('openWithExternalApp'),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

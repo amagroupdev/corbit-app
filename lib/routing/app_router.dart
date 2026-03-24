@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:orbit_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:orbit_app/features/auth/presentation/screens/verify_otp_screen.dart';
@@ -234,17 +235,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return PaymentWebViewScreen(
             url: extra['url'] as String? ?? '',
-            title: extra['title'] as String? ?? '\u0627\u0644\u062F\u0641\u0639',
+            title: extra['title'] as String?,
           );
         },
       ),
       GoRoute(
         name: RouteNames.termsPdf,
         path: '/terms-pdf',
-        builder: (context, state) => const PdfViewerScreen(
-          assetPath: 'assets/pdf/terms_of_use_corbit.pdf',
-          title: '\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645', // سياسة الاستخدام
-        ),
+        builder: (context, state) {
+          final t = AppLocalizations.of(context);
+          return PdfViewerScreen(
+            assetPath: 'assets/pdf/terms_of_use_corbit.pdf',
+            title: t?.translate('termsOfUse') ?? 'Terms of Use',
+          );
+        },
       ),
       GoRoute(
         name: RouteNames.archive,

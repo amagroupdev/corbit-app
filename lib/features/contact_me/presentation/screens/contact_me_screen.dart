@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing the Contact Me feature.
 ///
@@ -106,8 +107,8 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
           _isSavingSettings = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A'), // تم حفظ الإعدادات
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('settingsSaved')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -159,19 +160,19 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
     final title = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('\u0625\u0636\u0627\u0641\u0629 \u0633\u0628\u0628', style: TextStyle(fontWeight: FontWeight.w600)), // إضافة سبب
+        title: Text(AppLocalizations.of(context)!.translate('addReason'), style: const TextStyle(fontWeight: FontWeight.w600)),
         content: AppTextField(
-          hint: '\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0633\u0628\u0628', // عنوان السبب
+          hint: AppLocalizations.of(context)!.translate('reasonTitleLabel'),
           controller: controller,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('\u0625\u0644\u063A\u0627\u0621'), // إلغاء
+            child: Text(AppLocalizations.of(context)!.translate('cancel')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('\u0625\u0636\u0627\u0641\u0629'), // إضافة
+            child: Text(AppLocalizations.of(context)!.translate('add')),
           ),
         ],
       ),
@@ -198,14 +199,14 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('\u062D\u0630\u0641 \u0627\u0644\u0633\u0628\u0628', style: TextStyle(fontWeight: FontWeight.w600)), // حذف السبب
-        content: Text('\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 "${reason.title}"\u061F'), // هل أنت متأكد من حذف "..."؟
+        title: Text(AppLocalizations.of(context)!.translate('deleteReasonTitle'), style: const TextStyle(fontWeight: FontWeight.w600)),
+        content: Text('${AppLocalizations.of(context)!.translate("confirmDeleteReason")} "${reason.title}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('\u0625\u0644\u063A\u0627\u0621')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocalizations.of(context)!.translate('cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('\u062D\u0630\u0641'),
+            child: Text(AppLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),
@@ -262,16 +263,16 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u064A'), // تواصل معي
+        title: Text(AppLocalizations.of(context)!.translate('contactMe')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A'), // الإعدادات
-            Tab(text: '\u0627\u0644\u0623\u0633\u0628\u0627\u0628'), // الأسباب
-            Tab(text: '\u0627\u0644\u0631\u0633\u0627\u0626\u0644'), // الرسائل
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('settingsTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('reasonsTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('messagesTab')),
           ],
         ),
       ),
@@ -307,8 +308,8 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '\u062A\u0641\u0639\u064A\u0644 \u062E\u062F\u0645\u0629 \u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u064A', // تفعيل خدمة تواصل معي
+                Text(
+                  AppLocalizations.of(context)!.translate('enableContactMe'),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                 ),
                 Switch(
@@ -328,13 +329,13 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
           ),
           const SizedBox(height: 20),
           AppTextField(
-            label: '\u0631\u0627\u0628\u0637 \u0627\u0644\u0635\u0641\u062D\u0629', // رابط الصفحة
+            label: AppLocalizations.of(context)!.translate('pageUrl'),
             hint: 'my-company',
             controller: _rootUrlController,
           ),
           const SizedBox(height: 24),
           AppButton.primary(
-            text: '\u062D\u0641\u0638 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A', // حفظ الإعدادات
+            text: AppLocalizations.of(context)!.translate('saveSettings'),
             onPressed: _saveSettings,
             isLoading: _isSavingSettings,
             icon: Icons.save_rounded,
@@ -356,8 +357,8 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
           child: _reasons.isEmpty
               ? AppEmptyState(
                   icon: Icons.list_alt_outlined,
-                  title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0633\u0628\u0627\u0628', // لا توجد أسباب
-                  actionText: '\u0625\u0636\u0627\u0641\u0629 \u0633\u0628\u0628', // إضافة سبب
+                  title: AppLocalizations.of(context)!.translate('noReasons'),
+                  actionText: AppLocalizations.of(context)!.translate('addReason'),
                   onAction: _addReason,
                 )
               : RefreshIndicator(
@@ -398,7 +399,7 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
         Padding(
           padding: const EdgeInsets.all(16),
           child: AppButton.primary(
-            text: '\u0625\u0636\u0627\u0641\u0629 \u0633\u0628\u0628', // إضافة سبب
+            text: AppLocalizations.of(context)!.translate('addReason'),
             onPressed: _addReason,
             icon: Icons.add_rounded,
           ),
@@ -413,10 +414,10 @@ class _ContactMeScreenState extends ConsumerState<ContactMeScreen>
       return AppErrorWidget(message: _messagesError!, onRetry: _loadMessages);
     }
     if (_messages.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.message_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0633\u0627\u0626\u0644', // لا توجد رسائل
-        description: '\u0633\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u0648\u0627\u0631\u062F\u0629', // ستظهر هنا الرسائل الواردة
+        title: AppLocalizations.of(context)!.translate('noContactMessages'),
+        description: AppLocalizations.of(context)!.translate('incomingMessagesDesc'),
       );
     }
 

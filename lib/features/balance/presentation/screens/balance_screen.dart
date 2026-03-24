@@ -13,6 +13,7 @@ import 'package:orbit_app/features/balance/presentation/widgets/bank_info_tab.da
 import 'package:orbit_app/features/balance/presentation/widgets/packages_tab.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/transfer_balance_tab.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/upgrade_journey_tab.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/routing/route_names.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
@@ -115,9 +116,9 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
-          '\u0627\u0644\u0631\u0635\u064A\u062F',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          AppLocalizations.of(context)!.translate('balance'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: AppColors.surface,
@@ -162,12 +163,12 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
                             labelPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                             ),
-                            tabs: const [
-                              Tab(text: '\u0633\u062C\u0644 \u0627\u0644\u0631\u0635\u064A\u062F'),
-                              Tab(text: '\u0627\u0644\u0628\u0627\u0642\u0627\u062A'),
-                              Tab(text: '\u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0627\u0644\u0628\u0646\u0643'),
-                              Tab(text: '\u062A\u062D\u0648\u064A\u0644 \u0627\u0644\u0631\u0635\u064A\u062F'),
-                              Tab(text: '\u0631\u062D\u0644\u0629 \u0627\u0644\u062A\u0631\u0642\u064A\u0629'),
+                            tabs: [
+                              Tab(text: AppLocalizations.of(context)!.translate('balanceLog')),
+                              Tab(text: AppLocalizations.of(context)!.translate('packages')),
+                              Tab(text: AppLocalizations.of(context)!.translate('bankInfo')),
+                              Tab(text: AppLocalizations.of(context)!.translate('transferBalance')),
+                              Tab(text: AppLocalizations.of(context)!.translate('upgradeJourney')),
                             ],
                           ),
                         ),
@@ -191,6 +192,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
   /// Builds the always-visible top section with action buttons,
   /// balance summary cards, and expiry countdown.
   Widget _buildTopSection(BalanceModel balance) {
+    final t = AppLocalizations.of(context)!;
     final numberFormat = NumberFormat('#,##0', 'ar');
 
     return Container(
@@ -204,7 +206,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
             children: [
               Expanded(
                 child: AppButton.primary(
-                  text: '\u0625\u0636\u0627\u0641\u0629 \u0631\u0635\u064A\u062F',
+                  text: t.translate('addBalance'),
                   onPressed: () =>
                       context.pushNamed(RouteNames.buyBalance),
                   icon: Icons.add_circle_outline,
@@ -213,7 +215,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: AppButton.secondary(
-                  text: '\u0637\u0644\u0628 \u0625\u062B\u0628\u0627\u062A \u062A\u0639\u0627\u0642\u062F',
+                  text: t.translate('requestContractProof'),
                   onPressed: () =>
                       context.pushNamed(RouteNames.contracts),
                   icon: Icons.description_outlined,
@@ -228,7 +230,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
             children: [
               Expanded(
                 child: _BalanceMiniCard(
-                  title: '\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A',
+                  title: t.translate('balanceTotal'),
                   value: numberFormat.format(balance.totalPurchased.toInt()),
                   icon: Icons.account_balance_wallet_outlined,
                   gradient: AppColors.balanceGradient('blue'),
@@ -237,7 +239,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: _BalanceMiniCard(
-                  title: '\u0627\u0644\u0645\u062A\u0628\u0642\u064A',
+                  title: t.translate('balanceRemaining'),
                   value: numberFormat.format(balance.balance.toInt()),
                   icon: Icons.savings_outlined,
                   gradient: AppColors.balanceGradient('green'),
@@ -250,7 +252,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
             children: [
               Expanded(
                 child: _BalanceMiniCard(
-                  title: '\u0627\u0644\u0645\u0633\u062A\u0647\u0644\u0643',
+                  title: t.translate('balanceConsumed'),
                   value: numberFormat.format(balance.totalSent),
                   icon: Icons.trending_up_outlined,
                   gradient: AppColors.balanceGradient('orange'),
@@ -259,7 +261,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: _BalanceMiniCard(
-                  title: '\u062A\u0645 \u062A\u062D\u0648\u064A\u0644\u0647',
+                  title: t.translate('balanceTransferred'),
                   value: numberFormat.format(balance.totalTransferred),
                   icon: Icons.swap_horiz_outlined,
                   gradient: AppColors.balanceGradient('purple'),
@@ -290,9 +292,9 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
                     color: AppColors.warningDark,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    '\u0633\u064A\u0646\u062A\u0647\u064A \u0627\u0644\u0631\u0635\u064A\u062F \u062E\u0644\u0627\u0644',
-                    style: TextStyle(
+                  Text(
+                    t.translate('balanceExpiresIn'),
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: AppColors.warningDark,
@@ -301,7 +303,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '$_countdownDays \u064A\u0648\u0645 : $_countdownHours \u0633\u0627\u0639\u0629 : $_countdownMinutes \u062F\u0642\u064A\u0642\u0629 : $_countdownSeconds \u062B\u0627\u0646\u064A\u0629',
+                      '$_countdownDays ${t.translate('day')} : $_countdownHours ${t.translate('hour')} : $_countdownMinutes ${t.translate('minute')} : $_countdownSeconds ${t.translate('second')}',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -343,7 +345,7 @@ class _BalanceScreenState extends ConsumerState<BalanceScreen>
             TextButton.icon(
               onPressed: _onRefresh,
               icon: const Icon(Icons.refresh),
-              label: const Text('\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629'),
+              label: Text(AppLocalizations.of(context)!.translate('retry')),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],

@@ -57,16 +57,16 @@ class SenderRequestModel {
     };
   }
 
-  /// Returns the display-friendly status label in Arabic.
-  String get statusLabel {
+  /// Returns the translation key for the sender request status label.
+  String get statusLabelKey {
     return switch (status?.toLowerCase()) {
-      'pending' => 'قيد المراجعة',
-      'approved' => 'مقبول',
-      'rejected' => 'مرفوض',
-      'active' => 'نشط',
-      'inactive' => 'غير نشط',
-      'payment_pending' => 'بانتظار الدفع',
-      _ => status ?? 'غير محدد',
+      'pending' => 'sender_status_pending',
+      'approved' => 'sender_status_approved',
+      'rejected' => 'sender_status_rejected',
+      'active' => 'sender_status_active',
+      'inactive' => 'sender_status_inactive',
+      'payment_pending' => 'sender_status_payment_pending',
+      _ => 'sender_status_unknown',
     };
   }
 

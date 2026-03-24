@@ -6,6 +6,7 @@ import 'package:orbit_app/features/statements/data/models/statement_response_mod
 import 'package:orbit_app/features/statements/presentation/controllers/statements_controller.dart';
 import 'package:orbit_app/features/statements/presentation/widgets/statement_card.dart';
 import 'package:orbit_app/features/statements/presentation/widgets/statements_filter.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
@@ -109,10 +110,10 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
   // ─── Actions ───────────────────────────────────────────────────────
 
   Future<void> _deleteItem(StatementResponseItem item) async {
+    final t = AppLocalizations.of(context)!;
     final confirmed = await _showConfirmDialog(
-      title: '\u062D\u0630\u0641 \u0627\u0644\u0631\u062F', // حذف الرد
-      message:
-          '\u0647\u0644 \u0623\u0646\u062A \u0645\u062A\u0623\u0643\u062F \u0645\u0646 \u062D\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u0631\u062F\u061F', // هل أنت متأكد من حذف هذا الرد؟
+      title: t.translate('statement_delete_title'),
+      message: t.translate('statement_confirm_delete'),
     );
     if (confirmed != true) return;
 
@@ -122,7 +123,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         );
 
     if (success && mounted) {
-      _showSnackBar('\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0631\u062F \u0628\u0646\u062C\u0627\u062D'); // تم حذف الرد بنجاح
+      _showSnackBar(t.translate('statement_deleted'));
     }
   }
 
@@ -135,18 +136,20 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         );
 
     if (mounted) {
-      _showSnackBar('\u062A\u0645 \u0637\u0644\u0628 \u062A\u0635\u062F\u064A\u0631 \u0627\u0644\u0631\u062F\u0648\u062F \u0628\u0646\u062C\u0627\u062D'); // تم طلب تصدير الردود بنجاح
+      _showSnackBar(AppLocalizations.of(context)!.translate('statement_export_requested'));
     }
   }
 
   void _viewMessage(StatementResponseItem item) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) {
+        final t = AppLocalizations.of(context)!;
+        return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          '\u0627\u0644\u0631\u0633\u0627\u0644\u0629', // الرسالة
-          style: TextStyle(
+        title: Text(
+          t.translate('message'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -158,9 +161,9 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Response text
-              const Text(
-                '\u0646\u0635 \u0627\u0644\u0631\u062F:', // نص الرد:
-                style: TextStyle(
+              Text(
+                t.translate('statement_response_text'),
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -177,9 +180,9 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
               ),
               if (item.messageBody != null && item.messageBody!.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text(
-                  '\u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0623\u0635\u0644\u064A\u0629:', // الرسالة الأصلية:
-                  style: TextStyle(
+                Text(
+                  t.translate('statement_original_message'),
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
@@ -201,13 +204,14 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              '\u0625\u063A\u0644\u0627\u0642', // إغلاق
-              style: TextStyle(color: AppColors.primary),
+            child: Text(
+              t.translate('close'),
+              style: const TextStyle(color: AppColors.primary),
             ),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
@@ -237,16 +241,16 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              '\u0625\u0644\u063A\u0627\u0621', // إلغاء
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              AppLocalizations.of(context)!.translate('cancel'),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              '\u062A\u0623\u0643\u064A\u062F', // تأكيد
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.translate('confirm'),
+              style: const TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.w600,
               ),
@@ -319,9 +323,9 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
       backgroundColor: AppColors.surface,
       foregroundColor: AppColors.textPrimary,
       elevation: 0.5,
-      title: const Text(
-        '\u0627\u0644\u0625\u0641\u0627\u062F\u0627\u062A \u0648\u0627\u0644\u0631\u062F\u0648\u062F', // الإفادات والردود
-        style: TextStyle(
+      title: Text(
+        AppLocalizations.of(context)!.translate('statements'),
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
@@ -335,7 +339,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
             color: AppColors.textSecondary,
           ),
           onPressed: _toggleSearch,
-          tooltip: '\u0628\u062D\u062B', // بحث
+          tooltip: AppLocalizations.of(context)!.translate('search'),
         ),
 
         // Filter button with badge
@@ -348,7 +352,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
                 color: AppColors.textSecondary,
               ),
               onPressed: () => StatementsFilterSheet.show(context),
-              tooltip: '\u062A\u0635\u0641\u064A\u0629', // تصفية
+              tooltip: AppLocalizations.of(context)!.translate('filter'),
             ),
             if (filter.activeFilterCount > 0)
               Positioned(
@@ -393,7 +397,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
                   color: AppColors.textSecondary,
                 ),
           onPressed: actionState.isExporting ? null : _exportStatements,
-          tooltip: '\u062A\u0635\u062F\u064A\u0631 \u0627\u0644\u0631\u062F\u0648\u062F', // تصدير الردود
+          tooltip: AppLocalizations.of(context)!.translate('exportResponses'),
         ),
       ],
     );
@@ -406,9 +410,9 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
       color: AppColors.surface,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      child: const Text(
-        '\u0627\u0633\u062A\u0639\u0631\u0636 \u0631\u0633\u0627\u0626\u0644 \u0631\u062F\u0648\u062F \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646 \u0639\u0644\u0649 \u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u0645\u0631\u0633\u0644\u0629.', // استعرض رسائل ردود المستخدمين على الرسائل المرسلة.
-        style: TextStyle(
+      child: Text(
+        AppLocalizations.of(context)!.translate('statementsDescription'),
+        style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w400,
           color: AppColors.textSecondary,
@@ -441,7 +445,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         dividerColor: AppColors.divider,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         tabs: StatementType.values.map((type) {
-          return Tab(text: type.labelAr);
+          return Tab(text: AppLocalizations.of(context)!.translate(type.labelKey));
         }).toList(),
       ),
     );
@@ -457,7 +461,7 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
         controller: _searchController,
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
-          hintText: '\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0625\u0641\u0627\u062F\u0627\u062A \u0648\u0627\u0644\u0631\u062F\u0648\u062F...', // بحث في الإفادات والردود...
+          hintText: AppLocalizations.of(context)!.translate('statement_search_hint'),
           hintStyle: const TextStyle(
             color: AppColors.inputHint,
             fontSize: 14,
@@ -506,12 +510,11 @@ class _StatementsScreenState extends ConsumerState<StatementsScreen>
 
     // Empty state
     if (state.isEmpty && filteredItems.isEmpty) {
-      final tab = ref.read(statementsSelectedTabProvider);
+      final t = AppLocalizations.of(context)!;
       return AppEmptyState(
         icon: Icons.question_answer_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u062F\u0648\u062F', // لا توجد ردود
-        description:
-            '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u062F\u0648\u062F \u0641\u064A ${tab.labelAr}', // لا توجد ردود في X
+        title: t.translate('statement_no_responses'),
+        description: t.translate('statement_no_responses_in'),
       );
     }
 

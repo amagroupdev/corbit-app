@@ -10,6 +10,7 @@ import 'package:orbit_app/shared/widgets/app_empty_state.dart';
 import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for importing and sending messages via the Noor educational system.
 ///
@@ -67,8 +68,8 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
     if (_usernameController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u062F\u062E\u0648\u0644'), // يرجى إدخال بيانات الدخول
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('enterLoginCredentials')),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -127,8 +128,8 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
     if (!_formKey.currentState!.validate()) return;
     if (_selectedGroupIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('\u064A\u0631\u062C\u0649 \u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u062C\u0645\u0648\u0639\u0629 \u0648\u0627\u062D\u062F\u0629 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644'), // يرجى اختيار مجموعة واحدة على الأقل
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('selectAtLeastOneGroup')),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -147,8 +148,8 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0626\u0644 \u0646\u0648\u0631 \u0628\u0646\u062C\u0627\u062D'), // تم إرسال رسائل نور بنجاح
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('noorMessagesSent')),
             backgroundColor: AppColors.success,
           ),
         );
@@ -196,15 +197,15 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u0631\u0633\u0627\u0626\u0644 \u0646\u0648\u0631'), // رسائل نور
+        title: Text(AppLocalizations.of(context)!.translate('noorMessages')),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: '\u0625\u0631\u0633\u0627\u0644'), // إرسال
-            Tab(text: '\u0627\u0644\u0623\u0631\u0634\u064A\u0641'), // الأرشيف
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.translate('sendTab')),
+            Tab(text: AppLocalizations.of(context)!.translate('archiveTab')),
           ],
         ),
       ),
@@ -246,33 +247,33 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
                     child: const Icon(Icons.school_rounded, size: 32, color: Colors.white),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0644\u0646\u0638\u0627\u0645 \u0646\u0648\u0631', // تسجيل الدخول لنظام نور
+                  Text(
+                    AppLocalizations.of(context)!.translate('noorLoginTitle'),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '\u0633\u062C\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0637\u0644\u0627\u0628', // سجل الدخول لاستيراد بيانات الطلاب
+                  Text(
+                    AppLocalizations.of(context)!.translate('noorLoginDesc'),
                     style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 20),
                   AppTextField(
-                    label: '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645', // اسم المستخدم
-                    hint: '\u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0641\u064A \u0646\u0648\u0631', // أدخل اسم المستخدم في نور
+                    label: AppLocalizations.of(context)!.translate('username'),
+                    hint: AppLocalizations.of(context)!.translate('enterNoorUsername'),
                     controller: _usernameController,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   AppTextField(
-                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', // كلمة المرور
-                    hint: '\u0623\u062F\u062E\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', // أدخل كلمة المرور
+                    label: AppLocalizations.of(context)!.translate('password'),
+                    hint: AppLocalizations.of(context)!.translate('enterPassword'),
                     controller: _passwordController,
                     obscureText: true,
                     textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 20),
                   AppButton.primary(
-                    text: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644', // تسجيل الدخول
+                    text: AppLocalizations.of(context)!.translate('login'),
                     onPressed: _noorLogin,
                     isLoading: _isLoggingIn,
                     icon: Icons.login_rounded,
@@ -302,12 +303,12 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.successBorder),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.check_circle, color: AppColors.success, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    '\u062A\u0645 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0646\u0638\u0627\u0645 \u0646\u0648\u0631', // تم الاتصال بنظام نور
+                    AppLocalizations.of(context)!.translate('noorConnected'),
                     style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w600),
                   ),
                 ],
@@ -316,8 +317,8 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
             const SizedBox(height: 20),
 
             // Student groups selection
-            const Text(
-              '\u0627\u062E\u062A\u0631 \u0645\u062C\u0645\u0648\u0639\u0627\u062A \u0627\u0644\u0637\u0644\u0627\u0628', // اختر مجموعات الطلاب
+            Text(
+              AppLocalizations.of(context)!.translate('selectStudentGroups'),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 12),
@@ -329,9 +330,9 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
                   color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u062C\u0645\u0648\u0639\u0627\u062A \u0645\u062A\u0627\u062D\u0629', // لا توجد مجموعات متاحة
+                    AppLocalizations.of(context)!.translate('noAvailableGroups'),
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
                 ),
@@ -388,7 +389,7 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
                                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                                   ),
                                   Text(
-                                    '${group.studentCount} \u0637\u0627\u0644\u0628', // طالب
+                                    '${group.studentCount} ${AppLocalizations.of(context)!.translate("studentUnit")}',
                                     style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                                   ),
                                 ],
@@ -417,18 +418,18 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
             const SizedBox(height: 16),
 
             AppTextField(
-              label: '\u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629', // نص الرسالة
-              hint: '\u0623\u062F\u062E\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0631\u0627\u062F \u0625\u0631\u0633\u0627\u0644\u0647\u0627', // أدخل نص الرسالة المراد إرسالها
+              label: AppLocalizations.of(context)!.translate('messageBody'),
+              hint: AppLocalizations.of(context)!.translate('enterMessageToSend'),
               controller: _messageController,
               maxLines: 4,
               validator: (v) => v == null || v.trim().isEmpty
-                  ? '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0646\u0635 \u0627\u0644\u0631\u0633\u0627\u0644\u0629' // يرجى إدخال نص الرسالة
+                  ? AppLocalizations.of(context)!.translate('enterMessageBodyValidation')
                   : null,
             ),
             const SizedBox(height: 24),
 
             AppButton.primary(
-              text: '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0631\u0633\u0627\u0626\u0644', // إرسال الرسائل
+              text: AppLocalizations.of(context)!.translate('sendMessagesBtn'),
               onPressed: _selectedGroupIds.isNotEmpty ? _send : null,
               isLoading: _isSending,
               icon: Icons.send_rounded,
@@ -445,9 +446,9 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
       return AppErrorWidget(message: _archiveError!, onRetry: _loadArchive);
     }
     if (_archive.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.school_outlined,
-        title: '\u0644\u0627 \u062A\u0648\u062C\u062F \u0631\u0633\u0627\u0626\u0644 \u0646\u0648\u0631', // لا توجد رسائل نور
+        title: AppLocalizations.of(context)!.translate('noNoorMessages'),
       );
     }
 
@@ -508,8 +509,8 @@ class _NoorImportScreenState extends ConsumerState<NoorImportScreen>
                   ),
                   child: Text(
                     record.isSent
-                        ? '\u0645\u0631\u0633\u0644' // مرسل
-                        : '\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631', // قيد الانتظار
+                        ? AppLocalizations.of(context)!.translate('sent')
+                        : AppLocalizations.of(context)!.translate('pending'),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
