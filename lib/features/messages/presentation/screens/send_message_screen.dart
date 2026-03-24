@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/features/groups/data/datasources/groups_remote_datasource.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
@@ -739,8 +740,8 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
 
 // ─── Groups List Widget ───────────────────────────────────────────────────────
 
-/// Shows a list of groups, each expandable to show its numbers.
-/// User can select whole groups or pick individual numbers.
+/// Shows a list of groups. Tapping a group opens a popup dialog
+/// where the user can select specific numbers (supports 5000+ with pagination).
 class _GroupsList extends ConsumerStatefulWidget {
   const _GroupsList({
     required this.groups,
@@ -763,26 +764,26 @@ class _GroupsList extends ConsumerStatefulWidget {
 }
 
 class _GroupsListState extends ConsumerState<_GroupsList> {
-  /// Tracks which groups are currently expanded.
-  final Set<int> _expandedGroups = {};
+  void _openGroupNumbersPicker(GroupModel group) async {
+    final selected = await showDialog<List<String>>(
+      context: context,
+      builder: (context) => _GroupNumbersPickerDialog(
+        groupId: group.id,
+        groupName: group.name,
+        numbersCount: group.numbersCount,
+        initialSelected: Set<String>.from(widget.selectedNumbers),
+      ),
+    );
 
-  void _toggleExpand(int groupId) {
-    setState(() {
-      if (_expandedGroups.contains(groupId)) {
-        _expandedGroups.remove(groupId);
-      } else {
-        _expandedGroups.add(groupId);
+    if (selected == null) return;
+
+    // Remove old numbers from this group that might have been deselected
+    // Then add all newly selected ones
+    for (final num in selected) {
+      if (!widget.selectedNumbers.contains(num)) {
+        widget.onAddNumber(num);
       }
-    });
-  }
-
-  /// Normalize a number from API format (+966XXXXXXXXX) to local (5XXXXXXXX).
-  String _toLocal(String number) {
-    var n = number.trim();
-    if (n.startsWith('+966')) n = n.substring(4);
-    if (n.startsWith('966')) n = n.substring(3);
-    if (n.startsWith('0')) n = n.substring(1);
-    return n;
+    }
   }
 
   @override
@@ -799,8 +800,6 @@ class _GroupsListState extends ConsumerState<_GroupsList> {
           for (var i = 0; i < widget.groups.length; i++) ...[
             if (i > 0) const Divider(height: 1),
             _buildGroupTile(widget.groups[i]),
-            if (_expandedGroups.contains(widget.groups[i].id))
-              _buildGroupNumbers(widget.groups[i].id),
           ],
         ],
       ),
@@ -809,10 +808,9 @@ class _GroupsListState extends ConsumerState<_GroupsList> {
 
   Widget _buildGroupTile(GroupModel group) {
     final isSelected = widget.selectedGroupIds.contains(group.id);
-    final isExpanded = _expandedGroups.contains(group.id);
 
     return InkWell(
-      onTap: () => widget.onToggleGroup(group.id),
+      onTap: () => _openGroupNumbersPicker(group),
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -859,127 +857,408 @@ class _GroupsListState extends ConsumerState<_GroupsList> {
                 ],
               ),
             ),
-            // Expand button to show individual numbers.
+            // Arrow to open picker
             if (group.numbersCount > 0)
-              IconButton(
-                icon: Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: AppColors.textSecondary,
-                  size: 22,
-                ),
-                onPressed: () => _toggleExpand(group.id),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                tooltip: isExpanded
-                    ? '\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0623\u0631\u0642\u0627\u0645'
-                    : '\u0639\u0631\u0636 \u0627\u0644\u0623\u0631\u0642\u0627\u0645',
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.textHint,
+                size: 16,
               ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildGroupNumbers(int groupId) {
-    final numbersAsync = ref.watch(groupNumbersProvider(groupId));
+// ─── Group Numbers Picker Dialog ─────────────────────────────────────────────
 
-    return Container(
-      color: AppColors.surfaceVariant,
-      padding: const EdgeInsets.only(right: 36, left: 12, bottom: 8, top: 4),
-      child: numbersAsync.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(12),
-          child: Center(
-            child: SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-        ),
-        error: (e, _) => Padding(
-          padding: const EdgeInsets.all(8),
-          child: Text(
-            '\u0641\u0634\u0644 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0623\u0631\u0642\u0627\u0645',
-            style: TextStyle(fontSize: 12, color: AppColors.error),
-          ),
-        ),
-        data: (numbers) {
-          if (numbers.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                '\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0631\u0642\u0627\u0645',
-                style: TextStyle(fontSize: 12, color: AppColors.textHint),
-              ),
-            );
-          }
+/// Full-screen-like dialog that loads ALL numbers from a group with pagination.
+/// Supports 5000+ numbers with lazy loading.
+class _GroupNumbersPickerDialog extends ConsumerStatefulWidget {
+  const _GroupNumbersPickerDialog({
+    required this.groupId,
+    required this.groupName,
+    required this.numbersCount,
+    required this.initialSelected,
+  });
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: numbers.map((numberModel) {
-              final localNumber = _toLocal(numberModel.number);
-              final isSelected = widget.selectedNumbers.contains(localNumber);
+  final int groupId;
+  final String groupName;
+  final int numbersCount;
+  final Set<String> initialSelected;
 
-              return InkWell(
-                onTap: () {
-                  if (isSelected) {
-                    widget.onRemoveNumber(localNumber);
-                  } else {
-                    widget.onAddNumber(localNumber);
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          value: isSelected,
-                          onChanged: (_) {
-                            if (isSelected) {
-                              widget.onRemoveNumber(localNumber);
-                            } else {
-                              widget.onAddNumber(localNumber);
-                            }
-                          },
-                          activeColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      if (numberModel.name.isNotEmpty) ...[
+  @override
+  ConsumerState<_GroupNumbersPickerDialog> createState() =>
+      _GroupNumbersPickerDialogState();
+}
+
+class _GroupNumbersPickerDialogState extends ConsumerState<_GroupNumbersPickerDialog> {
+  final ScrollController _scrollController = ScrollController();
+  final List<NumberModel> _numbers = [];
+  final Set<String> _selectedNumbers = {};
+  bool _isLoading = true;
+  bool _isLoadingMore = false;
+  int _currentPage = 1;
+  bool _hasMore = true;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedNumbers.addAll(widget.initialSelected);
+    _scrollController.addListener(_onScroll);
+    _loadNumbers();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      _loadMoreNumbers();
+    }
+  }
+
+  String _toLocal(String number) {
+    var n = number.trim();
+    if (n.startsWith('+966')) n = n.substring(4);
+    if (n.startsWith('966')) n = n.substring(3);
+    if (n.startsWith('0')) n = n.substring(1);
+    return n;
+  }
+
+  Future<void> _loadNumbers() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final datasource = ref.read(groupsRemoteDatasourceProvider);
+      final result = await datasource.listNumbers(
+        groupId: widget.groupId,
+        page: 1,
+        perPage: 100,
+      );
+
+      if (mounted) {
+        setState(() {
+          _numbers.clear();
+          _numbers.addAll(result.data);
+          _currentPage = result.currentPage;
+          _hasMore = result.currentPage < result.lastPage;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadMoreNumbers() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final datasource = ref.read(groupsRemoteDatasourceProvider);
+      final result = await datasource.listNumbers(
+        groupId: widget.groupId,
+        page: _currentPage + 1,
+        perPage: 100,
+      );
+
+      if (mounted) {
+        setState(() {
+          _numbers.addAll(result.data);
+          _currentPage = result.currentPage;
+          _hasMore = result.currentPage < result.lastPage;
+          _isLoadingMore = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingMore = false);
+    }
+  }
+
+  List<NumberModel> get _filteredNumbers {
+    if (_searchQuery.isEmpty) return _numbers;
+    final query = _searchQuery.toLowerCase();
+    return _numbers.where((n) {
+      return n.name.toLowerCase().contains(query) ||
+          n.number.contains(query) ||
+          _toLocal(n.number).contains(query);
+    }).toList();
+  }
+
+  void _selectAll() {
+    setState(() {
+      for (final n in _filteredNumbers) {
+        _selectedNumbers.add(_toLocal(n.number));
+      }
+    });
+  }
+
+  void _deselectAll() {
+    setState(() {
+      for (final n in _filteredNumbers) {
+        _selectedNumbers.remove(_toLocal(n.number));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _filteredNumbers;
+    // Count how many from this group are selected
+    final groupSelectedCount = _numbers
+        .where((n) => _selectedNumbers.contains(_toLocal(n.number)))
+        .length;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: SizedBox(
+        width: double.maxFinite,
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          numberModel.name,
+                          widget.groupName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '${widget.numbersCount} \u0631\u0642\u0645 \u0625\u062C\u0645\u0627\u0644\u064A',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: AppColors.textPrimary,
+                            color: AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(width: 8),
                       ],
-                      Text(
-                        localNumber,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                          fontFamily: 'monospace',
-                        ),
-                        textDirection: TextDirection.ltr,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$groupSelectedCount',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
                       ),
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Search
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: '\u0628\u062D\u062B \u0628\u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0627\u0644\u0631\u0642\u0645...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10, horizontal: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                 ),
-              );
-            }).toList(),
-          );
-        },
+                onChanged: (val) => setState(() => _searchQuery = val),
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // Select all / deselect all
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: _selectAll,
+                    child: const Text(
+                      '\u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0643\u0644',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _deselectAll,
+                    child: const Text(
+                      '\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0643\u0644',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '\u062A\u0645 \u062A\u062D\u0645\u064A\u0644 ${_numbers.length}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Numbers list
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.primary),
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      itemCount: filtered.length + (_hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >= filtered.length) {
+                          if (!_isLoadingMore) _loadMoreNumbers();
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        final numberModel = filtered[index];
+                        final localNumber = _toLocal(numberModel.number);
+                        final isSelected =
+                            _selectedNumbers.contains(localNumber);
+
+                        return CheckboxListTile(
+                          value: isSelected,
+                          onChanged: (_) {
+                            setState(() {
+                              if (isSelected) {
+                                _selectedNumbers.remove(localNumber);
+                              } else {
+                                _selectedNumbers.add(localNumber);
+                              }
+                            });
+                          },
+                          title: Text(
+                            numberModel.name.isNotEmpty
+                                ? numberModel.name
+                                : localNumber,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          subtitle: numberModel.name.isNotEmpty
+                              ? Text(
+                                  localNumber,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                    fontFamily: 'monospace',
+                                  ),
+                                  textDirection: TextDirection.ltr,
+                                )
+                              : null,
+                          secondary: CircleAvatar(
+                            radius: 18,
+                            backgroundColor:
+                                AppColors.primary.withValues(alpha: 0.1),
+                            child: Text(
+                              numberModel.name.isNotEmpty
+                                  ? numberModel.name[0].toUpperCase()
+                                  : '#',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          controlAffinity:
+                              ListTileControlAffinity.trailing,
+                          dense: true,
+                          activeColor: AppColors.primary,
+                        );
+                      },
+                    ),
+            ),
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('\u0625\u0644\u063A\u0627\u0621'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(
+                            context, _selectedNumbers.toList());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        '\u062D\u0641\u0638 ($groupSelectedCount)',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -538,6 +538,44 @@ class ImportController extends StateNotifier<ImportState> {
     }
   }
 
+  /// Custom import for contacts - returns the result map directly.
+  Future<Map<String, dynamic>> importCustomForContacts({
+    required String filePath,
+    required String fileName,
+    required String phoneColumn,
+    required String groupColumn,
+    String? nameColumn,
+  }) async {
+    state = state.copyWith(isUploading: true, progress: 0, error: null);
+
+    try {
+      final result = await _repository.importCustomExcel(
+        filePath: filePath,
+        fileName: fileName,
+        phoneColumn: phoneColumn,
+        groupColumn: groupColumn,
+        nameColumn: nameColumn,
+        onProgress: (sent, total) {
+          if (total > 0) {
+            state = state.copyWith(progress: sent / total);
+          }
+        },
+      );
+
+      state = state.copyWith(isUploading: false, progress: 1.0, result: result);
+      return result;
+    } on ApiException catch (e) {
+      state = state.copyWith(isUploading: false, error: e.message);
+      rethrow;
+    } catch (e) {
+      state = state.copyWith(
+        isUploading: false,
+        error: 'فشل الرفع. حاول مرة أخرى.',
+      );
+      rethrow;
+    }
+  }
+
   /// Reset the import state for a new import.
   void reset() {
     state = const ImportState();

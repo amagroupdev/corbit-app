@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/utils/formatters.dart';
@@ -89,11 +93,78 @@ class ContactsImportSheet extends ConsumerStatefulWidget {
 class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
   bool _isLoading = false;
   bool _isImporting = false;
-  int _importProgress = 0;
-  int _importTotal = 0;
   int _skippedNonSaudi = 0;
-  Map<String, int>? _importResult;
+  int _saudiCount = 0;
+  Map<String, dynamic>? _importResult;
   String? _error;
+
+  @override
+  void dispose() {
+    // تأكد من إيقاف WakeLock إذا انغلق الشيت
+    WakelockPlus.disable();
+    super.dispose();
+  }
+
+  /// Builds a CSV from entries and uploads it in ONE request.
+  Future<void> _uploadEntriesAsCsv(List<_ContactEntry> entries) async {
+    // تفعيل WakeLock - منع السليب
+    await WakelockPlus.enable();
+
+    setState(() {
+      _isImporting = true;
+      _error = null;
+    });
+
+    try {
+      // Get the group name for the CSV
+      final state = ref.read(groupDetailControllerProvider);
+      final groupName = state.group?.name ?? '';
+
+      // Build CSV: group,name,phone
+      final buffer = StringBuffer();
+      buffer.writeln('group,name,phone');
+      for (final entry in entries) {
+        final name = entry.name.replaceAll(',', ' ');
+        buffer.writeln('$groupName,$name,${entry.phone}');
+      }
+
+      // Write to temp file
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/contacts_import_${DateTime.now().millisecondsSinceEpoch}.csv');
+      await file.writeAsString(buffer.toString());
+
+      // Upload via custom import (one request for all contacts)
+      final result = await ref
+          .read(importControllerProvider.notifier)
+          .importCustomForContacts(
+            filePath: file.path,
+            fileName: 'contacts_import.csv',
+            phoneColumn: 'phone',
+            groupColumn: 'group',
+            nameColumn: 'name',
+          );
+
+      if (mounted) {
+        setState(() {
+          _isImporting = false;
+          _importResult = result;
+        });
+      }
+
+      // Clean up temp file
+      try { await file.delete(); } catch (_) {}
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isImporting = false;
+          _error = 'خطأ في رفع جهات الاتصال: $e';
+        });
+      }
+    } finally {
+      // إيقاف WakeLock
+      await WakelockPlus.disable();
+    }
+  }
 
   Future<void> _importAllContacts() async {
     setState(() {
@@ -128,35 +199,13 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
       setState(() {
         _isLoading = false;
-        _isImporting = true;
-        _importTotal = expandResult.entries.length;
         _skippedNonSaudi = expandResult.skippedNonSaudi;
-        _importProgress = 0;
+        _saudiCount = expandResult.entries.length;
       });
 
-      final contactMaps = expandResult.entries
-          .map((e) => {'name': e.name, 'number': e.phone})
-          .toList();
-
-      final result = await ref
-          .read(groupDetailControllerProvider.notifier)
-          .addNumbersBatch(
-            groupId: widget.groupId,
-            contacts: contactMaps,
-            onProgress: (current, total) {
-              if (mounted) {
-                setState(() => _importProgress = current);
-              }
-            },
-          );
-
-      if (mounted) {
-        setState(() {
-          _isImporting = false;
-          _importResult = result;
-        });
-      }
+      await _uploadEntriesAsCsv(expandResult.entries);
     } catch (e) {
+      await WakelockPlus.disable();
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -205,7 +254,6 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
       if (!mounted) return;
 
-      // Show picker dialog (already filtered - only Saudi numbers shown)
       final selected = await showDialog<List<_ContactEntry>>(
         context: context,
         builder: (context) => _ContactEntryPickerDialog(
@@ -216,35 +264,11 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
       if (selected == null || selected.isEmpty || !mounted) return;
 
-      setState(() {
-        _isImporting = true;
-        _importTotal = selected.length;
-        _importProgress = 0;
-      });
+      setState(() => _saudiCount = selected.length);
 
-      final contactMaps = selected
-          .map((e) => {'name': e.name, 'number': e.phone})
-          .toList();
-
-      final result = await ref
-          .read(groupDetailControllerProvider.notifier)
-          .addNumbersBatch(
-            groupId: widget.groupId,
-            contacts: contactMaps,
-            onProgress: (current, total) {
-              if (mounted) {
-                setState(() => _importProgress = current);
-              }
-            },
-          );
-
-      if (mounted) {
-        setState(() {
-          _isImporting = false;
-          _importResult = result;
-        });
-      }
+      await _uploadEntriesAsCsv(selected);
     } catch (e) {
+      await WakelockPlus.disable();
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -325,7 +349,7 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
           if (_importResult != null)
             _buildResult()
           else if (_isImporting)
-            _buildProgress()
+            _buildUploading()
           else if (_error != null)
             _buildError()
           else if (_isLoading)
@@ -419,40 +443,57 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
     );
   }
 
-  Widget _buildProgress() {
-    final progress =
-        _importTotal > 0 ? _importProgress / _importTotal : 0.0;
+  Widget _buildUploading() {
+    final importState = ref.watch(importControllerProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
           const Text(
-            'جاري إضافة جهات الاتصال...',
+            'جاري رفع جهات الاتصال...',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
+          const SizedBox(height: 8),
+          Text(
+            '$_saudiCount رقم سعودي',
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
           const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: progress,
+              value: importState.progress > 0 ? importState.progress : null,
               backgroundColor: AppColors.borderLight,
               valueColor:
                   const AlwaysStoppedAnimation<Color>(AppColors.primary),
               minHeight: 8,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            '$_importProgress / $_importTotal',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+          if (importState.progress > 0) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${(importState.progress * 100).toInt()}%',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          const Text(
+            'لا تغلق التطبيق',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textHint,
             ),
           ),
         ],
@@ -462,9 +503,9 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
 
   Widget _buildResult() {
     final result = _importResult!;
-    final success = result['success'] ?? 0;
-    final failed = result['failed'] ?? 0;
-    final duplicate = result['duplicate'] ?? 0;
+    final successCount = result['success_count'] ?? result['imported'] ?? 0;
+    final failedCount = result['failed_count'] ?? result['failed'] ?? 0;
+    final message = result['message'] as String? ?? '';
 
     return Column(
       children: [
@@ -491,12 +532,19 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
                   ),
                 ],
               ),
+              if (message.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  style: const TextStyle(fontSize: 13, color: AppColors.successDark),
+                ),
+              ],
               const SizedBox(height: 12),
-              // Row 1: success + non-Saudi
               Row(
                 children: [
-                  _buildStatChip(
-                      'تمت إضافته', success.toString(), AppColors.success),
+                  if (successCount is int && successCount > 0)
+                    _buildStatChip(
+                        'تمت إضافته', successCount.toString(), AppColors.success),
                   if (_skippedNonSaudi > 0) ...[
                     const SizedBox(width: 8),
                     _buildStatChip(
@@ -504,19 +552,12 @@ class _ContactsImportSheetState extends ConsumerState<ContactsImportSheet> {
                   ],
                 ],
               ),
-              // Row 2: duplicate + errors (if any)
-              if (duplicate > 0 || failed > 0) ...[
+              if (failedCount is int && failedCount > 0) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    if (duplicate > 0)
-                      _buildStatChip(
-                          'موجود بالفعل', duplicate.toString(), AppColors.info),
-                    if (duplicate > 0 && failed > 0)
-                      const SizedBox(width: 8),
-                    if (failed > 0)
-                      _buildStatChip(
-                          'خطأ', failed.toString(), AppColors.error),
+                    _buildStatChip(
+                        'موجود بالفعل', failedCount.toString(), AppColors.info),
                   ],
                 ),
               ],
