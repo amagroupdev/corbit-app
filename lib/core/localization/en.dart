@@ -1255,6 +1255,18 @@ const Map<String, String> en = {
   'userTypeGovernment': 'Government',
   'userTypeCharity': 'Charity',
   'userTypeUnknown': 'Unknown',
+  'userTypeOrganization': 'Organization',
+  'individual': 'Individual',
+  'organization': 'Organization',
+  'individualDesc': 'Personal account for sending messages',
+  'organizationDesc': 'Account for schools, companies and organizations',
+  'generalData': 'General Information',
+  'accountData': 'Account Information',
+  'verification': 'Verification',
+  'stepVerification': 'Verify Phone Number',
+  'stepWelcome': 'Welcome!',
+  'welcomeRegistration': 'Welcome!',
+  'welcomeRegistrationDesc': 'Your account has been created successfully, you can start using the platform now',
 
   // Auth repository fallback messages
   'otpSentSuccess': 'Code sent successfully',

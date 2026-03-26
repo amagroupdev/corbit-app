@@ -1446,6 +1446,18 @@ const Map<String, String> ar = {
   'userTypeGovernment': 'جهة حكومية',
   'userTypeCharity': 'جمعية خيرية',
   'userTypeUnknown': 'غير محدد',
+  'userTypeOrganization': 'جهة',
+  'individual': 'فرد',
+  'organization': 'جهة',
+  'individualDesc': 'حساب شخصي لإرسال الرسائل',
+  'organizationDesc': 'حساب للمدارس والشركات والجهات',
+  'generalData': 'البيانات العامة',
+  'accountData': 'بيانات الحساب',
+  'verification': 'التحقق',
+  'stepVerification': 'التحقق من رقم الجوال',
+  'stepWelcome': 'أهلًا بك!',
+  'welcomeRegistration': 'أهلًا بك!',
+  'welcomeRegistrationDesc': 'تم إنشاء حسابك بنجاح، يمكنك البدء باستخدام المنصة الآن',
 
   // Auth repository fallback messages
   'otpSentSuccess': 'تم إرسال الرمز بنجاح',

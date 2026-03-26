@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:orbit_app/core/constants/app_strings.dart';
 import 'package:orbit_app/shared/widgets/otp_input.dart';
 
 /// Two-factor authentication screen.
@@ -35,7 +36,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
   }
 
   void _handleVerify() {
-    if (_currentCode.length < 4) return;
+    if (_currentCode.length < AppStrings.otpLength) return;
 
     ref.read(otpControllerProvider.notifier).verify2fa(
           code: _currentCode,
@@ -135,8 +136,8 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 // PIN code fields
                 OtpInput(
                   controller: _otpController,
-                  boxCount: 4,
-                  maxLength: 8,
+                  boxCount: AppStrings.otpLength,
+                  maxLength: AppStrings.otpLength,
                   autoFocus: true,
                   onChanged: (value) {
                     _currentCode = value;

@@ -3,17 +3,16 @@ import 'package:flutter/services.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 
-/// A custom OTP input widget that visually shows [boxCount] boxes (default 4)
-/// but silently accepts up to [maxLength] digits for safety.
+/// A custom OTP input widget that visually shows [boxCount] boxes (default 6)
+/// and accepts up to [maxLength] digits.
 ///
-/// The extra digits beyond [boxCount] are stored but not visually apparent –
-/// only 4 boxes are shown so the user sees a standard 4-digit code UI.
+/// Displays 6 boxes so the user sees a standard 6-digit code UI.
 class OtpInput extends StatefulWidget {
   const OtpInput({
     super.key,
     this.controller,
-    this.boxCount = 4,
-    this.maxLength = 8,
+    this.boxCount = 6,
+    this.maxLength = 6,
     this.autoFocus = true,
     this.onChanged,
     this.onCompleted,
@@ -23,10 +22,10 @@ class OtpInput extends StatefulWidget {
   /// its own.
   final TextEditingController? controller;
 
-  /// Number of visible boxes (default 4).
+  /// Number of visible boxes (default 6).
   final int boxCount;
 
-  /// Maximum characters accepted (default 8). Must be >= [boxCount].
+  /// Maximum characters accepted (default 6). Must be >= [boxCount].
   final int maxLength;
 
   /// Whether the hidden field is auto-focused.
@@ -102,7 +101,7 @@ class _OtpInputState extends State<OtpInput> {
 
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: 56,
+                  width: 48,
                   height: 60,
                   margin: EdgeInsets.only(
                     left: index == 0 ? 0 : 6,
@@ -146,7 +145,7 @@ class _OtpInputState extends State<OtpInput> {
             Opacity(
               opacity: 0,
               child: SizedBox(
-                width: (56 + 12) * widget.boxCount.toDouble(),
+                width: (48 + 12) * widget.boxCount.toDouble(),
                 child: TextField(
                   controller: _controller,
                   focusNode: _focusNode,
