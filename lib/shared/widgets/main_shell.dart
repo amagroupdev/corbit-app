@@ -102,6 +102,12 @@ class _MainShellState extends ConsumerState<MainShell> {
       },
       child: Scaffold(
         body: widget.child,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => context.push('/ai-assistant'),
+          backgroundColor: AppColors.primary,
+          tooltip: 'مساعد أوربت',
+          child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
+        ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
             color: AppColors.surface,

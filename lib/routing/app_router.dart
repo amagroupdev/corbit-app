@@ -51,6 +51,7 @@ import 'package:orbit_app/shared/widgets/main_shell.dart';
 import 'package:orbit_app/shared/widgets/payment_webview_screen.dart';
 import 'package:orbit_app/shared/widgets/pdf_viewer_screen.dart';
 import 'package:orbit_app/features/dashboard/presentation/screens/more_screen.dart';
+import 'package:orbit_app/features/ai_assistant/presentation/screens/ai_chat_screen.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -391,6 +392,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.statements,
         path: '/statements',
         builder: (context, state) => const StatementsScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.aiAssistant,
+        path: '/ai-assistant',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const AiChatScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1), // slide up from bottom
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+              child: child,
+            );
+          },
+        ),
       ),
     ],
   );

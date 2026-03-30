@@ -105,4 +105,7 @@ class RouteNames {
 
   // More
   static const String more = 'more';
+
+  // AI Assistant
+  static const aiAssistant = 'ai-assistant';
 }
