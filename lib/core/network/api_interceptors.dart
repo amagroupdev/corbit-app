@@ -45,11 +45,13 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     if (err.response?.statusCode == 401) {
-      // Clear all stored credentials.
-      await _storageService.clearAll();
-
-      // Navigate to login, clearing the navigation stack.
-      _router.go('/login');
+      final isGuest = await _storageService.isGuestMode();
+      if (!isGuest) {
+        // Clear all stored credentials.
+        await _storageService.clearAll();
+        // Navigate to login, clearing the navigation stack.
+        _router.go('/login');
+      }
     }
 
     handler.next(err);

@@ -1,7 +1,7 @@
 name: orbit_app
 description: "ORBIT SMS V3 - Mobile Application"
 publish_to: 'none'
-version: 1.0.0+15
+version: 1.0.0+16
 
 environment:
   sdk: ^3.4.0

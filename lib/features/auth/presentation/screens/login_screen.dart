@@ -8,6 +8,7 @@ import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/login_tab_toggle.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 
 /// Login screen for ORBIT SMS V3.
 ///
@@ -65,6 +66,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (_serverErrors.containsKey(key)) {
       setState(() => _serverErrors.remove(key));
     }
+  }
+
+  Future<void> _enterGuestMode() async {
+    final storage = ref.read(secureStorageProvider);
+    await storage.setGuestMode(true);
+    ref.read(authStateProvider.notifier).setAuthenticated();
+    if (mounted) context.go('/');
   }
 
   Widget _fieldErrorWidget(String key) {
@@ -246,6 +254,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
 
                 const SizedBox(height: 24),
+
+                // Try the app button
+                _buildTryAppButton(t),
+                const SizedBox(height: 12),
 
                 // Create account link
                 _buildCreateAccountLink(t),
@@ -578,6 +590,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ],
       ),
       textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildTryAppButton(AppLocalizations t) {
+    return SizedBox(
+      height: 48,
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _enterGuestMode,
+        icon: const Icon(Icons.explore_outlined, size: 20),
+        label: Text(
+          t.translate('tryTheApp'),
+          style: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
     );
   }
 

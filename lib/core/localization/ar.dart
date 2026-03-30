@@ -93,6 +93,7 @@ const Map<String, String> ar = {
   'termsAndConditions': 'الشروط والأحكام',
   'privacyPolicy': 'سياسة الخصوصية',
   'createAccount': 'إنشاء حساب',
+  'tryTheApp': 'تجربة التطبيق',
   'welcomeBack': 'مرحباً بعودتك',
   'signInToContinue': 'سجّل الدخول للمتابعة',
   'enterOtpSent': 'أدخل رمز التحقق المرسل إلى',

@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 abstract class _StorageKeys {
   static const String accessToken = 'orbit_access_token';
   static const String refreshToken = 'orbit_refresh_token';
+  static const String guestMode = 'orbit_guest_mode';
 }
 
 /// Provides a singleton [SecureStorageService] instance via Riverpod.
@@ -78,6 +79,7 @@ class SecureStorageService {
     await Future.wait([
       deleteToken(),
       deleteRefreshToken(),
+      _storage.delete(key: _StorageKeys.guestMode),
     ]);
   }
 
@@ -104,5 +106,23 @@ class SecureStorageService {
   Future<bool> hasToken() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Guest Mode
+  // ---------------------------------------------------------------------------
+
+  /// Enables guest/demo mode.
+  Future<void> setGuestMode(bool enabled) async {
+    await _storage.write(
+      key: _StorageKeys.guestMode,
+      value: enabled ? 'true' : 'false',
+    );
+  }
+
+  /// Returns `true` when guest mode is active.
+  Future<bool> isGuestMode() async {
+    final value = await _storage.read(key: _StorageKeys.guestMode);
+    return value == 'true';
   }
 }

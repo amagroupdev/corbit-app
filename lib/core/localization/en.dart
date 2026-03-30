@@ -93,6 +93,7 @@ const Map<String, String> en = {
   'termsAndConditions': 'Terms & Conditions',
   'privacyPolicy': 'Privacy Policy',
   'createAccount': 'Create Account',
+  'tryTheApp': 'Try the App',
   'welcomeBack': 'Welcome Back',
   'signInToContinue': 'Sign in to continue',
   'enterOtpSent': 'Enter the verification code sent to',
