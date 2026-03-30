@@ -138,7 +138,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (response != null) {
         if (response.isAuthenticated) {
           context.go('/');
-        } else if (response.requires2fa) {
+        } else if (response.requires2fa ||
+            (response.verificationUuid != null &&
+                response.verificationUuid!.isNotEmpty)) {
+          // Navigate to 2FA if requires_2fa is true OR if a verification UUID
+          // was returned (server may omit the flag but still require OTP).
           context.push('/two-factor', extra: {
             'verification_uuid': response.verificationUuid,
           });

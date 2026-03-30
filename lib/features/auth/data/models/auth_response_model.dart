@@ -93,8 +93,13 @@ class AuthResponseModel {
           : null,
       requires2fa: payload['requires_2fa'] as bool? ??
           payload['requires_two_factor'] as bool? ??
+          payload['require_2fa'] as bool? ??
+          payload['two_factor_required'] as bool? ??
+          payload['otp_required'] as bool? ??
           false,
-      verificationUuid: payload['verification_uuid'] as String?,
+      verificationUuid: payload['verification_uuid'] as String? ??
+          payload['uuid'] as String? ??
+          payload['otp_uuid'] as String?,
       requiresPhoneVerification:
           payload['requires_phone_verification'] as bool? ??
               payload['requires_verification'] as bool? ??
