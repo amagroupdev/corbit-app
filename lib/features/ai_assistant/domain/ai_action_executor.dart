@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/features/ai_assistant/data/models/ai_action_model.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
+import 'package:orbit_app/features/templates/data/repositories/templates_repository.dart';
 import 'package:orbit_app/routing/app_router.dart';
 import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
 import 'package:orbit_app/shared/widgets/ai_working_overlay.dart';
@@ -31,6 +32,8 @@ class AiActionExecutor {
         return _executeCreateGroup(action);
       case 'create_group_with_contacts':
         return _executeCreateGroupWithContacts(action);
+      case 'create_template':
+        return _executeCreateTemplate(action);
       default:
         return 'Unknown action type';
     }
@@ -73,12 +76,13 @@ class AiActionExecutor {
 
     final router = _ref.read(appRouterProvider);
 
+    // Use go('/') first then push the target so back button works
     router.go('/');
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
 
-    router.go(route);
+    router.push(route);
     await Future.delayed(const Duration(milliseconds: 400));
 
     _showSuccess('وصلنا! الصفحة المطلوبة قدامك الحين');
@@ -218,6 +222,42 @@ class AiActionExecutor {
       return 'Created group with contacts';
     } catch (e) {
       _showError('ما قدرت أكمل العملية — تأكد إنك مسجل دخول وحاول مرة ثانية');
+      return 'Failed: $e';
+    }
+  }
+
+  Future<String> _executeCreateTemplate(AiActionModel action) async {
+    final name = action.name;
+    final content = action.content;
+    if (name == null || name.isEmpty) return 'No template name specified';
+    if (content == null || content.isEmpty) return 'No template content specified';
+
+    _startWorking('جاري إنشاء قالب "$name"...');
+
+    final router = _ref.read(appRouterProvider);
+
+    try {
+      router.go('/');
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري فتح صفحة القوالب...');
+      router.push('/templates');
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري إنشاء القالب...');
+      final repo = _ref.read(templatesRepositoryProvider);
+      await repo.createTemplate(name: name, body: content);
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      _showSuccess('تم إنشاء قالب "$name" بنجاح!');
+
+      return 'Created template "$name"';
+    } catch (e) {
+      _showError('ما قدرت أسوي القالب "$name" — تأكد إنك مسجل دخول وحاول مرة ثانية');
       return 'Failed: $e';
     }
   }
