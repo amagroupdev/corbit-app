@@ -285,7 +285,6 @@ class DashboardRepository {
       final archiveResponse = await _apiClient.post<Map<String, dynamic>>(
         '/archive/list',
         data: {
-          'archive_type': 'general',
           'page': 1,
           'per_page': 5,
         },

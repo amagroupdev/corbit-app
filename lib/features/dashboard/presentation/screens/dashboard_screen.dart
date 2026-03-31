@@ -1230,17 +1230,34 @@ class _RecentMessageRow extends StatelessWidget {
 
   final RecentMessage message;
 
+  String _translateMessageType(BuildContext context, String type) {
+    final t = AppLocalizations.of(context);
+    final key = 'archive_type_$type';
+    final translated = t?.translate(key);
+    // If translation key doesn't exist, it returns the key itself
+    if (translated != null && translated != key) return translated;
+    // Fallback: make it human-readable
+    return type.replaceAll('_', ' ');
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Display description: prefer note, then senderName (which maps to bank for transactions).
-    final description = message.note.isNotEmpty
-        ? message.note
-        : message.senderName.isNotEmpty
-            ? message.senderName
-            : AppLocalizations.of(context)?.translate('unknown') ?? 'Unknown';
+    final t = AppLocalizations.of(context);
 
-    // Display amount if present.
-    final hasAmount = message.amount.isNotEmpty && message.amount != '0';
+    // Title: sender name first, fallback to message type
+    final title = message.senderName.isNotEmpty
+        ? message.senderName
+        : _translateMessageType(context, message.messageType);
+
+    // Subtitle: message body
+    final subtitle = message.note.isNotEmpty
+        ? message.note
+        : null;
+
+    // Translated type label
+    final typeLabel = message.messageType.isNotEmpty
+        ? _translateMessageType(context, message.messageType)
+        : null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1255,43 +1272,74 @@ class _RecentMessageRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Sender name
                 Text(
-                  description,
+                  title,
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                     fontFamily: 'Cairo',
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                // Message body preview
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontFamily: 'Cairo',
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 const SizedBox(height: 2),
+                // Type + recipient count
                 Row(
                   children: [
-                    if (hasAmount) ...[
+                    if (typeLabel != null && message.senderName.isNotEmpty)
                       Text(
-                        '${message.amount} ${AppLocalizations.of(context)?.translate('messagesUnit') ?? 'messages'}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: double.tryParse(message.amount) != null &&
-                                  double.parse(message.amount) < 0
-                              ? const Color(0xFFC62828)
-                              : const Color(0xFF2E7D32),
+                        typeLabel,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textHint,
                           fontFamily: 'Cairo',
                         ),
                       ),
-                      const SizedBox(width: 8),
-                    ],
-                    if (message.messageType.isNotEmpty)
-                      Text(
-                        message.messageType,
+                    if (typeLabel != null &&
+                        message.senderName.isNotEmpty &&
+                        message.recipientCount > 0)
+                      const Text(
+                        ' • ',
                         style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                          fontFamily: 'Cairo',
+                          fontSize: 11,
+                          color: AppColors.textHint,
                         ),
+                      ),
+                    if (message.recipientCount > 0)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.people_outline,
+                            size: 12,
+                            color: AppColors.textHint,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${message.recipientCount}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textHint,
+                              fontFamily: 'Cairo',
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),
@@ -1303,7 +1351,7 @@ class _RecentMessageRow extends StatelessWidget {
           if (message.sentAt != null)
             Text(
               DateFormat('yyyy/M/d').format(message.sentAt!),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.textSecondary,
                 fontFamily: 'Cairo',

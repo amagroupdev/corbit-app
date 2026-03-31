@@ -38,6 +38,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     // Initialize RAG datasource and seed API key on first open.
     Future.microtask(() {
       ref.read(chatProvider.notifier).initializeRag();
+      // Inject any completion messages from actions executed while away.
+      ref.read(chatProvider.notifier).injectCompletionMessages();
     });
   }
 
@@ -121,101 +123,12 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   void _handleActionTap(AiActionModel action) {
     if (!action.isAllowed) return;
 
-    final t = AppLocalizations.of(context);
-    final isArabic = t?.isRtl ?? true;
-
-    switch (action.type) {
-      case 'navigate':
-        if (action.route != null && action.route!.isNotEmpty) {
-          context.push(action.route!);
-        }
-        break;
-      case 'suggest_link':
-        if (action.route != null && action.route!.isNotEmpty) {
-          context.push(action.route!);
-        }
-        break;
-      case 'create_group':
-        _showConfirmationDialog(
-          title: isArabic ? 'إنشاء مجموعة' : 'Create Group',
-          content: isArabic
-              ? 'هل تريد إنشاء مجموعة باسم "${action.name ?? ''}"؟'
-              : 'Create a group named "${action.name ?? ''}"?',
-          onConfirm: () {
-            context.push('/contacts/groups/create', extra: {
-              'name': action.name ?? '',
-            });
-          },
-        );
-        break;
-      case 'create_template':
-        _showConfirmationDialog(
-          title: isArabic ? 'إنشاء قالب' : 'Create Template',
-          content: isArabic
-              ? 'هل تريد إنشاء قالب "${action.name ?? ''}"؟'
-              : 'Create a template "${action.name ?? ''}"?',
-          onConfirm: () {
-            context.push('/messages/templates/create', extra: {
-              'name': action.name ?? '',
-              'content': action.content ?? '',
-            });
-          },
-        );
-        break;
+    // Only suggest_link actions reach here now (others are auto-executed).
+    if (action.type == 'suggest_link') {
+      if (action.route != null && action.route!.isNotEmpty) {
+        context.push(action.route!);
+      }
     }
-  }
-
-  void _showConfirmationDialog({
-    required String title,
-    required String content,
-    required VoidCallback onConfirm,
-  }) {
-    final t = AppLocalizations.of(context);
-    final isArabic = t?.isRtl ?? true;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        content: Text(
-          content,
-          style: const TextStyle(
-            fontSize: 15,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              isArabic ? 'إلغاء' : 'Cancel',
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onConfirm();
-            },
-            child: Text(
-              isArabic ? 'تأكيد' : 'Confirm',
-              style: const TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -326,8 +239,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ),
           const SizedBox(width: AppTheme.spacingSm),
           Text(
-            t?.translate('ai_assistant_title') ??
-                (isArabic ? 'مساعد أوربت' : 'ORBIT Assistant'),
+            t?.translate('aiAssistantTitle') ??
+                (isArabic ? 'مساعد Corbit الذكي' : 'Corbit Smart Assistant'),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,

@@ -105,7 +105,7 @@ class _AiInputBarState extends State<AiInputBar> {
                   color: AppColors.textPrimary,
                 ),
                 decoration: InputDecoration(
-                  hintText: t?.translate('ai_type_question') ??
+                  hintText: t?.translate('aiInputHint') ??
                       (isRtl ? 'اكتب سؤالك...' : 'Type your question...'),
                   hintStyle: const TextStyle(
                     fontSize: 15,
