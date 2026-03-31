@@ -5,6 +5,8 @@ import 'package:orbit_app/core/constants/app_theme.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/routing/app_router.dart';
+import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
+import 'package:orbit_app/shared/widgets/ai_working_overlay.dart';
 
 class OrbitApp extends ConsumerWidget {
   const OrbitApp({super.key});
@@ -38,7 +40,13 @@ class OrbitApp extends ConsumerWidget {
             data: MediaQuery.of(context).copyWith(
               textScaler: TextScaler.noScaling,
             ),
-            child: child ?? const SizedBox.shrink(),
+            child: Stack(
+              children: [
+                child ?? const SizedBox.shrink(),
+                const AiWorkingOverlay(),
+                const AiCompletionOverlay(),
+              ],
+            ),
           ),
         );
       },

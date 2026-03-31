@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/storage/secure_storage.dart';
-import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
-import 'package:orbit_app/shared/widgets/ai_working_overlay.dart';
 import 'package:orbit_app/shared/widgets/collapsible_ai_fab.dart';
 
 /// Tracks the currently selected bottom navigation tab index.
@@ -162,8 +160,6 @@ class _MainShellState extends ConsumerState<MainShell> {
           children: [
             widget.child,
             const CollapsibleAiFab(),
-            const AiWorkingOverlay(),
-            const AiCompletionOverlay(),
           ],
         ),
         bottomNavigationBar: Container(
