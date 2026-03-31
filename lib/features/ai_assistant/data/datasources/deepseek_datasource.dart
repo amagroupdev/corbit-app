@@ -49,7 +49,7 @@ class DeepSeekDatasource {
   static const double _temperature = 0.3;
 
   /// Maximum tokens to generate per response.
-  static const int _maxTokens = 1024;
+  static const int _maxTokens = 2048;
 
   // ─── Dio Instance (lazy) ────────────────────────────────────────────────
 

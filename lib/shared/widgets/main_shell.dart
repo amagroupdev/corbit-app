@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
 import 'package:orbit_app/shared/widgets/ai_working_overlay.dart';
 import 'package:orbit_app/shared/widgets/collapsible_ai_fab.dart';
@@ -29,6 +31,9 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
+  int _devTapCount = 0;
+  DateTime? _lastDevTap;
+
   // Maps each tab index to its corresponding route path.
   static const List<String> _tabPaths = [
     '/',
@@ -47,11 +52,60 @@ class _MainShellState extends ConsumerState<MainShell> {
     return 0;
   }
 
+  Future<void> _showDevToken() async {
+    final storage = ref.read(secureStorageProvider);
+    final token = await storage.getToken();
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('🔧 Dev Token', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        content: SelectableText(
+          token ?? 'No token',
+          style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
+        ),
+        actions: [
+          if (token != null)
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: token));
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Token copied'), duration: Duration(seconds: 2)),
+                );
+              },
+              child: const Text('Copy'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _onTabTapped(int index) {
     final currentIndex = ref.read(bottomNavIndexProvider);
 
+    // Dev easter egg: 7 taps on "More" tab within 3 seconds
+    if (index == 4 && currentIndex == 4) {
+      final now = DateTime.now();
+      if (_lastDevTap != null && now.difference(_lastDevTap!).inSeconds > 3) {
+        _devTapCount = 0;
+      }
+      _lastDevTap = now;
+      _devTapCount++;
+      if (_devTapCount >= 7) {
+        _devTapCount = 0;
+        _showDevToken();
+      }
+      return;
+    }
+
     if (index == currentIndex) {
-      // If already on this tab, pop to the root of this branch.
       return;
     }
 
