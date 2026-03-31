@@ -31,8 +31,14 @@ class AiActionExecutor {
     }
   }
 
-  void _showCompletion(String message) {
-    _ref.read(aiCompletionMessageProvider.notifier).state = message;
+  void _showSuccess(String message) {
+    _ref.read(aiCompletionMessageProvider.notifier).state =
+        AiCompletionData(message: message, isSuccess: true);
+  }
+
+  void _showError(String message) {
+    _ref.read(aiCompletionMessageProvider.notifier).state =
+        AiCompletionData(message: message, isSuccess: false);
   }
 
   Future<String> _executeNavigate(AiActionModel action) async {
@@ -41,16 +47,13 @@ class AiActionExecutor {
 
     final router = _ref.read(appRouterProvider);
 
-    // Step 1: Close AI chat → go home
     router.go('/');
     await Future.delayed(const Duration(milliseconds: 600));
 
-    // Step 2: Navigate to target
     router.go(route);
     await Future.delayed(const Duration(milliseconds: 400));
 
-    // Step 3: Show notification
-    _showCompletion('وصلنا! الصفحة المطلوبة قدامك الحين');
+    _showSuccess('وصلنا! الصفحة المطلوبة قدامك الحين');
 
     return 'Navigated to $route';
   }
@@ -62,29 +65,24 @@ class AiActionExecutor {
     final router = _ref.read(appRouterProvider);
 
     try {
-      // Step 1: Close AI chat → go home
       router.go('/');
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // Step 2: Go to groups page
       router.go('/groups');
       await Future.delayed(const Duration(milliseconds: 800));
 
-      // Step 3: Create the group
       final repo = _ref.read(groupsRepositoryProvider);
       final group = await repo.createGroup(name: name);
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // Step 4: Navigate to the new group
       router.push('/groups/${group.id}');
       await Future.delayed(const Duration(milliseconds: 400));
 
-      // Step 5: Show completion
-      _showCompletion('تم إنشاء مجموعة "$name" بنجاح!');
+      _showSuccess('تم إنشاء مجموعة "$name" بنجاح!');
 
       return 'Created group "$name"';
     } catch (e) {
-      _showCompletion('ما قدرت أسوي المجموعة، حاول مرة ثانية');
+      _showError('ما قدرت أسوي المجموعة "$name" — تأكد إنك مسجل دخول وحاول مرة ثانية');
       return 'Failed: $e';
     }
   }
@@ -96,24 +94,19 @@ class AiActionExecutor {
     final router = _ref.read(appRouterProvider);
 
     try {
-      // Step 1: Close AI chat → go home
       router.go('/');
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // Step 2: Go to groups
       router.go('/groups');
       await Future.delayed(const Duration(milliseconds: 800));
 
-      // Step 3: Create group
       final repo = _ref.read(groupsRepositoryProvider);
       final group = await repo.createGroup(name: name);
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // Step 4: Navigate to group
       router.push('/groups/${group.id}');
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // Step 5: Add contacts
       if (action.addDeviceContacts) {
         final hasPermission =
             await FlutterContacts.requestPermission(readonly: true);
@@ -148,17 +141,17 @@ class AiActionExecutor {
             }
           }
 
-          _showCompletion(
+          _showSuccess(
               'تم إنشاء مجموعة "$name" وإضافة $added جهة اتصال!');
         } else {
-          _showCompletion(
+          _showError(
               'تم إنشاء "$name" لكن ما قدرت أوصل لجهات الاتصال — تحتاج تعطيني الصلاحية');
         }
       }
 
       return 'Created group with contacts';
     } catch (e) {
-      _showCompletion('ما قدرت أكمل العملية، حاول مرة ثانية');
+      _showError('ما قدرت أكمل العملية — تأكد إنك مسجل دخول وحاول مرة ثانية');
       return 'Failed: $e';
     }
   }

@@ -85,11 +85,16 @@ class ChatNotifier extends AsyncNotifier<List<ChatMessageModel>> {
 
     for (final entry in history) {
       final message = entry['message'] as String;
+      final isSuccess = entry['isSuccess'] as bool? ?? true;
       final timestamp = entry['timestamp'] as DateTime;
+      final emoji = isSuccess ? '🎉' : '⚠️';
+      final footer = isSuccess
+          ? 'أي شيء تبيه قولي بس وأبشر بسعدك!'
+          : 'جرب مرة ثانية أو تواصل مع الدعم';
       newMessages.add(ChatMessageModel(
         id: 'completion_${timestamp.millisecondsSinceEpoch}',
         role: 'assistant',
-        content: '🎉 **$message**\n\nأي شيء تبيه قولي بس وأبشر بسعدك!',
+        content: '$emoji **$message**\n\n$footer',
         timestamp: timestamp,
       ));
     }
