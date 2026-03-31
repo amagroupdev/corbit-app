@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/groups/data/datasources/groups_remote_datasource.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
@@ -230,6 +231,13 @@ final previewProvider = FutureProvider.autoDispose
 
 /// Loads the list of available sender names.
 final sendersProvider = FutureProvider<List<SenderModel>>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) {
+    return const [
+      SenderModel(id: 1, name: 'DEMO', status: 'active'),
+      SenderModel(id: 2, name: 'SaudiSmart', status: 'active'),
+    ];
+  }
   final repo = ref.watch(messagesRepositoryProvider);
   final senders = await repo.listSenders();
   // Only return active senders for the send form.
@@ -242,6 +250,13 @@ final sendersProvider = FutureProvider<List<SenderModel>>((ref) async {
 
 /// Loads the list of message templates.
 final templatesProvider = FutureProvider<List<TemplateModel>>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) {
+    return [
+      TemplateModel(id: 1, name: 'رسالة ترحيب', body: 'مرحباً {name}، شكراً لتواصلك معنا!', createdAt: DateTime.now()),
+      TemplateModel(id: 2, name: 'تذكير موعد', body: 'نذكرك بموعدك يوم {date} الساعة {time}', createdAt: DateTime.now()),
+    ];
+  }
   final repo = ref.watch(messagesRepositoryProvider);
   return repo.listTemplates();
 });
@@ -273,6 +288,52 @@ final messagePageProvider = StateProvider<int>((ref) => 1);
 /// Fetches paginated messages based on the selected filters.
 final messagesListProvider =
     FutureProvider.autoDispose<PaginatedResponse<SentMessageModel>>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) {
+    return PaginatedResponse<SentMessageModel>(
+      data: [
+        SentMessageModel(
+          id: 1,
+          messageType: MessageType.fromNumbers,
+          senderName: 'DEMO',
+          messageBody: 'مرحباً، هذه رسالة تجريبية للعرض',
+          recipientCount: 5,
+          status: MessageStatus.delivered,
+          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+          deliveredCount: 5,
+          cost: 0.5,
+        ),
+        SentMessageModel(
+          id: 2,
+          messageType: MessageType.fromGroups,
+          senderName: 'SaudiSmart',
+          messageBody: 'عرض خاص لعملائنا المميزين!',
+          recipientCount: 50,
+          status: MessageStatus.sent,
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          deliveredCount: 48,
+          failedCount: 2,
+          cost: 5.0,
+        ),
+        SentMessageModel(
+          id: 3,
+          messageType: MessageType.fromNumbers,
+          senderName: 'DEMO',
+          messageBody: 'تذكير بموعد الاجتماع غداً الساعة 10 صباحاً',
+          recipientCount: 10,
+          status: MessageStatus.scheduled,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          scheduledAt: DateTime.now().add(const Duration(days: 1)),
+          cost: 1.0,
+        ),
+      ],
+      currentPage: 1,
+      perPage: 15,
+      total: 3,
+      lastPage: 1,
+    );
+  }
+
   final repo = ref.watch(messagesRepositoryProvider);
   final type = ref.watch(selectedMessageTypeProvider);
   final search = ref.watch(messageSearchQueryProvider);
@@ -367,6 +428,14 @@ final sendMessageControllerProvider =
 
 /// Loads all groups for the group picker in send message.
 final groupsForSendProvider = FutureProvider<List<GroupModel>>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) {
+    return const [
+      GroupModel(id: 1, name: 'عملاء VIP', numbersCount: 50),
+      GroupModel(id: 2, name: 'موظفين', numbersCount: 25),
+      GroupModel(id: 3, name: 'تسويق', numbersCount: 100),
+    ];
+  }
   final datasource = ref.watch(groupsRemoteDatasourceProvider);
   final result = await datasource.listGroups(page: 1, perPage: 100);
   return result.data;
@@ -375,6 +444,10 @@ final groupsForSendProvider = FutureProvider<List<GroupModel>>((ref) async {
 /// Loads numbers for a specific group (on-demand when expanding).
 final groupNumbersProvider =
     FutureProvider.family<List<NumberModel>, int>((ref, groupId) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) {
+    return const [];
+  }
   final datasource = ref.watch(groupsRemoteDatasourceProvider);
   final result = await datasource.listNumbers(groupId: groupId, perPage: 100);
   return result.data;

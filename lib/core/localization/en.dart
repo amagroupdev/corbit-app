@@ -1740,8 +1740,8 @@ const Map<String, String> en = {
   'msg_validate_select_datetime': 'Please select a send date and time',
 
   // AI Assistant
-  'aiAssistant': 'ORBIT Assistant',
-  'aiAssistantTitle': 'ORBIT Assistant',
+  'aiAssistant': 'Corbit Assistant',
+  'aiAssistantTitle': 'Corbit Smart Assistant',
   'aiTyping': 'Typing...',
   'aiInputHint': 'Type your question...',
   'aiSendButton': 'Send',
@@ -1749,9 +1749,9 @@ const Map<String, String> en = {
   'aiClearChatConfirm': 'Do you want to clear the chat?',
   'aiErrorMessage': 'Sorry, an error occurred. Please try again.',
   'aiOfflineMessage': 'The assistant needs an internet connection. Check your connection and try again.',
-  'aiWelcome': 'Hello! I\'m ORBIT Assistant. How can I help you?',
+  'aiWelcome': 'Hello! I\'m Corbit Assistant. How can I help you?',
   'aiSuggestion1': 'How to send a message?',
-  'aiSuggestion2': 'What are ORBIT services?',
+  'aiSuggestion2': 'What are Corbit services?',
   'aiSuggestion3': 'Take me to settings',
   'aiSuggestion4': 'How to recharge balance?',
   'aiActionNavigate': 'Go to',

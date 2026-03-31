@@ -14,6 +14,7 @@ class AiActionModel {
     this.labelEn,
     this.name,
     this.content,
+    this.addDeviceContacts = false,
   });
 
   /// The action type. Must be one of [allowedTypes].
@@ -34,6 +35,9 @@ class AiActionModel {
   /// Content parameter (e.g. template body text).
   final String? content;
 
+  /// Whether to import device contacts into the group.
+  final bool addDeviceContacts;
+
   // ─── Whitelist ──────────────────────────────────────────────────────────
 
   /// The ONLY action types the AI is allowed to suggest.
@@ -44,6 +48,7 @@ class AiActionModel {
     'suggest_link',
     'create_group',
     'create_template',
+    'create_group_with_contacts',
   };
 
   /// Returns `true` if this action's [type] is in the whitelist.
@@ -59,6 +64,7 @@ class AiActionModel {
       labelEn: json['label_en'] as String?,
       name: json['name'] as String?,
       content: json['content'] as String?,
+      addDeviceContacts: json['add_device_contacts'] as bool? ?? false,
     );
   }
 
@@ -70,6 +76,7 @@ class AiActionModel {
       if (labelEn != null) 'label_en': labelEn,
       if (name != null) 'name': name,
       if (content != null) 'content': content,
+      'add_device_contacts': addDeviceContacts,
     };
   }
 

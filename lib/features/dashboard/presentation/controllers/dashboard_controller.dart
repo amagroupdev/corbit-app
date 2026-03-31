@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/dashboard/data/models/dashboard_model.dart';
 import 'package:orbit_app/features/dashboard/data/repositories/dashboard_repository.dart';
 
@@ -17,6 +18,22 @@ class DashboardStatsNotifier extends AsyncNotifier<DashboardStats> {
   }
 
   Future<DashboardStats> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return const DashboardStats(
+        currentBalance: 150,
+        servicesCount: 3,
+        consumedPoints: 500,
+        unreadNotifications: 2,
+        groupsCount: 5,
+        subAccountsCount: 1,
+        userName: 'زائر',
+        totalBalance: 200,
+        remainingBalance: 150,
+        consumedBalance: 50,
+        accountLevel: 'تجريبي',
+      );
+    }
     final repo = ref.read(dashboardRepositoryProvider);
     return repo.fetchDashboardStats();
   }
@@ -45,6 +62,10 @@ class DashboardBannersNotifier extends AsyncNotifier<List<BannerItem>> {
   }
 
   Future<List<BannerItem>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return const [];
+    }
     final repo = ref.read(dashboardRepositoryProvider);
     return repo.fetchBanners();
   }

@@ -19,14 +19,14 @@ class AiSuggestionChips extends StatelessWidget {
 
   static const _suggestionsAr = [
     'كيف أرسل رسالة؟',
-    'وش خدمات أوربت؟',
+    'وش خدمات Corbit؟',
     'وديني للإعدادات',
     'كيف أشحن رصيدي؟',
   ];
 
   static const _suggestionsEn = [
     'How to send a message?',
-    'What are ORBIT services?',
+    'What are Corbit services?',
     'Take me to settings',
     'How to recharge?',
   ];
@@ -60,7 +60,7 @@ class AiSuggestionChips extends StatelessWidget {
 
           // ── Title ──────────────────────────────────────────────────
           Text(
-            isArabic ? 'مساعد أوربت' : 'ORBIT Assistant',
+            isArabic ? 'مساعد Corbit' : 'Corbit Assistant',
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,

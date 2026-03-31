@@ -119,8 +119,7 @@ class DeepSeekDatasource {
         ),
       );
 
-      final responseStream =
-          response.data!.stream as Stream<List<int>>;
+      final Stream<List<int>> responseStream = response.data!.stream;
 
       return _parseSseStream(responseStream);
     } on DioException catch (e) {
@@ -146,7 +145,7 @@ class DeepSeekDatasource {
     String buffer = '';
 
     byteStream
-        .transform(utf8.decoder)
+        .map((bytes) => utf8.decode(bytes))
         .listen(
       (chunk) {
         buffer += chunk;

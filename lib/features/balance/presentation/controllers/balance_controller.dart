@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/balance/data/models/balance_model.dart';
 import 'package:orbit_app/features/balance/data/models/bank_model.dart';
 import 'package:orbit_app/features/balance/data/models/offer_model.dart';
@@ -198,14 +199,52 @@ class TransferBalanceState {
 // ═══════════════════════════════════════════════════════════════════════
 
 class BalanceScreenController extends StateNotifier<BalanceScreenState> {
-  BalanceScreenController(this._repository)
+  BalanceScreenController(this._repository, this._storage)
       : super(const BalanceScreenState());
 
   final BalanceRepository _repository;
+  final SecureStorageService _storage;
 
   /// Load all data for the balance overview screen.
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, error: null);
+
+    if (await _storage.isGuestMode()) {
+      state = state.copyWith(
+        balance: const BalanceModel(
+          balance: 150,
+          formattedBalance: '150',
+          remainingDays: 90,
+          totalSent: 50,
+          totalPurchased: 200,
+          totalTransferred: 0,
+          currency: 'SAR',
+        ),
+        offers: const [],
+        recentTransactions: [
+          TransactionModel(
+            id: 1,
+            amount: 100,
+            smsCount: 500,
+            status: 'approved',
+            paymentMethod: 'online',
+            referenceNumber: 'DEMO-001',
+            createdAt: DateTime(2026, 3, 15),
+          ),
+          TransactionModel(
+            id: 2,
+            amount: 100,
+            smsCount: 500,
+            status: 'approved',
+            paymentMethod: 'bank_transfer',
+            referenceNumber: 'DEMO-002',
+            createdAt: DateTime(2026, 2, 10),
+          ),
+        ],
+        isLoading: false,
+      );
+      return;
+    }
 
     try {
       final results = await Future.wait([
@@ -292,13 +331,53 @@ class BalanceScreenController extends StateNotifier<BalanceScreenState> {
 // ═══════════════════════════════════════════════════════════════════════
 
 class TransactionsController extends StateNotifier<TransactionsState> {
-  TransactionsController(this._repository) : super(const TransactionsState());
+  TransactionsController(this._repository, this._storage) : super(const TransactionsState());
 
   final BalanceRepository _repository;
+  final SecureStorageService _storage;
 
   /// Load the first page of transactions.
   Future<void> loadTransactions() async {
     state = state.copyWith(isLoading: true, error: null);
+
+    if (await _storage.isGuestMode()) {
+      state = state.copyWith(
+        transactions: [
+          TransactionModel(
+            id: 1,
+            amount: 100,
+            smsCount: 500,
+            status: 'approved',
+            paymentMethod: 'online',
+            referenceNumber: 'DEMO-001',
+            createdAt: DateTime(2026, 3, 15),
+          ),
+          TransactionModel(
+            id: 2,
+            amount: 100,
+            smsCount: 500,
+            status: 'approved',
+            paymentMethod: 'bank_transfer',
+            referenceNumber: 'DEMO-002',
+            createdAt: DateTime(2026, 2, 10),
+          ),
+          TransactionModel(
+            id: 3,
+            amount: 50,
+            smsCount: 200,
+            status: 'pending',
+            paymentMethod: 'stc_pay',
+            referenceNumber: 'DEMO-003',
+            createdAt: DateTime(2026, 1, 5),
+          ),
+        ],
+        isLoading: false,
+        currentPage: 1,
+        lastPage: 1,
+        total: 3,
+      );
+      return;
+    }
 
     try {
       final response = await _repository.getTransactions(
@@ -392,12 +471,14 @@ class TransactionsController extends StateNotifier<TransactionsState> {
 // ═══════════════════════════════════════════════════════════════════════
 
 class BuyBalanceController extends StateNotifier<BuyBalanceState> {
-  BuyBalanceController(this._repository) : super(const BuyBalanceState());
+  BuyBalanceController(this._repository, this._storage) : super(const BuyBalanceState());
 
   final BalanceRepository _repository;
+  final SecureStorageService _storage;
 
   /// Load price tiers and banks.
   Future<void> loadInitialData() async {
+    if (await _storage.isGuestMode()) return;
     try {
       final results = await Future.wait([
         _repository.getPriceTiers(),
@@ -582,13 +663,19 @@ class BuyBalanceController extends StateNotifier<BuyBalanceState> {
 // ═══════════════════════════════════════════════════════════════════════
 
 class TransferBalanceController extends StateNotifier<TransferBalanceState> {
-  TransferBalanceController(this._repository)
+  TransferBalanceController(this._repository, this._storage)
       : super(const TransferBalanceState());
 
   final BalanceRepository _repository;
+  final SecureStorageService _storage;
 
   /// Load transfer history.
   Future<void> loadHistory() async {
+    if (await _storage.isGuestMode()) {
+      state = state.copyWith(history: const [], isLoadingHistory: false);
+      return;
+    }
+
     state = state.copyWith(isLoadingHistory: true);
 
     try {
@@ -646,21 +733,24 @@ class TransferBalanceController extends StateNotifier<TransferBalanceState> {
 final balanceScreenControllerProvider =
     StateNotifierProvider<BalanceScreenController, BalanceScreenState>((ref) {
   final repository = ref.watch(balanceRepositoryProvider);
-  return BalanceScreenController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return BalanceScreenController(repository, storage);
 });
 
 /// Provider for the transactions list controller.
 final transactionsControllerProvider =
     StateNotifierProvider<TransactionsController, TransactionsState>((ref) {
   final repository = ref.watch(balanceRepositoryProvider);
-  return TransactionsController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return TransactionsController(repository, storage);
 });
 
 /// Provider for the buy balance controller.
 final buyBalanceControllerProvider =
     StateNotifierProvider<BuyBalanceController, BuyBalanceState>((ref) {
   final repository = ref.watch(balanceRepositoryProvider);
-  return BuyBalanceController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return BuyBalanceController(repository, storage);
 });
 
 /// Provider for the transfer balance controller.
@@ -668,5 +758,6 @@ final transferBalanceControllerProvider =
     StateNotifierProvider<TransferBalanceController, TransferBalanceState>(
         (ref) {
   final repository = ref.watch(balanceRepositoryProvider);
-  return TransferBalanceController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return TransferBalanceController(repository, storage);
 });

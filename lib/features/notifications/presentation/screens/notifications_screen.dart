@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/notifications/data/models/notification_model.dart';
 import 'package:orbit_app/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:orbit_app/features/notifications/presentation/widgets/notification_card.dart';
@@ -61,6 +62,36 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         _isLoading = true;
         _errorMessage = null;
       });
+    }
+
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      if (mounted) {
+        setState(() {
+          _notifications = [
+            NotificationModel(
+              id: 1,
+              message: 'مرحباً بك في النظام التجريبي',
+              senderName: 'DEMO',
+              recipientCount: 10,
+              sentAt: DateTime.now().subtract(const Duration(hours: 1)),
+              status: 'sent',
+            ),
+            NotificationModel(
+              id: 2,
+              message: 'تم تفعيل حسابك بنجاح',
+              senderName: 'النظام',
+              recipientCount: 1,
+              sentAt: DateTime.now().subtract(const Duration(days: 1)),
+              status: 'sent',
+            ),
+          ];
+          _hasMore = false;
+          _currentPage = 1;
+          _isLoading = false;
+        });
+      }
+      return;
     }
 
     try {

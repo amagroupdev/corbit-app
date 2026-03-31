@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/statements/data/models/statement_response_model.dart';
 import 'package:orbit_app/features/statements/data/repositories/statements_repository.dart';
 
@@ -90,9 +91,10 @@ final statementsSearchQueryProvider = StateProvider<String>((ref) => '');
 /// Main controller for the statements list with pagination, refresh, and
 /// append-on-scroll support.
 class StatementsListNotifier extends StateNotifier<StatementsListState> {
-  StatementsListNotifier(this._repository) : super(const StatementsListState());
+  StatementsListNotifier(this._repository, this._storage) : super(const StatementsListState());
 
   final StatementsRepository _repository;
+  final SecureStorageService _storage;
 
   static const int _perPage = 15;
 
@@ -102,6 +104,18 @@ class StatementsListNotifier extends StateNotifier<StatementsListState> {
     StatementFilter? filter,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
+
+    if (await _storage.isGuestMode()) {
+      state = const StatementsListState(
+        items: [],
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        isLoading: false,
+        hasLoadedOnce: true,
+      );
+      return;
+    }
 
     try {
       final result = await _repository.getStatementsList(
@@ -200,7 +214,8 @@ class StatementsListNotifier extends StateNotifier<StatementsListState> {
 final statementsListProvider =
     StateNotifierProvider<StatementsListNotifier, StatementsListState>((ref) {
   final repository = ref.watch(statementsRepositoryProvider);
-  return StatementsListNotifier(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return StatementsListNotifier(repository, storage);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════

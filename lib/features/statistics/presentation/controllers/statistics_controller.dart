@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/statistics/data/models/statistics_model.dart';
 import 'package:orbit_app/features/statistics/data/repositories/statistics_repository.dart';
 
@@ -83,9 +84,10 @@ final statisticsExportingProvider = StateProvider<bool>((ref) => false);
 
 /// Main controller for the statistics list with pagination.
 class StatisticsListNotifier extends StateNotifier<StatisticsListState> {
-  StatisticsListNotifier(this._repository) : super(const StatisticsListState());
+  StatisticsListNotifier(this._repository, this._storage) : super(const StatisticsListState());
 
   final StatisticsRepository _repository;
+  final SecureStorageService _storage;
 
   static const int _perPage = 15;
 
@@ -95,6 +97,18 @@ class StatisticsListNotifier extends StateNotifier<StatisticsListState> {
     StatisticsFilter? filter,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
+
+    if (await _storage.isGuestMode()) {
+      state = const StatisticsListState(
+        items: [],
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        isLoading: false,
+        hasLoadedOnce: true,
+      );
+      return;
+    }
 
     try {
       final result = await _repository.getStatisticsList(
@@ -183,7 +197,8 @@ class StatisticsListNotifier extends StateNotifier<StatisticsListState> {
 final statisticsListProvider =
     StateNotifierProvider<StatisticsListNotifier, StatisticsListState>((ref) {
   final repository = ref.watch(statisticsRepositoryProvider);
-  return StatisticsListNotifier(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return StatisticsListNotifier(repository, storage);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════

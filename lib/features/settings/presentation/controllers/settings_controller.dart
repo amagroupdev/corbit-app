@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/settings/data/models/api_key_model.dart';
 import 'package:orbit_app/features/settings/data/models/contract_model.dart';
 import 'package:orbit_app/features/settings/data/models/invoice_model.dart';
@@ -22,10 +23,26 @@ class ProfileNotifier extends AsyncNotifier<Map<String, dynamic>> {
   @override
   Future<Map<String, dynamic>> build() => _fetch();
 
-  Future<Map<String, dynamic>> _fetch() {
+  Future<Map<String, dynamic>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return _guestProfile;
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.getProfile();
   }
+
+  static const _guestProfile = <String, dynamic>{
+    'id': 0,
+    'name': 'زائر',
+    'username': 'guest',
+    'phone': '0500000000',
+    'email': 'guest@demo.app',
+    'balance': 150.0,
+    'points': 500,
+    'status': 'active',
+    'avatar': null,
+  };
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
@@ -83,7 +100,11 @@ class BalanceReminderNotifier extends AsyncNotifier<BalanceReminderModel> {
   @override
   Future<BalanceReminderModel> build() => _fetch();
 
-  Future<BalanceReminderModel> _fetch() {
+  Future<BalanceReminderModel> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return const BalanceReminderModel();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.getBalanceReminder();
   }
@@ -121,7 +142,11 @@ class SubAccountsNotifier
   @override
   Future<PaginatedResponse<SubAccountModel>> build() => _fetch();
 
-  Future<PaginatedResponse<SubAccountModel>> _fetch() {
+  Future<PaginatedResponse<SubAccountModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return PaginatedResponse<SubAccountModel>.empty();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listSubAccounts(
       page: _currentPage,
@@ -224,7 +249,11 @@ class RolesNotifier extends AsyncNotifier<PaginatedResponse<RoleModel>> {
   @override
   Future<PaginatedResponse<RoleModel>> build() => _fetch();
 
-  Future<PaginatedResponse<RoleModel>> _fetch() {
+  Future<PaginatedResponse<RoleModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return PaginatedResponse<RoleModel>.empty();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listRoles();
   }
@@ -265,6 +294,8 @@ final rolesProvider =
 
 /// Loads all available permissions for role editing.
 final permissionsProvider = FutureProvider<List<PermissionModel>>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  if (await storage.isGuestMode()) return const [];
   final repo = ref.read(settingsRepositoryProvider);
   return repo.getPermissions();
 });
@@ -278,7 +309,9 @@ class SubAccountCategoriesNotifier
   @override
   Future<List<SubAccountCategoryModel>> build() => _fetch();
 
-  Future<List<SubAccountCategoryModel>> _fetch() {
+  Future<List<SubAccountCategoryModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) return const [];
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listSubAccountCategories();
   }
@@ -331,7 +364,11 @@ class InvoicesNotifier
   @override
   Future<PaginatedResponse<InvoiceModel>> build() => _fetch();
 
-  Future<PaginatedResponse<InvoiceModel>> _fetch() {
+  Future<PaginatedResponse<InvoiceModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return PaginatedResponse<InvoiceModel>.empty();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listInvoices(
       page: _currentPage,
@@ -392,7 +429,9 @@ class ApiKeysNotifier extends AsyncNotifier<List<ApiKeyModel>> {
   @override
   Future<List<ApiKeyModel>> build() => _fetch();
 
-  Future<List<ApiKeyModel>> _fetch() {
+  Future<List<ApiKeyModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) return const [];
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listApiKeys();
   }
@@ -434,7 +473,11 @@ class SenderRequestsNotifier
   @override
   Future<PaginatedResponse<SenderRequestModel>> build() => _fetch();
 
-  Future<PaginatedResponse<SenderRequestModel>> _fetch() {
+  Future<PaginatedResponse<SenderRequestModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return PaginatedResponse<SenderRequestModel>.empty();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listSenderRequests(page: _currentPage);
   }
@@ -500,7 +543,11 @@ class ContractsNotifier
   @override
   Future<PaginatedResponse<ContractModel>> build() => _fetch();
 
-  Future<PaginatedResponse<ContractModel>> _fetch() {
+  Future<PaginatedResponse<ContractModel>> _fetch() async {
+    final storage = ref.read(secureStorageProvider);
+    if (await storage.isGuestMode()) {
+      return PaginatedResponse<ContractModel>.empty();
+    }
     final repo = ref.read(settingsRepositoryProvider);
     return repo.listContracts(page: _currentPage);
   }

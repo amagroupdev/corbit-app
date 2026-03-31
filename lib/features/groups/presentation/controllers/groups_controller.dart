@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
@@ -148,13 +149,31 @@ class ImportState {
 // ═══════════════════════════════════════════════════════════════════════
 
 class GroupsListController extends StateNotifier<GroupsListState> {
-  GroupsListController(this._repository) : super(const GroupsListState());
+  GroupsListController(this._repository, this._storage) : super(const GroupsListState());
 
   final GroupsRepository _repository;
+  final SecureStorageService _storage;
+
+  static const _guestGroups = [
+    GroupModel(id: 1, name: 'عملاء VIP', numbersCount: 50),
+    GroupModel(id: 2, name: 'موظفين', numbersCount: 25),
+    GroupModel(id: 3, name: 'تسويق', numbersCount: 100),
+  ];
 
   /// Load the first page of groups.
   Future<void> loadGroups() async {
     state = state.copyWith(isLoading: true, error: null);
+
+    if (await _storage.isGuestMode()) {
+      state = state.copyWith(
+        groups: _guestGroups,
+        isLoading: false,
+        currentPage: 1,
+        lastPage: 1,
+        total: 3,
+      );
+      return;
+    }
 
     try {
       final response = await _repository.listGroups(
@@ -250,13 +269,30 @@ class GroupsListController extends StateNotifier<GroupsListState> {
 // ═══════════════════════════════════════════════════════════════════════
 
 class GroupDetailController extends StateNotifier<GroupDetailState> {
-  GroupDetailController(this._repository) : super(const GroupDetailState());
+  GroupDetailController(this._repository, this._storage) : super(const GroupDetailState());
 
   final GroupsRepository _repository;
+  final SecureStorageService _storage;
 
   /// Load the group and its numbers.
   Future<void> loadGroup(int groupId) async {
     state = state.copyWith(isLoading: true, error: null);
+
+    if (await _storage.isGuestMode()) {
+      final guestGroup = GroupsListController._guestGroups
+          .where((g) => g.id == groupId)
+          .firstOrNull;
+      state = state.copyWith(
+        group: guestGroup ?? const GroupModel(id: 0, name: 'مجموعة تجريبية'),
+        numbersCount: guestGroup?.numbersCount ?? 0,
+        isLoading: false,
+        numbers: [],
+        isLoadingNumbers: false,
+        numbersPage: 1,
+        numbersLastPage: 1,
+      );
+      return;
+    }
 
     try {
       final group = await _repository.getGroup(groupId);
@@ -281,6 +317,16 @@ class GroupDetailController extends StateNotifier<GroupDetailState> {
 
   /// Load numbers for this group.
   Future<void> loadNumbers(int groupId) async {
+    if (await _storage.isGuestMode()) {
+      state = state.copyWith(
+        numbers: [],
+        isLoadingNumbers: false,
+        numbersPage: 1,
+        numbersLastPage: 1,
+      );
+      return;
+    }
+
     state = state.copyWith(isLoadingNumbers: true);
 
     try {
@@ -590,14 +636,16 @@ class ImportController extends StateNotifier<ImportState> {
 final groupsListControllerProvider =
     StateNotifierProvider<GroupsListController, GroupsListState>((ref) {
   final repository = ref.watch(groupsRepositoryProvider);
-  return GroupsListController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return GroupsListController(repository, storage);
 });
 
 /// Provider for the group detail controller.
 final groupDetailControllerProvider =
     StateNotifierProvider<GroupDetailController, GroupDetailState>((ref) {
   final repository = ref.watch(groupsRepositoryProvider);
-  return GroupDetailController(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return GroupDetailController(repository, storage);
 });
 
 /// Provider for the import controller.

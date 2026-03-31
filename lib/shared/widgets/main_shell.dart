@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
+import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
+import 'package:orbit_app/shared/widgets/collapsible_ai_fab.dart';
 
 /// Tracks the currently selected bottom navigation tab index.
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
@@ -101,12 +103,12 @@ class _MainShellState extends ConsumerState<MainShell> {
         }
       },
       child: Scaffold(
-        body: widget.child,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => context.push('/ai-assistant'),
-          backgroundColor: AppColors.primary,
-          tooltip: 'مساعد أوربت',
-          child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
+        body: Stack(
+          children: [
+            widget.child,
+            const CollapsibleAiFab(),
+            const AiCompletionOverlay(),
+          ],
         ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(

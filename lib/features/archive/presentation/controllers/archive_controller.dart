@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
+import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/archive/data/models/archive_model.dart';
 import 'package:orbit_app/features/archive/data/repositories/archive_repository.dart';
 
@@ -100,9 +101,10 @@ final archiveSearchQueryProvider = StateProvider<String>((ref) => '');
 /// Main controller for the archive list with pagination, refresh, and
 /// append-on-scroll support.
 class ArchiveListNotifier extends StateNotifier<ArchiveListState> {
-  ArchiveListNotifier(this._repository) : super(const ArchiveListState());
+  ArchiveListNotifier(this._repository, this._storage) : super(const ArchiveListState());
 
   final ArchiveRepository _repository;
+  final SecureStorageService _storage;
 
   static const int _perPage = 15;
 
@@ -112,6 +114,18 @@ class ArchiveListNotifier extends StateNotifier<ArchiveListState> {
     ArchiveFilter? filter,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
+
+    if (await _storage.isGuestMode()) {
+      state = const ArchiveListState(
+        items: [],
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        isLoading: false,
+        hasLoadedOnce: true,
+      );
+      return;
+    }
 
     try {
       final result = await _repository.getArchiveList(
@@ -210,7 +224,8 @@ class ArchiveListNotifier extends StateNotifier<ArchiveListState> {
 final archiveListProvider =
     StateNotifierProvider<ArchiveListNotifier, ArchiveListState>((ref) {
   final repository = ref.watch(archiveRepositoryProvider);
-  return ArchiveListNotifier(repository);
+  final storage = ref.watch(secureStorageProvider);
+  return ArchiveListNotifier(repository, storage);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════

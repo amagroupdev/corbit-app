@@ -1550,8 +1550,8 @@ const Map<String, String> ar = {
   'doneSuccess': 'تم بنجاح!',
 
   // AI Assistant
-  'aiAssistant': 'مساعد أوربت',
-  'aiAssistantTitle': 'مساعد أوربت',
+  'aiAssistant': 'مساعد Corbit',
+  'aiAssistantTitle': 'مساعد Corbit الذكي',
   'aiTyping': 'يكتب...',
   'aiInputHint': 'اكتب سؤالك...',
   'aiSendButton': 'إرسال',
@@ -1559,9 +1559,9 @@ const Map<String, String> ar = {
   'aiClearChatConfirm': 'هل تريد مسح المحادثة؟',
   'aiErrorMessage': 'عذراً، حدث خطأ. حاول مرة أخرى.',
   'aiOfflineMessage': 'المساعد يحتاج اتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى.',
-  'aiWelcome': 'مرحباً! أنا مساعد أوربت. كيف أقدر أساعدك؟',
+  'aiWelcome': 'مرحباً! أنا مساعد Corbit. كيف أقدر أساعدك؟',
   'aiSuggestion1': 'كيف أرسل رسالة؟',
-  'aiSuggestion2': 'وش خدمات أوربت؟',
+  'aiSuggestion2': 'وش خدمات Corbit؟',
   'aiSuggestion3': 'وديني للإعدادات',
   'aiSuggestion4': 'كيف أشحن رصيدي؟',
   'aiActionNavigate': 'انتقل إلى',
