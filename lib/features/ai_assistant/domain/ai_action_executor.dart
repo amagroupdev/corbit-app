@@ -7,10 +7,12 @@ import 'package:orbit_app/features/ai_assistant/data/models/ai_action_model.dart
 import 'package:orbit_app/features/groups/data/repositories/groups_repository.dart';
 import 'package:orbit_app/routing/app_router.dart';
 import 'package:orbit_app/shared/widgets/ai_completion_overlay.dart';
+import 'package:orbit_app/shared/widgets/ai_working_overlay.dart';
 
 /// Executes AI actions autonomously (navigation, group creation, etc.)
 ///
-/// Flow: close AI chat → navigate slowly → perform action → show completion.
+/// Flow: show working overlay → close AI chat → navigate → perform action
+/// → hide overlay → show completion popup.
 class AiActionExecutor {
   AiActionExecutor(this._ref);
   final Ref _ref;
@@ -18,6 +20,9 @@ class AiActionExecutor {
   /// Execute an action. Returns a status message for the AI to display.
   Future<String> execute(AiActionModel action) async {
     if (!action.isAllowed) return 'Action not allowed';
+
+    // Reset cancel flag
+    _ref.read(aiCancelRequestedProvider.notifier).state = false;
 
     switch (action.type) {
       case 'navigate':
@@ -31,12 +36,31 @@ class AiActionExecutor {
     }
   }
 
+  bool get _isCancelled => _ref.read(aiCancelRequestedProvider);
+
+  void _startWorking(String message) {
+    _ref.read(aiWorkingMessageProvider.notifier).state = message;
+    _ref.read(aiWorkingProvider.notifier).state = true;
+  }
+
+  void _updateWorkingMessage(String message) {
+    _ref.read(aiWorkingMessageProvider.notifier).state = message;
+  }
+
+  void _stopWorking() {
+    _ref.read(aiWorkingProvider.notifier).state = false;
+    _ref.read(aiWorkingMessageProvider.notifier).state = '';
+    _ref.read(aiCancelRequestedProvider.notifier).state = false;
+  }
+
   void _showSuccess(String message) {
+    _stopWorking();
     _ref.read(aiCompletionMessageProvider.notifier).state =
         AiCompletionData(message: message, isSuccess: true);
   }
 
   void _showError(String message) {
+    _stopWorking();
     _ref.read(aiCompletionMessageProvider.notifier).state =
         AiCompletionData(message: message, isSuccess: false);
   }
@@ -45,10 +69,14 @@ class AiActionExecutor {
     final route = action.route;
     if (route == null || route.isEmpty) return 'No route specified';
 
+    _startWorking('جاري التنقل للصفحة المطلوبة...');
+
     final router = _ref.read(appRouterProvider);
 
     router.go('/');
     await Future.delayed(const Duration(milliseconds: 600));
+
+    if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
 
     router.go(route);
     await Future.delayed(const Duration(milliseconds: 400));
@@ -62,15 +90,23 @@ class AiActionExecutor {
     final name = action.name;
     if (name == null || name.isEmpty) return 'No group name specified';
 
+    _startWorking('جاري إنشاء مجموعة "$name"...');
+
     final router = _ref.read(appRouterProvider);
 
     try {
       router.go('/');
       await Future.delayed(const Duration(milliseconds: 600));
 
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري فتح صفحة المجموعات...');
       router.go('/groups');
       await Future.delayed(const Duration(milliseconds: 800));
 
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري إنشاء المجموعة...');
       final repo = _ref.read(groupsRepositoryProvider);
       final group = await repo.createGroup(name: name);
       await Future.delayed(const Duration(milliseconds: 500));
@@ -91,32 +127,60 @@ class AiActionExecutor {
     final name = action.name;
     if (name == null || name.isEmpty) return 'No group name specified';
 
+    _startWorking('جاري إنشاء مجموعة "$name" مع جهات الاتصال...');
+
     final router = _ref.read(appRouterProvider);
 
     try {
       router.go('/');
       await Future.delayed(const Duration(milliseconds: 600));
 
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري فتح صفحة المجموعات...');
       router.go('/groups');
       await Future.delayed(const Duration(milliseconds: 800));
 
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
+
+      _updateWorkingMessage('جاري إنشاء المجموعة...');
       final repo = _ref.read(groupsRepositoryProvider);
       final group = await repo.createGroup(name: name);
       await Future.delayed(const Duration(milliseconds: 500));
+
+      if (_isCancelled) { _stopWorking(); return 'Cancelled'; }
 
       router.push('/groups/${group.id}');
       await Future.delayed(const Duration(milliseconds: 600));
 
       if (action.addDeviceContacts) {
+        _updateWorkingMessage('جاري طلب صلاحية جهات الاتصال...');
         final hasPermission =
             await FlutterContacts.requestPermission(readonly: true);
         if (hasPermission) {
+          _updateWorkingMessage('جاري قراءة جهات الاتصال...');
           final contacts =
               await FlutterContacts.getContacts(withProperties: true);
           final saudiRegex = RegExp(r'^(?:\+?966|0)?5[0-9]{8}$');
 
           int added = 0;
+          int total = 0;
+          // Count total Saudi numbers first
           for (final contact in contacts) {
+            for (final phone in contact.phones) {
+              final cleaned =
+                  phone.number.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+              if (saudiRegex.hasMatch(cleaned)) total++;
+            }
+          }
+
+          for (final contact in contacts) {
+            if (_isCancelled) {
+              _showSuccess(
+                  'تم إيقاف المساعد — أضاف $added جهة اتصال من أصل $total قبل الإيقاف');
+              return 'Cancelled after adding $added contacts';
+            }
+
             for (final phone in contact.phones) {
               final cleaned =
                   phone.number.replaceAll(RegExp(r'[\s\-\(\)]'), '');
@@ -136,6 +200,8 @@ class AiActionExecutor {
                     number: formatted,
                   );
                   added++;
+                  _updateWorkingMessage(
+                      'جاري إضافة جهات الاتصال... ($added/$total)');
                 } catch (_) {}
               }
             }
