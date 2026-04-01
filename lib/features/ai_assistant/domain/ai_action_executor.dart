@@ -229,8 +229,14 @@ class AiActionExecutor {
   Future<String> _executeCreateTemplate(AiActionModel action) async {
     final name = action.name;
     final content = action.content;
-    if (name == null || name.isEmpty) return 'No template name specified';
-    if (content == null || content.isEmpty) return 'No template content specified';
+    if (name == null || name.isEmpty) {
+      _showError('ما قدرت أسوي القالب — ما حددت اسم القالب. قول لي وش تبي اسمه');
+      return 'No template name specified';
+    }
+    if (content == null || content.isEmpty) {
+      _showError('ما قدرت أسوي القالب "$name" — ما حددت محتوى الرسالة. قول لي وش تبي المحتوى');
+      return 'No template content specified';
+    }
 
     _startWorking('جاري إنشاء قالب "$name"...');
 

@@ -78,7 +78,7 @@ class TemplatesRepository {
         ApiConstants.templates,
         data: {
           'name': name,
-          'body': body,
+          'template': body,
         },
       );
 
@@ -107,7 +107,7 @@ class TemplatesRepository {
         ApiConstants.templateUpdate(id),
         data: {
           'name': name,
-          'body': body,
+          'template': body,
         },
       );
 

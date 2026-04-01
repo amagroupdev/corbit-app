@@ -30,9 +30,13 @@ class DashboardRepository {
 
       final data = response.data;
       if (data != null && data['success'] == true && data['data'] != null) {
-        return DashboardStats.fromJson(
+        var stats = DashboardStats.fromJson(
           data['data'] as Map<String, dynamic>,
         );
+
+        // Supplement missing data from individual endpoints
+        stats = await _supplementMissingData(stats);
+        return stats;
       }
 
       // If the aggregate endpoint returned unexpected shape, try individual.
@@ -287,6 +291,7 @@ class DashboardRepository {
         data: {
           'page': 1,
           'per_page': 5,
+          'archive_type': 'general',
         },
       );
       final archiveData = archiveResponse.data;
@@ -407,6 +412,82 @@ class DashboardRepository {
       nextLevelRequirement: nextLevelRequirement,
       recentMessages: recentMessages,
     );
+  }
+
+  // ─── Supplement Missing Data ──────────────────────────────────────
+
+  /// Fills in avatar, userName, and recentMessages when the aggregate
+  /// /dashboard endpoint didn't include them.
+  Future<DashboardStats> _supplementMissingData(DashboardStats stats) async {
+    String userName = stats.userName;
+    String userAvatar = stats.userAvatar;
+    List<RecentMessage> recentMessages = stats.recentMessages;
+
+    // Fetch user profile if avatar or name is missing
+    if (userAvatar.isEmpty || userName.isEmpty) {
+      try {
+        final meResponse = await _apiClient.get<Map<String, dynamic>>(
+          ApiConstants.me,
+        );
+        final meData = meResponse.data;
+        if (meData != null) {
+          final inner = meData['data'] as Map<String, dynamic>? ?? meData;
+          if (userName.isEmpty) {
+            userName = inner['name'] as String? ??
+                inner['full_name'] as String? ??
+                '';
+          }
+          if (userAvatar.isEmpty) {
+            userAvatar = inner['profile_photo_url'] as String? ??
+                inner['avatar_url'] as String? ??
+                inner['avatar'] as String? ??
+                '';
+          }
+        }
+      } catch (e) {
+        debugPrint('[DashboardRepo] supplement /auth/me error: $e');
+      }
+    }
+
+    // Always fetch recent messages from archive for richer data
+    // (sender_name, message_body, etc. not available from /dashboard)
+    {
+      try {
+        final archiveResponse = await _apiClient.post<Map<String, dynamic>>(
+          '/archive/list',
+          data: {'page': 1, 'per_page': 5, 'archive_type': 'general'},
+        );
+        final archiveData = archiveResponse.data;
+        if (archiveData != null && archiveData['data'] != null) {
+          final dataField = archiveData['data'];
+          List? messagesList;
+          if (dataField is Map<String, dynamic>) {
+            messagesList = dataField['messages'] as List? ?? dataField['data'] as List?;
+          } else if (dataField is List) {
+            messagesList = dataField;
+          }
+          if (messagesList != null) {
+            recentMessages = messagesList
+                .whereType<Map<String, dynamic>>()
+                .map((item) => RecentMessage.fromArchiveJson(item))
+                .toList();
+          }
+        }
+      } catch (e) {
+        debugPrint('[DashboardRepo] supplement /archive/list error: $e');
+      }
+    }
+
+    if (userName != stats.userName ||
+        userAvatar != stats.userAvatar ||
+        recentMessages.isNotEmpty) {
+      return stats.copyWith(
+        userName: userName,
+        userAvatar: userAvatar,
+        recentMessages: recentMessages,
+      );
+    }
+    return stats;
   }
 
   // ─── Banners ────────────────────────────────────────────────────────

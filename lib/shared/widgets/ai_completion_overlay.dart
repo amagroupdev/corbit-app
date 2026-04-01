@@ -119,7 +119,9 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
         : AppColors.error.withValues(alpha: 0.2);
 
     return Positioned.fill(
-      child: GestureDetector(
+      child: Material(
+        type: MaterialType.transparency,
+        child: GestureDetector(
         onTap: _dismiss,
         child: FadeTransition(
           opacity: _fadeAnim,
@@ -218,6 +220,7 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
             ),
           ),
         ),
+      ),
       ),
     );
   }

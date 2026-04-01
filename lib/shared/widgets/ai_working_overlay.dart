@@ -56,7 +56,9 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
     if (!isWorking) return const SizedBox.shrink();
 
     return Positioned.fill(
-      child: Container(
+      child: Material(
+        type: MaterialType.transparency,
+        child: Container(
         color: Colors.black.withValues(alpha: 0.6),
         child: Center(
           child: Container(
@@ -175,6 +177,7 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
             ),
           ),
         ),
+      ),
       ),
     );
   }

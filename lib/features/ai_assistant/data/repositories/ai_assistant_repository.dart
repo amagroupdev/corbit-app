@@ -7,6 +7,7 @@ import 'package:orbit_app/features/ai_assistant/data/datasources/deepseek_dataso
 import 'package:orbit_app/features/ai_assistant/data/datasources/rag_local_datasource.dart';
 import 'package:orbit_app/features/ai_assistant/data/models/ai_action_model.dart';
 import 'package:orbit_app/features/ai_assistant/data/models/chat_message_model.dart';
+import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 
 /// Repository that combines the DeepSeek LLM with local RAG context
 /// to power the AI assistant feature.
@@ -20,11 +21,13 @@ class AiAssistantRepository {
   const AiAssistantRepository({
     required DeepSeekDatasource deepSeekDatasource,
     required RagLocalDatasource ragDatasource,
+    this.userName = '',
   })  : _deepSeekDatasource = deepSeekDatasource,
         _ragDatasource = ragDatasource;
 
   final DeepSeekDatasource _deepSeekDatasource;
   final RagLocalDatasource _ragDatasource;
+  final String userName;
 
   /// Ensures the DeepSeek API key is stored in secure storage.
   ///
@@ -77,6 +80,7 @@ class AiAssistantRepository {
             .map((c) => '## ${c.title}\n${c.content}')
             .join('\n\n'),
         navigationMap: navigationMap,
+        userName: userName,
       );
 
       // 3. Build messages array (last N history + new user message).
@@ -178,12 +182,21 @@ class AiAssistantRepository {
     required String basePrompt,
     required String ragContext,
     required String navigationMap,
+    String userName = '',
   }) {
     final buffer = StringBuffer();
 
     // Base system prompt.
     if (basePrompt.isNotEmpty) {
       buffer.writeln(basePrompt);
+      buffer.writeln();
+    }
+
+    // User identity section.
+    if (userName.isNotEmpty) {
+      buffer.writeln('--- معلومات العميل ---');
+      buffer.writeln('اسم العميل: $userName');
+      buffer.writeln('استخدم اسم العميل أحياناً بشكل طبيعي ومهذب في ردودك — مثلاً في الترحيب أو التأكيد على إنجاز مهمة. لا تذكر الاسم في كل رسالة، فقط لما يكون مناسب للسياق ويضيف لمسة شخصية. خاطبه بأدب واحترام فائق.');
       buffer.writeln();
     }
 
@@ -208,8 +221,10 @@ class AiAssistantRepository {
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 final aiAssistantRepositoryProvider = Provider<AiAssistantRepository>((ref) {
+  final user = ref.watch(currentUserProvider);
   return AiAssistantRepository(
     deepSeekDatasource: ref.watch(deepSeekDatasourceProvider),
     ragDatasource: ref.watch(ragLocalDatasourceProvider),
+    userName: user?.name ?? '',
   );
 });
