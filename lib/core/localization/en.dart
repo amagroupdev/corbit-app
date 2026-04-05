@@ -601,6 +601,12 @@ const Map<String, String> en = {
   'editProfile': 'Edit Profile',
   'profileUpdated': 'Profile updated successfully',
   'deleteAccount': 'Delete Account',
+  'deleteAccountTitle': 'Delete My Account',
+  'deleteAccountWarning': 'Are you sure you want to delete your account? All your data will be permanently deleted and cannot be recovered.',
+  'deleteAccountConfirm': 'Yes, Delete My Account',
+  'deleteAccountSuccess': 'Your request has been received. Your account will be deleted within 72 hours.',
+  'deleteAccountSubtitle': 'Permanently delete your account and all data',
+  'settings_section_danger': 'Danger Zone',
   'confirmLogout': 'Are you sure you want to logout?',
   'confirmDeleteAccount':
       'Are you sure you want to delete your account? This action cannot be undone.',

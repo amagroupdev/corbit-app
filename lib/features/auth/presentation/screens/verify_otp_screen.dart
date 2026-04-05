@@ -62,7 +62,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -80,7 +80,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
             SnackBar(
               content: Text(
                 next.message!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
@@ -138,7 +138,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                 Text(
                   t.translate('verifyPhoneNumber'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -148,7 +148,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                 Text(
                   t.translate('enterOtpSentToPhone'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -189,7 +189,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                       Text(
                         '${t.translate('codeValidityExpires')} ${otpState.formattedTime} ${t.translate('minuteUnit')}',
                         style: const TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
@@ -228,7 +228,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                         : Text(
                             t.translate('verifyCode'),
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -244,7 +244,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                     Text(
                       t.translate('didNotReceiveCode'),
                       style: const TextStyle(
-                        fontFamily: 'Cairo',
+                        fontFamily: 'IBMPlexSansArabic',
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
@@ -267,7 +267,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                           : Text(
                               t.translate('resend'),
                               style: TextStyle(
-                                fontFamily: 'Cairo',
+                                fontFamily: 'IBMPlexSansArabic',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: otpState.canResend

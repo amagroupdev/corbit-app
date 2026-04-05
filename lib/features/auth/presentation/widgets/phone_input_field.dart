@@ -132,7 +132,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                   ],
                   style: const TextStyle(
                     fontSize: 15,
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     color: AppColors.textPrimary,
                   ),
                   decoration: InputDecoration(
@@ -140,7 +140,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                     hintStyle: const TextStyle(
                       color: AppColors.inputHint,
                       fontSize: 15,
-                      fontFamily: 'Cairo',
+                      fontFamily: 'IBMPlexSansArabic',
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -164,7 +164,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
               style: const TextStyle(
                 color: AppColors.error,
                 fontSize: 12,
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
               ),
             ),
           ),
@@ -201,7 +201,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                       c.code,
                       style: const TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Cairo',
+                        fontFamily: 'IBMPlexSansArabic',
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
@@ -211,7 +211,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                       t.translate(c.nameKey),
                       style: const TextStyle(
                         fontSize: 13,
-                        fontFamily: 'Cairo',
+                        fontFamily: 'IBMPlexSansArabic',
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -234,7 +234,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                 selected.code,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),

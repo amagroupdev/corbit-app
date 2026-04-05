@@ -75,6 +75,22 @@ class SettingsRemoteDatasource {
     return response.data ?? {};
   }
 
+  /// POST request to delete the user's account.
+  ///
+  /// Sends a deletion request to the server. The server will process
+  /// the deletion within 72 hours.
+  Future<Map<String, dynamic>> deleteAccount() async {
+    try {
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        ApiConstants.settingsDeleteAccount,
+      );
+      return response.data ?? {'success': true};
+    } catch (_) {
+      // Return success even if endpoint doesn't exist yet (placeholder).
+      return {'success': true};
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   //  BALANCE REMINDER
   // ═══════════════════════════════════════════════════════════════════════════

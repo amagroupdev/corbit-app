@@ -4,11 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/providers/locale_provider.dart';
+import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/settings/data/models/sub_account_model.dart';
+import 'package:orbit_app/features/settings/data/repositories/settings_repository.dart';
 import 'package:orbit_app/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:orbit_app/features/settings/presentation/widgets/settings_item.dart';
 import 'package:orbit_app/features/settings/presentation/widgets/settings_section.dart';
 import 'package:orbit_app/routing/route_names.dart';
+import 'package:orbit_app/shared/widgets/app_confirmation_dialog.dart';
 
 import 'package:orbit_app/core/localization/app_localizations.dart';
 /// Main settings screen with grouped list items organized by category.
@@ -130,6 +133,15 @@ class SettingsScreen extends ConsumerWidget {
                   subtitle: AppLocalizations.of(context)!.translate('settings_contracts_subtitle'),
                   onTap: () => context.pushNamed(RouteNames.contracts),
                 ),
+              ],
+            ),
+
+            // ── منطقة الخطر (Danger Zone) ──────────────────────────
+            SettingsSection(
+              title: AppLocalizations.of(context)!.translate('settings_section_danger'),
+              icon: Icons.warning_rounded,
+              children: [
+                _DeleteAccountItem(),
               ],
             ),
           ],
@@ -468,6 +480,84 @@ class _BalanceReminderSheetState extends ConsumerState<_BalanceReminderSheet> {
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+}
+
+/// Delete account button with confirmation dialog.
+class _DeleteAccountItem extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_DeleteAccountItem> createState() => _DeleteAccountItemState();
+}
+
+class _DeleteAccountItemState extends ConsumerState<_DeleteAccountItem> {
+  bool _isDeleting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsItem(
+      icon: Icons.delete_forever_rounded,
+      title: AppLocalizations.of(context)!.translate('deleteAccountTitle'),
+      subtitle: AppLocalizations.of(context)!.translate('deleteAccountSubtitle'),
+      iconColor: AppColors.error,
+      iconBackgroundColor: AppColors.errorSurface,
+      showChevron: false,
+      trailing: _isDeleting
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.error),
+            )
+          : const Icon(Icons.chevron_right_rounded, color: AppColors.error),
+      onTap: _isDeleting ? () {} : _handleDeleteAccount,
+    );
+  }
+
+  Future<void> _handleDeleteAccount() async {
+    final confirmed = await AppConfirmationDialog.show(
+      context: context,
+      title: AppLocalizations.of(context)!.translate('deleteAccountTitle'),
+      message: AppLocalizations.of(context)!.translate('deleteAccountWarning'),
+      confirmText: AppLocalizations.of(context)!.translate('deleteAccountConfirm'),
+      isDestructive: true,
+      icon: Icons.warning_rounded,
+    );
+
+    if (!confirmed || !mounted) return;
+
+    setState(() => _isDeleting = true);
+
+    try {
+      final repository = ref.read(settingsRepositoryProvider);
+      await repository.deleteAccount();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.translate('deleteAccountSuccess'),
+          ),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+
+      // Logout after showing the message
+      await ref.read(logoutControllerProvider).logout();
+      if (mounted) {
+        context.goNamed(RouteNames.login);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isDeleting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppLocalizations.of(context)!.translate('error_prefix')}: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 }

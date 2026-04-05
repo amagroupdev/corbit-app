@@ -272,12 +272,12 @@ class _MessageCenterScreenState extends ConsumerState<MessageCenterScreen>
         labelStyle: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
         ),
         unselectedLabelStyle: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w400,
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
         ),
         indicatorColor: AppColors.primary,
         indicatorWeight: 3,

@@ -159,7 +159,7 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
                         title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
@@ -170,7 +170,7 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
                         _currentMessage,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textSecondary,
@@ -182,7 +182,7 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
                         subtitle,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                           color: AppColors.textHint,
@@ -206,7 +206,7 @@ class _AiCompletionOverlayState extends ConsumerState<AiCompletionOverlay>
                           child: Text(
                             buttonText,
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),

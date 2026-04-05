@@ -102,7 +102,7 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
                   'المساعد يشتغل...',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -116,7 +116,7 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
                     message,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontFamily: 'Cairo',
+                      fontFamily: 'IBMPlexSansArabic',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
@@ -130,7 +130,7 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
                   'انتظر شوي وخل المساعد يكمل شغله',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 12,
                     color: AppColors.textHint,
                   ),
@@ -158,7 +158,7 @@ class _AiWorkingOverlayState extends ConsumerState<AiWorkingOverlay>
                     label: const Text(
                       'إيقاف المساعد',
                       style: TextStyle(
-                        fontFamily: 'Cairo',
+                        fontFamily: 'IBMPlexSansArabic',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),

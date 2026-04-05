@@ -61,7 +61,7 @@ class AppHelpers {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                   ),
                 ),
               ),
@@ -100,7 +100,7 @@ class AppHelpers {
         title: Text(
           title,
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -108,7 +108,7 @@ class AppHelpers {
         content: Text(
           message,
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
           ),
         ),
@@ -117,7 +117,7 @@ class AppHelpers {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               cancelText ?? 'إلغاء',
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
             ),
           ),
           ElevatedButton(
@@ -131,7 +131,7 @@ class AppHelpers {
             ),
             child: Text(
               confirmText ?? 'تأكيد',
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
             ),
           ),
         ],
@@ -229,7 +229,7 @@ class AppHelpers {
                   Text(
                     message,
                     style: const TextStyle(
-                      fontFamily: 'Cairo',
+                      fontFamily: 'IBMPlexSansArabic',
                       fontSize: 14,
                     ),
                   ),

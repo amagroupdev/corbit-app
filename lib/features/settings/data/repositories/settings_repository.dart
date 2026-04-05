@@ -45,6 +45,9 @@ class SettingsRepository {
         confirmPassword: confirmPassword,
       );
 
+  /// Sends an account deletion request.
+  Future<Map<String, dynamic>> deleteAccount() => _datasource.deleteAccount();
+
   // ═══════════════════════════════════════════════════════════════════════════
   //  BALANCE REMINDER
   // ═══════════════════════════════════════════════════════════════════════════

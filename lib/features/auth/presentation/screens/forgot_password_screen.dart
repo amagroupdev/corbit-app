@@ -38,7 +38,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           SnackBar(
             content: Text(
               t.translate('pleaseEnterPhone'),
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
             ),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
@@ -69,7 +69,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -143,7 +143,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Text(
           t.translate('forgotPassword'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -153,7 +153,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Text(
           t.translate('enterRegisteredPhone'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             color: AppColors.textSecondary,
           ),
@@ -182,7 +182,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Text(
                 t.translate('phone'),
                 style: const TextStyle(
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -225,7 +225,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       : Text(
                           t.translate('sendVerificationCode'),
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -250,7 +250,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Text(
                 t.translate('backToLogin'),
                 style: const TextStyle(
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
@@ -290,7 +290,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Text(
           t.translate('sentSuccessfully'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -301,7 +301,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Text(
           message,
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             color: AppColors.textSecondary,
           ),
@@ -326,7 +326,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             child: Text(
               t.translate('backToLogin'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),

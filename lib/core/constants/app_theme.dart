@@ -5,7 +5,7 @@ import 'app_colors.dart';
 
 /// Complete application theme configuration for ORBIT SMS V3.
 ///
-/// Uses Cairo font family, supports RTL layout, and provides both
+/// Uses IBM Plex Sans Arabic font family, supports RTL layout, and provides both
 /// light (default) and dark theme variants.
 ///
 /// Usage:
@@ -19,7 +19,7 @@ abstract final class AppTheme {
   // ──────────────────────────────────────────────
   // Font Family
   // ──────────────────────────────────────────────
-  static const String _fontFamily = 'Cairo';
+  static const String _fontFamily = 'IBMPlexSansArabic';
 
   // ──────────────────────────────────────────────
   // Border Radius Constants

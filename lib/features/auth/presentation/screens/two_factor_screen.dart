@@ -57,7 +57,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -115,7 +115,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 Text(
                   t.translate('twoStepVerification'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -125,7 +125,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                 Text(
                   t.translate('enterCodeSentToDevice'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -166,7 +166,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                       Text(
                         '${t.translate('codeValidityExpires')} ${otpState.formattedTime} ${t.translate('minuteUnit')}',
                         style: const TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
@@ -205,7 +205,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                         : Text(
                             t.translate('verifyCode'),
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -221,7 +221,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                     Text(
                       t.translate('didNotReceiveCode'),
                       style: const TextStyle(
-                        fontFamily: 'Cairo',
+                        fontFamily: 'IBMPlexSansArabic',
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
@@ -232,7 +232,7 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                       child: Text(
                         t.translate('reLogin'),
                         style: TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: otpState.canResend

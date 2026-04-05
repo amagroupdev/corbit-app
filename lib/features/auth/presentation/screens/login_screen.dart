@@ -88,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Text(
               errors.join('\n'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 12,
                 color: AppColors.error,
               ),
@@ -131,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -198,7 +198,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           t.translate('welcomeBackTitle'),
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -209,7 +209,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           t.translate('signInToAccount'),
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
@@ -288,7 +288,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Text(
           t.translate('phone'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -318,7 +318,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Text(
           t.translate('username'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -336,14 +336,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             return null;
           },
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 15,
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: t.translate('enterUsername'),
             hintStyle: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               color: AppColors.inputHint,
             ),
@@ -391,7 +391,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Text(
           t.translate('password'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -414,14 +414,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             return null;
           },
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 15,
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: t.translate('enterPassword'),
             hintStyle: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               color: AppColors.inputHint,
             ),
@@ -502,7 +502,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Text(
                 t.translate('rememberMe'),
                 style: const TextStyle(
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontSize: 13,
                   color: AppColors.textSecondary,
                 ),
@@ -519,7 +519,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Text(
             t.translate('forgotPassword'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
@@ -556,7 +556,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             : Text(
                 t.translate('login'),
                 style: const TextStyle(
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -570,7 +570,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       TextSpan(
         text: t.translate('loginBySigningIn'),
         style: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
           fontSize: 12,
           color: AppColors.textSecondary,
         ),
@@ -578,7 +578,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           TextSpan(
             text: t.translate('usagePolicy'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
               decoration: TextDecoration.underline,
@@ -603,7 +603,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         label: Text(
           t.translate('tryTheApp'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
@@ -626,7 +626,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Text(
           t.translate('dontHaveAccount'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             color: AppColors.textSecondary,
           ),
@@ -637,7 +637,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Text(
             t.translate('createAccount'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: AppColors.primary,

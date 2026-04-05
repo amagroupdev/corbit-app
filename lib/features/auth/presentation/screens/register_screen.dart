@@ -292,7 +292,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Text(
               errors.join('\n'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 12,
                 color: AppColors.error,
               ),
@@ -335,7 +335,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -368,7 +368,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -404,7 +404,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         title: Text(
           t.translate('registerNewAccount'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -500,7 +500,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         ? t.translate('createAccount')
                                         : t.translate('verify'),
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -575,7 +575,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     : Text(
                         '${stepIndex + 1}',
                         style: TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: isCurrent
@@ -596,7 +596,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   labels[index],
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 10,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                     color: isActive
@@ -626,7 +626,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             t.translate('selectAccountType'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -636,7 +636,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             t.translate('selectAccountTypeDesc'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
@@ -693,7 +693,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Text(
                             t.translate(type.labelKey),
                             style: TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight:
                                   isSelected ? FontWeight.w700 : FontWeight.w600,
@@ -707,7 +707,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             t.translate(type.descKey),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -741,7 +741,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Text(
               t.translate('generalData'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -751,7 +751,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Text(
               t.translate('enterPersonalInfo'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
@@ -833,8 +833,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 value: _selectedGender,
                 hint: t.translate('selectGender'),
                 items: [
-                  DropdownMenuItem(value: 'M', child: Text(t.translate('male'), style: const TextStyle(fontFamily: 'Cairo'))),
-                  DropdownMenuItem(value: 'F', child: Text(t.translate('female'), style: const TextStyle(fontFamily: 'Cairo'))),
+                  DropdownMenuItem(value: 'M', child: Text(t.translate('male'), style: const TextStyle(fontFamily: 'IBMPlexSansArabic'))),
+                  DropdownMenuItem(value: 'F', child: Text(t.translate('female'), style: const TextStyle(fontFamily: 'IBMPlexSansArabic'))),
                 ],
                 onChanged: (v) {
                   setState(() => _selectedGender = v);
@@ -906,7 +906,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             t.translate('accountData'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -916,7 +916,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             t.translate('uploadRequiredDocs'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
@@ -953,7 +953,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Text(
                             t.translate('uploadPhoto'),
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 10,
                               color: AppColors.textSecondary,
                             ),
@@ -1025,7 +1025,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 .map((r) => DropdownMenuItem(
                       value: r['id'] as String,
                       child: Text(r['name'] as String,
-                          style: const TextStyle(fontFamily: 'Cairo')),
+                          style: const TextStyle(fontFamily: 'IBMPlexSansArabic')),
                     ))
                 .toList(),
             onChanged: (v) {
@@ -1053,7 +1053,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 .map((c) => DropdownMenuItem(
                       value: c['id'] as String,
                       child: Text(c['name'] as String,
-                          style: const TextStyle(fontFamily: 'Cairo')),
+                          style: const TextStyle(fontFamily: 'IBMPlexSansArabic')),
                     ))
                 .toList(),
             onChanged: (v) {
@@ -1106,7 +1106,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             t.translate('verifyPhone'),
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1117,7 +1117,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             t.translate('otpSentMessage'),
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: 'Cairo',
+              fontFamily: 'IBMPlexSansArabic',
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
@@ -1141,7 +1141,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Text(
               otpState.formattedTime,
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
@@ -1161,7 +1161,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: Text(
                 t.translate('resendCode'),
                 style: TextStyle(
-                  fontFamily: 'Cairo',
+                  fontFamily: 'IBMPlexSansArabic',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: otpState.isResending
@@ -1206,7 +1206,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Text(
               t.translate('welcomeRegistration'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -1217,7 +1217,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               t.translate('welcomeRegistrationDesc'),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
@@ -1239,7 +1239,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 child: Text(
                   t.translate('getStarted'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1260,7 +1260,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Text(
       text,
       style: const TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
@@ -1282,14 +1282,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       keyboardType: keyboardType,
       onChanged: onChanged,
       style: const TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 15,
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
           fontSize: 14,
           color: AppColors.inputHint,
         ),
@@ -1335,14 +1335,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       validator: validator,
       onChanged: onChanged,
       style: const TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 15,
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
           fontSize: 14,
           color: AppColors.inputHint,
         ),
@@ -1396,7 +1396,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       hint: Text(
         hint,
         style: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'IBMPlexSansArabic',
           fontSize: 14,
           color: AppColors.inputHint,
         ),
@@ -1407,7 +1407,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       icon: const Icon(Icons.keyboard_arrow_down_rounded,
           color: AppColors.textSecondary),
       style: const TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 15,
         color: AppColors.textPrimary,
       ),
@@ -1467,7 +1467,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         Text(
                           file.name,
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -1477,7 +1477,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         Text(
                           '${(file.size / 1024).toStringAsFixed(1)} KB',
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
@@ -1509,7 +1509,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   Text(
                     label,
                     style: const TextStyle(
-                      fontFamily: 'Cairo',
+                      fontFamily: 'IBMPlexSansArabic',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -1519,7 +1519,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   Text(
                     sublabel,
                     style: const TextStyle(
-                      fontFamily: 'Cairo',
+                      fontFamily: 'IBMPlexSansArabic',
                       fontSize: 12,
                       color: AppColors.textSecondary,
                     ),

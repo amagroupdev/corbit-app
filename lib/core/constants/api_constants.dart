@@ -172,6 +172,7 @@ abstract final class ApiConstants {
   static const String settingsProfile = '/settings/profile';
   static const String settingsProfilePhoto = '/settings/profile/photo';
   static const String settingsPassword = '/settings/password';
+  static const String settingsDeleteAccount = '/settings/account/delete';
   static const String settingsBalanceReminder = '/settings/balance-reminder';
   static const String settingsHelp = '/settings/help';
 

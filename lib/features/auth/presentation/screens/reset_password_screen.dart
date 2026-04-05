@@ -92,7 +92,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             SnackBar(
               content: Text(
                 next.error!,
-                style: const TextStyle(fontFamily: 'Cairo'),
+                style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -159,7 +159,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         Text(
           t.translate('resetPassword'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -169,7 +169,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         Text(
           t.translate('enterNewPassword'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             color: AppColors.textSecondary,
           ),
@@ -201,7 +201,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 Text(
                   t.translate('newPassword'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -222,7 +222,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     return null;
                   },
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 15,
                     color: AppColors.textPrimary,
                   ),
@@ -254,7 +254,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       Text(
                         '${t.translate('passwordStrengthLabel')} ${_strengthLabel(strength, t)}',
                         style: TextStyle(
-                          fontFamily: 'Cairo',
+                          fontFamily: 'IBMPlexSansArabic',
                           fontSize: 12,
                           color: _strengthColor(strength),
                           fontWeight: FontWeight.w600,
@@ -271,7 +271,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 Text(
                   t.translate('confirmPassword'),
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -288,7 +288,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     return null;
                   },
                   style: const TextStyle(
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                     fontSize: 15,
                     color: AppColors.textPrimary,
                   ),
@@ -330,7 +330,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                         : Text(
                             t.translate('resetPassword'),
                             style: const TextStyle(
-                              fontFamily: 'Cairo',
+                              fontFamily: 'IBMPlexSansArabic',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -371,7 +371,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         Text(
           t.translate('doneSuccess'),
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -382,7 +382,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         Text(
           message,
           style: const TextStyle(
-            fontFamily: 'Cairo',
+            fontFamily: 'IBMPlexSansArabic',
             fontSize: 14,
             color: AppColors.textSecondary,
           ),
@@ -406,7 +406,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             child: Text(
               t.translate('login'),
               style: const TextStyle(
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -429,7 +429,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 14,
         color: AppColors.inputHint,
       ),

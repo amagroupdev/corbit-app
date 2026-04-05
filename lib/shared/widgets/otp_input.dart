@@ -128,7 +128,7 @@ class _OtpInputState extends State<OtpInput> {
                       ? Text(
                           _text[index],
                           style: const TextStyle(
-                            fontFamily: 'Cairo',
+                            fontFamily: 'IBMPlexSansArabic',
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,

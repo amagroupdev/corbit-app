@@ -162,7 +162,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
               ),
               textAlign: TextAlign.center,
             ),
@@ -172,7 +172,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
               style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
-                fontFamily: 'Cairo',
+                fontFamily: 'IBMPlexSansArabic',
               ),
               textAlign: TextAlign.center,
             ),
@@ -195,7 +195,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Cairo',
+                    fontFamily: 'IBMPlexSansArabic',
                   ),
                 ),
               ),
@@ -212,7 +212,7 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(fontFamily: 'Cairo'),
+          style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
         ),
         backgroundColor: isError ? AppColors.error : AppColors.success,
         behavior: SnackBarBehavior.floating,
