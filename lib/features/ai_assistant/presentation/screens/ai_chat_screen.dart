@@ -5,307 +5,417 @@ import 'package:go_router/go_router.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
-import 'package:orbit_app/features/ai_assistant/data/models/ai_action_model.dart';
-import 'package:orbit_app/features/ai_assistant/data/models/chat_message_model.dart';
-import 'package:orbit_app/features/ai_assistant/presentation/controllers/chat_controller.dart';
-import 'package:orbit_app/features/ai_assistant/presentation/widgets/ai_input_bar.dart';
-import 'package:orbit_app/features/ai_assistant/presentation/widgets/ai_suggestion_chips.dart';
-import 'package:orbit_app/features/ai_assistant/presentation/widgets/ai_typing_indicator.dart';
-import 'package:orbit_app/features/ai_assistant/presentation/widgets/chat_bubble.dart';
 
-/// Main AI Assistant chat screen with a WhatsApp-like design.
-///
-/// Displays a chat conversation between the user and the ORBIT AI assistant.
-/// Features:
-/// - Reversed ListView for auto-scroll to the latest message
-/// - Suggestion chips when chat is empty
-/// - Typing indicator during streaming
-/// - Action buttons parsed from assistant responses
-/// - RTL/LTR support based on current locale
-class AiChatScreen extends ConsumerStatefulWidget {
+class AiChatScreen extends ConsumerWidget {
   const AiChatScreen({super.key});
 
   @override
-  ConsumerState<AiChatScreen> createState() => _AiChatScreenState();
-}
-
-class _AiChatScreenState extends ConsumerState<AiChatScreen> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize RAG datasource and seed API key on first open.
-    Future.microtask(() {
-      ref.read(chatProvider.notifier).initializeRag();
-      // Inject any completion messages from actions executed while away.
-      ref.read(chatProvider.notifier).injectCompletionMessages();
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  /// Scrolls to the bottom of the chat list.
-  void _scrollToBottom() {
-    if (!_scrollController.hasClients) return;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          0.0, // reversed list: 0 is the bottom
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  void _handleSendMessage(String text) {
-    ref.read(chatProvider.notifier).sendMessage(text);
-    _scrollToBottom();
-  }
-
-  void _handleClearChat() {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final isArabic = t?.isRtl ?? true;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        ),
-        title: Text(
-          isArabic ? 'مسح المحادثة' : 'Clear Chat',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        content: Text(
-          isArabic
-              ? 'هل تريد مسح جميع الرسائل؟'
-              : 'Do you want to clear all messages?',
-          style: const TextStyle(
-            fontSize: 15,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              t?.translate('cancel') ?? 'Cancel',
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(chatProvider.notifier).clearChat();
-            },
-            child: Text(
-              t?.translate('delete') ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleActionTap(AiActionModel action) {
-    if (!action.isAllowed) return;
-
-    // Only suggest_link actions reach here now (others are auto-executed).
-    if (action.type == 'suggest_link') {
-      if (action.route != null && action.route!.isNotEmpty) {
-        context.push(action.route!);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final isArabic = t?.isRtl ?? true;
-    final messagesAsync = ref.watch(chatProvider);
-    final isStreaming = ref.watch(isStreamingProvider);
-
-    // Auto-scroll when messages change.
-    ref.listen(chatProvider, (previous, next) {
-      _scrollToBottom();
-    });
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      appBar: _buildAppBar(isArabic),
-      body: Column(
-        children: [
-          // ── Chat body ──────────────────────────────────────────────
-          Expanded(
-            child: messagesAsync.when(
-              data: (messages) {
-                if (messages.isEmpty) {
-                  return Center(
-                    child: SingleChildScrollView(
-                      child: AiSuggestionChips(
-                        onChipTap: _handleSendMessage,
-                      ),
-                    ),
-                  );
-                }
-
-                return _buildMessageList(messages, isStreaming);
-              },
-              loading: () => const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
-              ),
-              error: (error, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.error,
-                    ),
-                    const SizedBox(height: AppTheme.spacingMd),
-                    Text(
-                      t?.translate('error') ?? 'Error',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppTheme.spacingSm),
-                    TextButton(
-                      onPressed: () => ref.invalidate(chatProvider),
-                      child: Text(
-                        t?.translate('retry') ?? 'Retry',
-                        style: const TextStyle(color: AppColors.primary),
-                      ),
-                    ),
-                  ],
-                ),
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.primarySurface,
+              child: const Icon(
+                Icons.smart_toy_outlined,
+                size: 18,
+                color: AppColors.primary,
               ),
             ),
-          ),
-
-          // ── Input bar ──────────────────────────────────────────────
-          AiInputBar(
-            onSend: _handleSendMessage,
-            isStreaming: isStreaming,
-          ),
-        ],
+            const SizedBox(width: AppTheme.spacingSm),
+            Text(
+              isArabic ? 'مساعد Corbit الذكي' : 'Corbit Smart Assistant',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppTheme.spacingLg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: AppTheme.spacingXl),
+            _Hero(isArabic: isArabic),
+            const SizedBox(height: AppTheme.spacingXl),
+            _DescriptionCard(isArabic: isArabic),
+            const SizedBox(height: AppTheme.spacingLg),
+            _FeaturesCard(isArabic: isArabic),
+            const SizedBox(height: AppTheme.spacingXl),
+            _NotifyButton(isArabic: isArabic),
+            const SizedBox(height: AppTheme.spacingLg),
+          ],
+        ),
       ),
     );
   }
+}
 
-  // ─── AppBar ────────────────────────────────────────────────────────────
+class _Hero extends StatelessWidget {
+  const _Hero({required this.isArabic});
+  final bool isArabic;
 
-  PreferredSizeWidget _buildAppBar(bool isArabic) {
-    final t = AppLocalizations.of(context);
-    final messages = ref.watch(chatProvider).valueOrNull ?? [];
-
-    return AppBar(
-      backgroundColor: AppColors.surface,
-      elevation: 0,
-      scrolledUnderElevation: 0.5,
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-      ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: AppColors.primarySurface,
-            child: const Icon(
-              Icons.smart_toy_outlined,
-              size: 18,
-              color: AppColors.primary,
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 110,
+          height: 110,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryLight],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.25),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-          const SizedBox(width: AppTheme.spacingSm),
-          Text(
-            t?.translate('aiAssistantTitle') ??
-                (isArabic ? 'مساعد Corbit الذكي' : 'Corbit Smart Assistant'),
+          child: const Icon(
+            Icons.auto_awesome_rounded,
+            color: Colors.white,
+            size: 56,
+          ),
+        ),
+        const SizedBox(height: AppTheme.spacingLg),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingMd,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.primarySurface,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: AppColors.primaryBorder),
+          ),
+          child: Text(
+            isArabic ? 'قريباً' : 'Coming Soon',
             style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+              letterSpacing: 0.3,
             ),
           ),
-        ],
-      ),
-      centerTitle: true,
-      actions: [
-        if (messages.isNotEmpty)
-          IconButton(
-            onPressed: _handleClearChat,
-            icon: const Icon(
-              Icons.delete_outline_rounded,
-              size: 22,
-              color: AppColors.textSecondary,
-            ),
-            tooltip: isArabic ? 'مسح المحادثة' : 'Clear Chat',
+        ),
+        const SizedBox(height: AppTheme.spacingMd),
+        Text(
+          isArabic ? 'مساعد Corbit الذكي' : 'Corbit Smart Assistant',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
           ),
-        const SizedBox(width: AppTheme.spacingXs),
+        ),
+        const SizedBox(height: AppTheme.spacingSm),
+        Text(
+          isArabic
+              ? 'مساعدك الذكي داخل التطبيق — يفهمك، يساعدك، ويختصر وقتك'
+              : 'Your in-app smart assistant — understands you, helps you, saves your time',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
+        ),
       ],
     );
   }
+}
 
-  // ─── Message list ──────────────────────────────────────────────────────
+class _DescriptionCard extends StatelessWidget {
+  const _DescriptionCard({required this.isArabic});
+  final bool isArabic;
 
-  Widget _buildMessageList(List<ChatMessageModel> messages, bool isStreaming) {
-    // Check if the last assistant message is still empty (streaming just started).
-    final showTyping = isStreaming &&
-        messages.isNotEmpty &&
-        messages.last.isAssistant &&
-        messages.last.content.isEmpty;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingLg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppColors.surfaceVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.lightbulb_outline_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
+              const SizedBox(width: AppTheme.spacingSm),
+              Text(
+                isArabic ? 'وش يسوي لك؟' : 'What can it do?',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingMd),
+          Text(
+            isArabic
+                ? 'مساعد ذكي مدمج في تطبيق Corbit يساعدك تدير حملاتك بشكل أسرع وأذكى. يفهم طلباتك بالعربي والإنجليزي، ويقدر يجاوب على أسئلتك عن الرصيد والإحصائيات والقوالب، ويرشدك لأي صفحة في التطبيق بضغطة، ويساعدك تكتب رسائل احترافية بدقائق.'
+                : 'A smart assistant embedded in the Corbit app to help you manage your campaigns faster and smarter. It understands Arabic and English, answers your questions about balance, statistics, and templates, navigates you to any screen in the app, and helps you craft professional messages in minutes.',
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.7,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-    return ListView.builder(
-      controller: _scrollController,
-      reverse: true,
-      padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
-      itemCount: messages.length + (showTyping ? 1 : 0),
-      itemBuilder: (context, index) {
-        // In a reversed list, index 0 is the bottom.
-        if (showTyping && index == 0) {
-          return const AiTypingIndicator();
-        }
+class _FeaturesCard extends StatelessWidget {
+  const _FeaturesCard({required this.isArabic});
+  final bool isArabic;
 
-        final messageIndex = showTyping
-            ? messages.length - index
-            : messages.length - 1 - index;
+  @override
+  Widget build(BuildContext context) {
+    final features = isArabic
+        ? const [
+            _Feature(
+              icon: Icons.chat_bubble_outline_rounded,
+              title: 'محادثة طبيعية',
+              subtitle: 'اسأل بلغتك الطبيعية واحصل على إجابات فورية',
+            ),
+            _Feature(
+              icon: Icons.edit_note_rounded,
+              title: 'كتابة رسائل احترافية',
+              subtitle: 'اكتب لك قوالب SMS جاهزة مخصصة لجمهورك',
+            ),
+            _Feature(
+              icon: Icons.insights_rounded,
+              title: 'تحليل الإحصائيات',
+              subtitle: 'يلخّص لك أداء حملاتك ويقترح تحسينات',
+            ),
+            _Feature(
+              icon: Icons.explore_outlined,
+              title: 'تنقل ذكي',
+              subtitle: 'يوديك لأي صفحة بالتطبيق بدون ما تدور',
+            ),
+            _Feature(
+              icon: Icons.account_balance_wallet_outlined,
+              title: 'إدارة الرصيد',
+              subtitle: 'يخبرك بحالة رصيدك ويذكّرك قبل النفاد',
+            ),
+            _Feature(
+              icon: Icons.shield_outlined,
+              title: 'خصوصية تامة',
+              subtitle: 'بياناتك محمية ومشفّرة، ما تطلع من جهازك',
+            ),
+          ]
+        : const [
+            _Feature(
+              icon: Icons.chat_bubble_outline_rounded,
+              title: 'Natural Conversation',
+              subtitle: 'Ask in your own words and get instant answers',
+            ),
+            _Feature(
+              icon: Icons.edit_note_rounded,
+              title: 'Professional Drafting',
+              subtitle: 'Generates SMS templates tailored to your audience',
+            ),
+            _Feature(
+              icon: Icons.insights_rounded,
+              title: 'Statistics Insights',
+              subtitle: 'Summarizes campaign performance and suggests fixes',
+            ),
+            _Feature(
+              icon: Icons.explore_outlined,
+              title: 'Smart Navigation',
+              subtitle: 'Jumps you to any screen without searching',
+            ),
+            _Feature(
+              icon: Icons.account_balance_wallet_outlined,
+              title: 'Balance Management',
+              subtitle: 'Reports your balance and warns before it runs out',
+            ),
+            _Feature(
+              icon: Icons.shield_outlined,
+              title: 'Full Privacy',
+              subtitle: 'Your data stays encrypted and never leaves your device',
+            ),
+          ];
 
-        if (messageIndex < 0 || messageIndex >= messages.length) {
-          return const SizedBox.shrink();
-        }
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingLg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppColors.surfaceVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.star_outline_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
+              const SizedBox(width: AppTheme.spacingSm),
+              Text(
+                isArabic ? 'المميزات' : 'Features',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingMd),
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.spacingMd),
+              child: _FeatureTile(feature: f),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-        final message = messages[messageIndex];
+class _Feature {
+  const _Feature({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+  final IconData icon;
+  final String title;
+  final String subtitle;
+}
 
-        // Skip empty assistant messages (being streamed — shown as typing).
-        if (message.isAssistant && message.content.isEmpty && isStreaming) {
-          return const SizedBox.shrink();
-        }
+class _FeatureTile extends StatelessWidget {
+  const _FeatureTile({required this.feature});
+  final _Feature feature;
 
-        return ChatBubble(
-          message: message,
-          onActionTap: _handleActionTap,
-        );
-      },
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppColors.primarySurface,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(feature.icon, color: AppColors.primary, size: 20),
+        ),
+        const SizedBox(width: AppTheme.spacingMd),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                feature.title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                feature.subtitle,
+                style: const TextStyle(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NotifyButton extends StatelessWidget {
+  const _NotifyButton({required this.isArabic});
+  final bool isArabic;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 52,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.primary,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              ),
+              content: Text(
+                isArabic
+                    ? 'بنخبرك أول ما يصير جاهز!'
+                    : "We'll let you know once it's ready!",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          ),
+        ),
+        icon: const Icon(Icons.notifications_active_outlined, size: 20),
+        label: Text(
+          isArabic ? 'نبّهني عند الإطلاق' : 'Notify me on launch',
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        ),
+      ),
     );
   }
 }

@@ -21,7 +21,7 @@ class DeepSeekDatasource {
   static const String _apiKeyStorageKey = 'orbit_deepseek_api_key';
 
   /// Default API key seeded on first launch.
-  static const String _defaultApiKey = 'sk-1fbe3ce794d24ed08da1424adcb787c3';
+  static const String _defaultApiKey = '';
 
   /// Ensures the API key exists in secure storage.
   ///
