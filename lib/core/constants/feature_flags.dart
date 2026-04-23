@@ -13,3 +13,12 @@
 /// ================================================================
 
 const bool kRechargeEnabled = false;
+
+/// ⚠️ [kBusinessRegistrationEnabled]: ميزة إنشاء حساب جديد (Sign Up / Register).
+/// مخفية مؤقتاً في Build 27 لتمرير مراجعة Apple (Guideline 3.1.1).
+/// التطبيق يصير Login-only للعملاء الحاليين (زي Slack/Netflix).
+///
+/// لإرجاع الميزة: غيّر القيمة لـ `true` فقط. الكود (شاشة RegisterScreen،
+/// controllers، routes، ترجمات، API) محفوظ بالحرف ويشتغل فوراً.
+
+const bool kBusinessRegistrationEnabled = false;

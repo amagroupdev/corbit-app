@@ -96,6 +96,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: RouteNames.register,
         path: '/register',
+        redirect: (context, state) =>
+            !kBusinessRegistrationEnabled ? '/login' : null,
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
