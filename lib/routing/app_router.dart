@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:orbit_app/features/auth/presentation/screens/register_screen.dart';
@@ -168,6 +169,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             name: RouteNames.balance,
             path: '/balance',
+            redirect: (context, state) =>
+                !kRechargeEnabled ? '/' : null,
             pageBuilder: (context, state) => _buildShellPage(
               state,
               const BalanceScreen(),
@@ -217,21 +220,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: RouteNames.buyBalance,
         path: '/buy-balance',
+        redirect: (context, state) =>
+            !kRechargeEnabled ? '/' : null,
         builder: (context, state) => const BuyBalanceScreen(),
       ),
       GoRoute(
         name: RouteNames.transferBalance,
         path: '/transfer-balance',
+        redirect: (context, state) =>
+            !kRechargeEnabled ? '/' : null,
         builder: (context, state) => const TransferBalanceScreen(),
       ),
       GoRoute(
         name: RouteNames.transactions,
         path: '/transactions',
+        redirect: (context, state) =>
+            !kRechargeEnabled ? '/' : null,
         builder: (context, state) => const TransactionsScreen(),
       ),
       GoRoute(
         name: RouteNames.paymentWebView,
         path: '/payment-webview',
+        redirect: (context, state) =>
+            !kRechargeEnabled ? '/' : null,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return PaymentWebViewScreen(

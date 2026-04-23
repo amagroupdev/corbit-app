@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/shared/widgets/collapsible_ai_fab.dart';
@@ -39,6 +40,17 @@ class _MainShellState extends ConsumerState<MainShell> {
     '/groups',
     '/balance',
     '/more',
+  ];
+
+  /// Visible tab indices (filters out the Balance tab when the recharge
+  /// feature is disabled). The internal logical indices in [_tabPaths]
+  /// stay identical so existing code paths continue to map correctly.
+  static final List<int> _visibleTabIndices = [
+    0,
+    1,
+    2,
+    if (kRechargeEnabled) 3,
+    4,
   ];
 
   /// Determines the active tab index from the current route location.
@@ -177,7 +189,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             child: SizedBox(
               height: 64,
               child: Row(
-                children: List.generate(5, (index) {
+                children: _visibleTabIndices.map((index) {
                   final isActive = activeIndex == index;
                   return Expanded(
                     child: _BottomNavItem(
@@ -188,7 +200,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                       onTap: () => _onTabTapped(index),
                     ),
                   );
-                }),
+                }).toList(),
               ),
             ),
           ),

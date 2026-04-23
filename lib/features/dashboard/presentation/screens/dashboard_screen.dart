@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/routing/route_names.dart';
 import 'package:orbit_app/features/dashboard/data/models/dashboard_model.dart';
@@ -428,16 +429,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             onTap: () => context.pushNamed(RouteNames.subAccounts),
           ),
 
-          const SizedBox(height: AppTheme.spacingMd),
+          if (kRechargeEnabled) ...[
+            const SizedBox(height: AppTheme.spacingMd),
 
-          // Add Balance card
-          QuickActionCard(
-            icon: Icons.account_balance_wallet_rounded,
-            title: t?.translate('addBalance') ?? 'Add Balance',
-            subtitle: t?.translate('buyNewBalance') ?? 'Buy New Balance',
-            iconColor: AppColors.warning,
-            onTap: () => context.pushNamed(RouteNames.buyBalance),
-          ),
+            // Add Balance card
+            QuickActionCard(
+              icon: Icons.account_balance_wallet_rounded,
+              title: t?.translate('addBalance') ?? 'Add Balance',
+              subtitle: t?.translate('buyNewBalance') ?? 'Buy New Balance',
+              iconColor: AppColors.warning,
+              onTap: () => context.pushNamed(RouteNames.buyBalance),
+            ),
+          ],
 
           const SizedBox(height: AppTheme.spacingMd),
 
@@ -615,7 +618,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ],
 
                 // Next level info
-                if (stats.nextLevelName.isNotEmpty) ...[
+                if (kRechargeEnabled && stats.nextLevelName.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,

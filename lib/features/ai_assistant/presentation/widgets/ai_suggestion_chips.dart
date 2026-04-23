@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_theme.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Suggestion chips shown when the AI chat is empty.
@@ -31,11 +32,23 @@ class AiSuggestionChips extends StatelessWidget {
     'How to recharge?',
   ];
 
+  /// Prompts that reference the recharge feature and must be hidden
+  /// whenever [kRechargeEnabled] is false.
+  static const _rechargePromptsAr = {'كيف أشحن رصيدي؟'};
+  static const _rechargePromptsEn = {'How to recharge?'};
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isArabic = t?.isRtl ?? true;
-    final suggestions = isArabic ? _suggestionsAr : _suggestionsEn;
+    final allSuggestions = isArabic ? _suggestionsAr : _suggestionsEn;
+    final rechargePrompts =
+        isArabic ? _rechargePromptsAr : _rechargePromptsEn;
+    final suggestions = kRechargeEnabled
+        ? allSuggestions
+        : allSuggestions
+            .where((s) => !rechargePrompts.contains(s))
+            .toList();
 
     return Padding(
       padding: const EdgeInsets.all(AppTheme.spacingXl),
