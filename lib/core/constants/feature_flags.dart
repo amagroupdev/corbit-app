@@ -3,22 +3,27 @@
 /// ================================================================
 /// Flags عامة للتحكم في ظهور/إخفاء المزايا بدون حذف الكود.
 ///
-/// ⚠️ [kRechargeEnabled]: ميزة الشحن/التعبئة (شراء الرصيد، تحويل
-/// الرصيد، السجلات، طرق الدفع). مخفية مؤقتاً في Build 26 لتمرير
-/// مراجعة Apple (Guideline 3.1.1 - In-App Purchase).
+/// السياسة الحالية: الفلاقز تُفعَّل على **Android فقط**.
+/// على **iOS** تبقى محصورة (false) لتمرير مراجعة Apple
+/// (Guideline 3.1.1 - In-App Purchase). على **Web** أيضاً false
+/// لأن Platform.* يرمي استثناء خارج Android/iOS.
 ///
-/// لإرجاع الميزة بالكامل: غيّر القيمة لـ `true` فقط.
+/// ⚠️ [kRechargeEnabled]: ميزة الشحن/التعبئة (شراء الرصيد، تحويل
+/// الرصيد، السجلات، طرق الدفع).
+///
+/// ⚠️ [kBusinessRegistrationEnabled]: ميزة إنشاء حساب جديد
+/// (Sign Up / Register). iOS يصير Login-only للعملاء الحاليين
+/// (زي Slack/Netflix).
+///
 /// كل الكود (شاشات، controllers، routes، ترجمات، API) محفوظ بالحرف
-/// ويشتغل فوراً عند قلب هذا الفلاج.
+/// ويشتغل فوراً حين يقيّم الفلاج True.
 /// ================================================================
 
-const bool kRechargeEnabled = false;
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
-/// ⚠️ [kBusinessRegistrationEnabled]: ميزة إنشاء حساب جديد (Sign Up / Register).
-/// مخفية مؤقتاً في Build 27 لتمرير مراجعة Apple (Guideline 3.1.1).
-/// التطبيق يصير Login-only للعملاء الحاليين (زي Slack/Netflix).
-///
-/// لإرجاع الميزة: غيّر القيمة لـ `true` فقط. الكود (شاشة RegisterScreen،
-/// controllers، routes، ترجمات، API) محفوظ بالحرف ويشتغل فوراً.
+/// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
+bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
-const bool kBusinessRegistrationEnabled = false;
+/// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
+bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
