@@ -31,10 +31,14 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: keystoreProperties["keyAlias"] as String?
-            keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: keystoreProperties["keyPassword"] as String?
-            storeFile = file(System.getenv("ANDROID_KEYSTORE_PATH") ?: keystoreProperties["storeFile"] as String? ?: "corbit-release.jks")
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: keystoreProperties["storePassword"] as String?
+            val envKeyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: keystoreProperties["keyAlias"] as String?
+            val envKeyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: keystoreProperties["keyPassword"] as String?
+            val envStorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: keystoreProperties["storeFile"] as String?
+            val envStorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: keystoreProperties["storePassword"] as String?
+            if (envKeyAlias != null) keyAlias = envKeyAlias
+            if (envKeyPassword != null) keyPassword = envKeyPassword
+            if (envStorePath != null) storeFile = file(envStorePath)
+            if (envStorePassword != null) storePassword = envStorePassword
         }
     }
 
@@ -49,7 +53,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Use debug signing for direct-download APK distribution (no Play Store)
+            // Original release signingConfig retained above for future use when keystore is available
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }

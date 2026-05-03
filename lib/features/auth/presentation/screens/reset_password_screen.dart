@@ -85,7 +85,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     ref.listen<ResetPasswordState>(resetPasswordControllerProvider,
         (prev, next) {
-      if (next.error != null) {
+      if (next.error != null && prev?.error != next.error) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(

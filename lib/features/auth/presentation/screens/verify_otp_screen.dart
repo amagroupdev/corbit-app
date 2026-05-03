@@ -55,7 +55,7 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
     final t = AppLocalizations.of(context)!;
 
     ref.listen<OtpState>(otpControllerProvider, (prev, next) {
-      if (next.error != null) {
+      if (next.error != null && prev?.error != next.error) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(

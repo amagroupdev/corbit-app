@@ -277,7 +277,7 @@ abstract final class AppStrings {
   static const int maxPasswordLength = 64;
   static const int minUsernameLength = 3;
   static const int maxUsernameLength = 30;
-  static const int otpLength = 6;
+  static const int otpLength = 4;
   static const int otpResendDelaySeconds = 60;
   static const int maxMessageLength = 1000;
   static const int maxSmsPartLength = 70;

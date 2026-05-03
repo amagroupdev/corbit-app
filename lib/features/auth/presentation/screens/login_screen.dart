@@ -125,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       // Show generic error in snackbar
-      if (next.error != null) {
+      if (next.error != null && prev?.error != next.error) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -171,10 +171,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               children: [
-                // Logo
-                _buildLogo(),
-                const SizedBox(height: 32),
-
                 // Card
                 Container(
                   width: double.infinity,
@@ -273,13 +269,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // ---------------------------------------------------------------------------
   // Sub-widgets
   // ---------------------------------------------------------------------------
-
-  Widget _buildLogo() {
-    return Image.asset(
-      'assets/images/orbit-logo-dark.png',
-      height: 60,
-    );
-  }
 
   Widget _buildPhoneField(AppLocalizations t) {
     return Column(

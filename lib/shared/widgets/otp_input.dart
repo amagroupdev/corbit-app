@@ -11,8 +11,8 @@ class OtpInput extends StatefulWidget {
   const OtpInput({
     super.key,
     this.controller,
-    this.boxCount = 6,
-    this.maxLength = 6,
+    this.boxCount = 4,
+    this.maxLength = 4,
     this.autoFocus = true,
     this.onChanged,
     this.onCompleted,

@@ -235,7 +235,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // ---------------------------------------------------------------------------
 
   void _handleVerifyOtp() {
-    if (_otpUserId == null || _otpCode.length < 6) return;
+    if (_otpUserId == null || _otpCode.length < AppStrings.otpLength) return;
     ref.read(otpControllerProvider.notifier).verifyPhone(
           code: _otpCode,
           userId: _otpUserId!,
@@ -328,7 +328,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
 
       // Handle generic error (show snackbar)
-      if (next.error != null) {
+      if (next.error != null && prev?.error != next.error) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -361,7 +361,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     // Listen to OTP state
     ref.listen<OtpState>(otpControllerProvider, (prev, next) {
-      if (next.error != null) {
+      if (next.error != null && prev?.error != next.error) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -415,15 +415,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Logo
-            Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 16),
-              child: Image.asset(
-                'assets/images/orbit-logo-dark.png',
-                height: 44,
-              ),
-            ),
-
             // Step indicator (hidden on step 0)
             if (_currentStep > 0) ...[
               _buildStepIndicator(t),
