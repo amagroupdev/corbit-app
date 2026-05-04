@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/messages/presentation/controllers/messages_controller.dart';
+import 'package:orbit_app/features/messages/presentation/widgets/ai_generate_dialog.dart';
+import 'package:orbit_app/features/messages/presentation/widgets/dynamic_texts_picker.dart';
 
 /// Multi-line text field for composing SMS message body.
 ///
@@ -62,21 +66,47 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
   }
 
   void _insertVariable(_Variable variable) {
+    _insertToken('{${variable.key}}');
+  }
+
+  /// Inserts [token] (already wrapped, e.g. `{student_name}`) at the
+  /// current cursor position, preserving the focus and selection.
+  void _insertToken(String token) {
     final text = _controller.text;
     final selection = _controller.selection;
     final cursorPos = selection.isValid ? selection.baseOffset : text.length;
-    final variableText = '{${variable.key}}';
 
-    final newText = text.substring(0, cursorPos) +
-        variableText +
-        text.substring(cursorPos);
+    final newText =
+        text.substring(0, cursorPos) + token + text.substring(cursorPos);
 
     _controller.text = newText;
     _controller.selection = TextSelection.collapsed(
-      offset: cursorPos + variableText.length,
+      offset: cursorPos + token.length,
     );
 
     ref.read(messageFormProvider.notifier).setMessageBody(newText);
+  }
+
+  Future<void> _openDynamicTextsPicker() async {
+    final picked = await DynamicTextsPicker.show(context);
+    if (picked != null) {
+      _insertToken(picked.token);
+    }
+  }
+
+  Future<void> _openAiGenerate() async {
+    final result = await AiGenerateDialog.show(
+      context,
+      initialText: _controller.text,
+    );
+    if (result != null && result.isNotEmpty) {
+      _controller.text = result;
+      _controller.selection =
+          TextSelection.collapsed(offset: result.length);
+      ref.read(messageFormProvider.notifier).setMessageBody(result);
+      // Re-focus so the user can continue editing.
+      SystemChannels.textInput.invokeMethod<void>('TextInput.show');
+    }
   }
 
   void _showVariablesMenu() {
@@ -207,6 +237,32 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
               ),
             ),
             const Spacer(),
+            // ─── Wave 5: AI Generate ───────────────────────────
+            if (kAiGenerateEnabled) ...[
+              _IconActionButton(
+                icon: Icons.auto_awesome,
+                tooltip: AppLocalizations.of(context)!
+                    .translate('aiGenerateTitle'),
+                color: AppColors.primary,
+                background: AppColors.primarySurface,
+                border: AppColors.primaryBorder,
+                onTap: _openAiGenerate,
+              ),
+              const SizedBox(width: 6),
+            ],
+            // ─── Wave 5: Dynamic Texts (server) ────────────────
+            if (kDynamicTextsEnabled) ...[
+              _IconActionButton(
+                icon: Icons.alternate_email,
+                tooltip: AppLocalizations.of(context)!
+                    .translate('dynamicTextsTitle'),
+                color: AppColors.info,
+                background: AppColors.infoSurface,
+                border: AppColors.infoBorder,
+                onTap: _openDynamicTextsPicker,
+              ),
+              const SizedBox(width: 6),
+            ],
             // Template button
             if (widget.onInsertTemplate != null)
               InkWell(
@@ -425,4 +481,46 @@ class _Variable {
 
   /// Localization key for display label.
   final String labelKey;
+}
+
+// ─── Icon Action Button ──────────────────────────────────────────────────────
+
+/// Compact icon-only action used in the composer header for new Wave 5
+/// quick actions (AI generate, dynamic texts) without enlarging the row.
+class _IconActionButton extends StatelessWidget {
+  const _IconActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.background,
+    required this.border,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color background;
+  final Color border;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: border),
+          ),
+          child: Icon(icon, size: 16, color: color),
+        ),
+      ),
+    );
+  }
 }

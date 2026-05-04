@@ -1849,4 +1849,43 @@ const Map<String, String> en = {
   'voiceMessagesDuration': 'Duration',
   'voiceMessagesNamePlaceholder': 'Optional name (e.g. Welcome message)',
   'voiceMessagesUntitled': 'Voice message',
+
+  // ---------------------------------------------------------------------------
+  // Wave 5 — Messages Enhancements (AI generate, dynamic texts, DLR, receipt)
+  // ---------------------------------------------------------------------------
+  'aiGenerateTitle': 'AI Text Generator',
+  'aiGenerateAction': 'Generate',
+  'aiGeneratePlaceholder': 'Write your message idea here...',
+  'aiGenerateImprove': 'Improve',
+  'aiGenerateShorten': 'Shorten',
+  'aiGenerateFormal': 'Formalize',
+  'aiGenerateExpand': 'Expand',
+  'aiGenerateUseText': 'Use this text',
+  'aiGenerateFailed': 'Could not generate text. Please try again.',
+  'aiGenerateLoading': 'Generating...',
+
+  'dynamicTextsTitle': 'Dynamic Variables',
+  'dynamicTextsEmpty': 'No variables available right now.',
+
+  'dlrByNumberTitle': 'DLR Report by Number',
+  'dlrByNumberSearch': 'Enter number (e.g. 9665XXXXXXXX)',
+  'dlrByNumberEmpty': 'No messages for this number.',
+  'dlrByNumberInvalid': 'Please enter a valid number.',
+
+  'receiptReportTitle': 'Receipt Report',
+  'receiptReportSummary': 'Sending Summary',
+  'receiptReportNumbers': 'Numbers & Status',
+  'receiptReportLoadFailed': 'Could not load report.',
+
+  'sendVariantSelect': 'Send Method',
+  'sendVariant_fromNumbers_label': 'To Numbers',
+  'sendVariant_fromGroups_label': 'To Groups',
+  'sendVariant_fromSpecificGroup_label': 'To Specific Group',
+  'sendVariant_withFile_label': 'With File',
+  'sendVariant_withVoice_label': 'With Voice',
+  'sendVariant_withShortLink_label': 'With Short Link',
+  'sendVariant_attendanceRecords_label': 'Attendance Records',
+  'sendVariant_certificationWithTool_label': 'Certification',
+  'sendVariant_vipCard_label': 'VIP Card',
+  'sendVariant_fromExcel_label': 'From Excel',
 };

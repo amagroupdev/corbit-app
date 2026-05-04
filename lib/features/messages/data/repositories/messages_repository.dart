@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/messages/data/datasources/messages_remote_datasource.dart';
 import 'package:orbit_app/features/messages/data/datasources/senders_remote_datasource.dart';
 import 'package:orbit_app/features/messages/data/datasources/templates_remote_datasource.dart';
+import 'package:orbit_app/features/messages/data/models/dlr_report_model.dart';
+import 'package:orbit_app/features/messages/data/models/dynamic_text_model.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
+import 'package:orbit_app/features/messages/data/models/receipt_report_model.dart';
 import 'package:orbit_app/features/messages/data/models/sender_model.dart';
 import 'package:orbit_app/features/messages/data/models/template_model.dart';
 import 'package:orbit_app/shared/models/api_response_model.dart';
@@ -33,17 +38,16 @@ class MessagesRepository {
 
   /// Sends a message through the unified V3 endpoint.
   ///
+  /// Pass [excelFile] when sending with [SendVariant.fromExcel].
+  ///
   /// Returns the raw response data on success; throws [ApiException] on error.
   Future<ApiResponse<Map<String, dynamic>>> sendMessage(
-    SendMessageRequest request,
-  ) async {
-    try {
-      return await _messagesDatasource.sendMessage(request);
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException(message: e.toString());
-    }
+    SendMessageRequest request, {
+    File? excelFile,
+  }) async {
+    return _guard(
+      () => _messagesDatasource.sendMessage(request, excelFile: excelFile),
+    );
   }
 
   /// Previews message cost and recipient count.
@@ -127,6 +131,46 @@ class MessagesRepository {
   Future<SentMessageModel> getMessageDetail(int id) async {
     try {
       return await _messagesDatasource.getMessageDetail(id);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(message: e.toString());
+    }
+  }
+
+  // ─── Wave 5 — Messages Enhancements ─────────────────────────────────
+
+  /// Loads the list of dynamic-text variables (`{student_name}`, ...).
+  Future<List<DynamicTextModel>> listDynamicTexts() {
+    return _guard(_messagesDatasource.listDynamicTexts);
+  }
+
+  /// Generates an improved/shortened/formal/expanded variant of [text].
+  Future<String> aiGenerate({
+    required String text,
+    required String action,
+  }) {
+    return _guard(() =>
+        _messagesDatasource.aiGenerate(text: text, action: action));
+  }
+
+  /// Returns the DLR history for every message sent to [number].
+  Future<List<DlrReportEntry>> dlrByNumber(String number) {
+    return _guard(() => _messagesDatasource.dlrByNumber(number));
+  }
+
+  /// Returns a comprehensive receipt report for the message [uuid].
+  Future<ReceiptReportModel> getReceiptReport(String uuid) {
+    return _guard(() => _messagesDatasource.getReceiptReport(uuid));
+  }
+
+  // ─── Internal helper ────────────────────────────────────────────────
+
+  /// Wraps any datasource call and rethrows [ApiException] verbatim while
+  /// converting unexpected errors into a generic [ApiException].
+  Future<T> _guard<T>(Future<T> Function() body) async {
+    try {
+      return await body();
     } on ApiException {
       rethrow;
     } catch (e) {

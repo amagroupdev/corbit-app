@@ -20,6 +20,8 @@ class RouteNames {
   static const String messageCenter = 'message-center';
   static const String sendMessage = 'send-message';
   static const String messagePreview = 'message-preview';
+  static const String messageReceiptReport = 'message-receipt-report';
+  static const String messageDlrByNumber = 'message-dlr-by-number';
 
   // Drafts (Wave 3)
   static const String drafts = 'drafts';

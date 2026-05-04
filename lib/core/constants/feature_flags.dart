@@ -38,6 +38,15 @@ const bool kDraftsEnabled = true;
 /// Wave 4 — Voice Messages (تسجيل ورفع الرسائل الصوتية). محمي بإذن المايك.
 const bool kVoiceMessagesEnabled = true;
 
+/// Wave 5 — Messages Enhancements (dynamic texts, AI generate, DLR,
+/// receipt report, send variants موسّعة).
+const bool kMessagesEnhancementsEnabled = true;
+const bool kAiGenerateEnabled = kMessagesEnhancementsEnabled;
+const bool kDynamicTextsEnabled = kMessagesEnhancementsEnabled;
+const bool kDlrByNumberEnabled = kMessagesEnhancementsEnabled;
+const bool kReceiptReportEnabled = kMessagesEnhancementsEnabled;
+const bool kSendVariantsEnabled = kMessagesEnhancementsEnabled;
+
 /// Wave 8 — Promotional banner carousels (Login + Dashboard).
 const bool kBannersEnabled = true;
 

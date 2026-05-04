@@ -15,6 +15,7 @@ import 'package:orbit_app/features/messages/presentation/controllers/messages_co
 import 'package:orbit_app/features/messages/presentation/widgets/message_composer.dart';
 import 'package:orbit_app/features/messages/presentation/widgets/recipient_input.dart';
 import 'package:orbit_app/features/messages/presentation/widgets/schedule_picker.dart';
+import 'package:orbit_app/features/messages/presentation/widgets/send_variant_selector.dart';
 import 'package:orbit_app/features/messages/presentation/widgets/template_picker_sheet.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 
@@ -93,8 +94,20 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     final form = ref.read(messageFormProvider);
     if (form.groupIds.isNotEmpty && form.numbers.isEmpty) {
       ref.read(messageFormProvider.notifier).setMessageType(MessageType.fromGroups);
+      // Align variant only when the user hasn't picked a non-default
+      // variant (with_short_link / from_specific_group / etc.).
+      if (form.variant == SendVariant.fromNumbers) {
+        ref
+            .read(messageFormProvider.notifier)
+            .setVariant(SendVariant.fromGroups);
+      }
     } else {
       ref.read(messageFormProvider.notifier).setMessageType(MessageType.fromNumbers);
+      if (form.variant == SendVariant.fromGroups) {
+        ref
+            .read(messageFormProvider.notifier)
+            .setVariant(SendVariant.fromNumbers);
+      }
     }
 
     final controller = ref.read(sendMessageControllerProvider.notifier);
@@ -353,6 +366,22 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
 
               const SizedBox(height: 24),
 
+              // ─── Wave 5: Send Variant Selector ──────────────────
+              if (kSendVariantsEnabled) ...[
+                const SendVariantSelector(
+                  variants: [
+                    SendVariant.fromNumbers,
+                    SendVariant.fromGroups,
+                    SendVariant.fromSpecificGroup,
+                    SendVariant.withShortLink,
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (ref.watch(messageFormProvider).variant ==
+                    SendVariant.withShortLink)
+                  _buildShortLinkInput(),
+              ],
+
               // ─── Recipient Mode Toggle ──────────────────────────
               _buildRecipientModeToggle(),
 
@@ -405,6 +434,48 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // ─── Short Link Input (Wave 5) ─────────────────────────────────────
+
+  Widget _buildShortLinkInput() {
+    final t = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        textDirection: TextDirection.ltr,
+        keyboardType: TextInputType.url,
+        decoration: InputDecoration(
+          hintText: 'https://...',
+          labelText: t.translate('sendVariant_withShortLink_label'),
+          prefixIcon: const Icon(Icons.link, size: 20),
+          filled: true,
+          fillColor: AppColors.inputFill,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 12,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: AppColors.inputBorderFocused,
+              width: 1.5,
+            ),
+          ),
+        ),
+        onChanged: (value) {
+          ref.read(messageFormProvider.notifier).setShortLink(value.trim());
+        },
       ),
     );
   }

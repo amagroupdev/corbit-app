@@ -14,6 +14,8 @@ import 'package:orbit_app/features/drafts/presentation/screens/draft_detail_scre
 import 'package:orbit_app/features/drafts/presentation/screens/drafts_screen.dart';
 import 'package:orbit_app/features/messages/presentation/screens/message_center_screen.dart';
 import 'package:orbit_app/features/messages/presentation/screens/send_message_screen.dart';
+import 'package:orbit_app/features/messages/presentation/screens/dlr_by_number_screen.dart';
+import 'package:orbit_app/features/messages/presentation/screens/receipt_report_screen.dart';
 import 'package:orbit_app/features/groups/presentation/screens/groups_screen.dart';
 import 'package:orbit_app/features/groups/presentation/screens/group_detail_screen.dart';
 import 'package:orbit_app/features/groups/presentation/screens/create_group_screen.dart';
@@ -205,6 +207,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             messageType: extra['message_type'] as String? ?? 'from_numbers',
           );
         },
+      ),
+
+      // ─── Wave 5: Messages enhancements ────────────────────────
+      GoRoute(
+        name: RouteNames.messageReceiptReport,
+        path: '/messages/receipt/:uuid',
+        builder: (context, state) => ReceiptReportScreen(
+          uuid: state.pathParameters['uuid'] ?? '',
+        ),
+      ),
+      GoRoute(
+        name: RouteNames.messageDlrByNumber,
+        path: '/messages/dlr',
+        builder: (context, state) => const DlrByNumberScreen(),
       ),
       GoRoute(
         name: RouteNames.groupDetail,

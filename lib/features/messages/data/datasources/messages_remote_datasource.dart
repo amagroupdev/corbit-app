@@ -1,8 +1,14 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart' show MultipartFile;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orbit_app/core/constants/api_constants.dart';
 import 'package:orbit_app/core/network/api_client.dart';
+import 'package:orbit_app/features/messages/data/models/dlr_report_model.dart';
+import 'package:orbit_app/features/messages/data/models/dynamic_text_model.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
+import 'package:orbit_app/features/messages/data/models/receipt_report_model.dart';
 import 'package:orbit_app/shared/models/api_response_model.dart';
 import 'package:orbit_app/shared/models/pagination_model.dart';
 
@@ -20,10 +26,42 @@ class MessagesRemoteDatasource {
 
   /// Sends a message through POST /messages/send.
   ///
+  /// For the [SendVariant.fromExcel] variant the request is uploaded as
+  /// multipart/form-data with the [excelFile] attached under the `file`
+  /// field. For all other variants a regular JSON POST is performed.
+  ///
   /// Returns the API response wrapping the created message data.
   Future<ApiResponse<Map<String, dynamic>>> sendMessage(
-    SendMessageRequest request,
-  ) async {
+    SendMessageRequest request, {
+    File? excelFile,
+  }) async {
+    if (request.variant == SendVariant.fromExcel && excelFile != null) {
+      final filename = excelFile.path.split(Platform.pathSeparator).last;
+      final multipart = await MultipartFile.fromFile(
+        excelFile.path,
+        filename: filename,
+      );
+      // Send the JSON shape as flat form fields alongside the file.
+      final flatData = <String, dynamic>{};
+      request.toJson().forEach((key, value) {
+        if (value is List) {
+          flatData[key] = value.join(',');
+        } else {
+          flatData[key] = value;
+        }
+      });
+
+      final response = await _client.upload(
+        ApiConstants.messagesSend,
+        file: multipart,
+        fileFieldName: 'file',
+        data: flatData,
+      );
+      return ApiResponse<Map<String, dynamic>>.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    }
+
     final response = await _client.post(
       ApiConstants.messagesSend,
       data: request.toJson(),
@@ -160,6 +198,116 @@ class MessagesRemoteDatasource {
       response.data as Map<String, dynamic>,
     );
     return SentMessageModel.fromJson(apiResponse.data ?? {});
+  }
+
+  // ─── Dynamic Texts (V3) ──────────────────────────────────────────────
+
+  /// Loads the list of variable placeholders supported by the gateway
+  /// (e.g. `{student_name}`, `{group}`, `{link}`, `{number_name}`).
+  ///
+  /// Endpoint: `GET /messages/dynamic-texts`.
+  Future<List<DynamicTextModel>> listDynamicTexts() async {
+    final response = await _client.get(ApiConstants.messagesDynamicTexts);
+    final apiResponse = ApiResponse<dynamic>.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+
+    final raw = apiResponse.data;
+    if (raw is List) {
+      return raw
+          .whereType<Map<String, dynamic>>()
+          .map(DynamicTextModel.fromJson)
+          .toList();
+    }
+    if (raw is Map<String, dynamic>) {
+      // Some V3 builds wrap the list under a `texts` or `variables` key.
+      final list = (raw['texts'] ?? raw['variables'] ?? raw['data'])
+          as List<dynamic>?;
+      if (list != null) {
+        return list
+            .whereType<Map<String, dynamic>>()
+            .map(DynamicTextModel.fromJson)
+            .toList();
+      }
+    }
+    return const [];
+  }
+
+  // ─── AI Generate (V3) ────────────────────────────────────────────────
+
+  /// Calls the server-side text-generation endpoint to improve, shorten,
+  /// formalise or expand the provided [text].
+  ///
+  /// Endpoint: `POST /messages/ai-generate`
+  /// Body: `{text, action: improve|shorten|formal|expand}`
+  /// Returns the generated text via `data.generated_text`.
+  Future<String> aiGenerate({
+    required String text,
+    required String action,
+  }) async {
+    final response = await _client.post(
+      ApiConstants.messagesAiGenerate,
+      data: {
+        'text': text,
+        'action': action,
+      },
+    );
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+    final data = apiResponse.data ?? const <String, dynamic>{};
+    final generated = (data['generated_text'] as String?)?.trim() ??
+        (data['text'] as String?)?.trim() ??
+        (data['result'] as String?)?.trim() ??
+        '';
+    return generated;
+  }
+
+  // ─── DLR by Number (V3) ──────────────────────────────────────────────
+
+  /// Fetches the per-message DLR history for a given phone number.
+  ///
+  /// Endpoint: `POST /messages/dlr-by-number`.
+  Future<List<DlrReportEntry>> dlrByNumber(String number) async {
+    final response = await _client.post(
+      ApiConstants.messagesDlrByNumber,
+      data: {'number': number},
+    );
+    final apiResponse = ApiResponse<dynamic>.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+    final raw = apiResponse.data;
+    if (raw is List) {
+      return raw
+          .whereType<Map<String, dynamic>>()
+          .map(DlrReportEntry.fromJson)
+          .toList();
+    }
+    if (raw is Map<String, dynamic>) {
+      final list = (raw['messages'] ?? raw['records'] ?? raw['data'])
+          as List<dynamic>?;
+      if (list != null) {
+        return list
+            .whereType<Map<String, dynamic>>()
+            .map(DlrReportEntry.fromJson)
+            .toList();
+      }
+    }
+    return const [];
+  }
+
+  // ─── Receipt Report (V3) ─────────────────────────────────────────────
+
+  /// Fetches the comprehensive receipt report for a single sent message.
+  ///
+  /// Endpoint: `GET /messages/{uuid}/receipt-report`.
+  Future<ReceiptReportModel> getReceiptReport(String uuid) async {
+    final response =
+        await _client.get(ApiConstants.messageReceiptReport(uuid));
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+    return ReceiptReportModel.fromJson(apiResponse.data ?? const {});
   }
 }
 
