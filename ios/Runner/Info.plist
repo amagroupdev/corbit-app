@@ -53,6 +53,8 @@
 	<string>يحتاج التطبيق للوصول إلى معرض الصور لاختيار صورة الملف الشخصي</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>يحتاج التطبيق لحفظ الملفات في معرض الصور</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Corbit needs microphone access to record voice messages.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

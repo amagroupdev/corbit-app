@@ -31,12 +31,12 @@ bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
 // ════════════════════════════════════════════════════════════════════
 //  V3 — Waves 3+ feature flags
 // ════════════════════════════════════════════════════════════════════
-// كل ميزة جديدة من موجات V3 تنزل خلف flag منفصل عشان نقدر نطفّيها
-// بدون رفع الكود. الافتراضي = true لأنها feature additions.
-// ════════════════════════════════════════════════════════════════════
 
 /// Wave 3 — Drafts (مسودات الرسائل).
 const bool kDraftsEnabled = true;
+
+/// Wave 4 — Voice Messages (تسجيل ورفع الرسائل الصوتية). محمي بإذن المايك.
+const bool kVoiceMessagesEnabled = true;
 
 /// Wave 8 — Promotional banner carousels (Login + Dashboard).
 const bool kBannersEnabled = true;

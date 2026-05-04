@@ -121,4 +121,8 @@ class RouteNames {
 
   // AI Assistant
   static const aiAssistant = 'ai-assistant';
+
+  // Voice Messages (Wave 4)
+  static const String voiceMessages = 'voice-messages';
+  static const String recordVoice = 'record-voice';
 }

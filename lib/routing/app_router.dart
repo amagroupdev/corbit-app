@@ -55,6 +55,8 @@ import 'package:orbit_app/shared/widgets/payment_webview_screen.dart';
 import 'package:orbit_app/shared/widgets/pdf_viewer_screen.dart';
 import 'package:orbit_app/features/dashboard/presentation/screens/more_screen.dart';
 import 'package:orbit_app/features/ai_assistant/presentation/screens/ai_chat_screen.dart';
+import 'package:orbit_app/features/voice_messages/presentation/screens/voice_messages_screen.dart';
+import 'package:orbit_app/features/voice_messages/presentation/screens/record_voice_screen.dart';
 import 'package:orbit_app/routing/route_names.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -424,6 +426,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.statements,
         path: '/statements',
         builder: (context, state) => const StatementsScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.voiceMessages,
+        path: '/voice-messages',
+        redirect: (context, state) => !kVoiceMessagesEnabled ? '/' : null,
+        builder: (context, state) => const VoiceMessagesScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.recordVoice,
+        path: '/voice-messages/record',
+        redirect: (context, state) => !kVoiceMessagesEnabled ? '/' : null,
+        builder: (context, state) => const RecordVoiceScreen(),
       ),
       GoRoute(
         name: RouteNames.aiAssistant,

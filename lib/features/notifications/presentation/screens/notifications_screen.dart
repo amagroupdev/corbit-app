@@ -68,24 +68,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (await storage.isGuestMode()) {
       if (mounted) {
         setState(() {
-          _notifications = [
-            NotificationModel(
-              id: 1,
-              message: 'مرحباً بك في النظام التجريبي',
-              senderName: 'DEMO',
-              recipientCount: 10,
-              sentAt: DateTime.now().subtract(const Duration(hours: 1)),
-              status: 'sent',
-            ),
-            NotificationModel(
-              id: 2,
-              message: 'تم تفعيل حسابك بنجاح',
-              senderName: 'النظام',
-              recipientCount: 1,
-              sentAt: DateTime.now().subtract(const Duration(days: 1)),
-              status: 'sent',
-            ),
-          ];
+          // Empty fallback - real notifications come from API only
+          _notifications = [];
           _hasMore = false;
           _currentPage = 1;
           _isLoading = false;

@@ -210,37 +210,19 @@ class BalanceScreenController extends StateNotifier<BalanceScreenState> {
     state = state.copyWith(isLoading: true, error: null);
 
     if (await _storage.isGuestMode()) {
+      // Empty fallback - real balance/transactions come from API only
       state = state.copyWith(
         balance: const BalanceModel(
-          balance: 150,
-          formattedBalance: '150',
-          remainingDays: 90,
-          totalSent: 50,
-          totalPurchased: 200,
+          balance: 0,
+          formattedBalance: '0',
+          remainingDays: 0,
+          totalSent: 0,
+          totalPurchased: 0,
           totalTransferred: 0,
           currency: 'SAR',
         ),
         offers: const [],
-        recentTransactions: [
-          TransactionModel(
-            id: 1,
-            amount: 100,
-            smsCount: 500,
-            status: 'approved',
-            paymentMethod: 'online',
-            referenceNumber: 'DEMO-001',
-            createdAt: DateTime(2026, 3, 15),
-          ),
-          TransactionModel(
-            id: 2,
-            amount: 100,
-            smsCount: 500,
-            status: 'approved',
-            paymentMethod: 'bank_transfer',
-            referenceNumber: 'DEMO-002',
-            createdAt: DateTime(2026, 2, 10),
-          ),
-        ],
+        recentTransactions: const [],
         isLoading: false,
       );
       return;
@@ -341,40 +323,13 @@ class TransactionsController extends StateNotifier<TransactionsState> {
     state = state.copyWith(isLoading: true, error: null);
 
     if (await _storage.isGuestMode()) {
+      // Empty fallback - real transactions come from API only
       state = state.copyWith(
-        transactions: [
-          TransactionModel(
-            id: 1,
-            amount: 100,
-            smsCount: 500,
-            status: 'approved',
-            paymentMethod: 'online',
-            referenceNumber: 'DEMO-001',
-            createdAt: DateTime(2026, 3, 15),
-          ),
-          TransactionModel(
-            id: 2,
-            amount: 100,
-            smsCount: 500,
-            status: 'approved',
-            paymentMethod: 'bank_transfer',
-            referenceNumber: 'DEMO-002',
-            createdAt: DateTime(2026, 2, 10),
-          ),
-          TransactionModel(
-            id: 3,
-            amount: 50,
-            smsCount: 200,
-            status: 'pending',
-            paymentMethod: 'stc_pay',
-            referenceNumber: 'DEMO-003',
-            createdAt: DateTime(2026, 1, 5),
-          ),
-        ],
+        transactions: const [],
         isLoading: false,
         currentPage: 1,
         lastPage: 1,
-        total: 3,
+        total: 0,
       );
       return;
     }

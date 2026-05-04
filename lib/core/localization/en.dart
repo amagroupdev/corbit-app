@@ -1818,4 +1818,35 @@ const Map<String, String> en = {
   'draftMsgTypeToGroup': 'To groups',
   'draftMsgTypeVoice': 'Voice',
   'draftMsgTypeVipCard': 'VIP card',
+
+  // ---------------------------------------------------------------------------
+  // Voice Messages (Wave 4)
+  // ---------------------------------------------------------------------------
+  'voiceMessagesTitle': 'Voice messages',
+  'voiceMessagesEmpty': 'No voice messages yet',
+  'voiceMessagesEmptyDesc': 'Record your first voice message to get started.',
+  'voiceMessagesRecord': 'Record',
+  'voiceMessagesRecording': 'Recording...',
+  'voiceMessagesPaused': 'Paused',
+  'voiceMessagesReady': 'Recording ready',
+  'voiceMessagesTapToRecord': 'Tap the mic to start recording',
+  'voiceMessagesPause': 'Pause',
+  'voiceMessagesResume': 'Resume',
+  'voiceMessagesStop': 'Stop',
+  'voiceMessagesDiscard': 'Discard',
+  'voiceMessagesPlay': 'Play',
+  'voiceMessagesUpload': 'Upload',
+  'voiceMessagesUploaded': 'Voice message uploaded',
+  'voiceMessagesDelete': 'Delete voice message',
+  'voiceMessagesDeleteConfirm': 'Delete',
+  'voiceMessagesDeleted': 'Voice message deleted',
+  'voiceMessagesPermissionDenied':
+      'Microphone permission denied. Enable it from Settings.',
+  'voiceMessagesUploadFailed': 'Failed to upload voice message.',
+  'voiceMessagesGenericError':
+      'Something went wrong while loading voice messages.',
+  'voiceMessagesName': 'Name',
+  'voiceMessagesDuration': 'Duration',
+  'voiceMessagesNamePlaceholder': 'Optional name (e.g. Welcome message)',
+  'voiceMessagesUntitled': 'Voice message',
 };
