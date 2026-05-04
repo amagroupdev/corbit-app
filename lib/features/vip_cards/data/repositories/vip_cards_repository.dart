@@ -38,6 +38,22 @@ class VipCardsRepository {
     }
   }
 
+  /// POST /api/v3/vip-cards/templates/bulk-delete (Wave 6)
+  ///
+  /// Permanently deletes a set of VIP card template ids in one request.
+  /// Body shape mandated by the API: `{template_ids: [1,2,3]}`.
+  Future<Map<String, dynamic>> bulkDeleteTemplates(List<int> templateIds) async {
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.vipCardsTemplatesBulkDelete,
+        data: {'template_ids': templateIds},
+      );
+      return (response.data as Map<String, dynamic>?) ?? <String, dynamic>{};
+    } on ApiException {
+      rethrow;
+    }
+  }
+
   /// Fetches the VIP cards archive.
   Future<PaginatedResponse<VipCardModel>> getArchive({
     int page = 1,

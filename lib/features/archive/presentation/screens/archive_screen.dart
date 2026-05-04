@@ -207,6 +207,45 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
     }
   }
 
+  /// Bulk resend (Wave 6 — `POST /archive/resend`).
+  ///
+  /// Only items whose [ArchiveItem.status] is `failed` or `rejected`
+  /// are eligible. The button silently skips ineligible ones in the
+  /// selection rather than rejecting the whole batch.
+  Future<void> _resendSelected() async {
+    final selectedIds = ref.read(archiveSelectedIdsProvider);
+    if (selectedIds.isEmpty) return;
+
+    final t = AppLocalizations.of(context)!;
+    final items = ref.read(archiveListProvider).items;
+    final eligibleIds = items
+        .where(
+          (i) =>
+              selectedIds.contains(i.id) &&
+              (i.status == ArchiveMessageStatus.failed ||
+                  i.status == ArchiveMessageStatus.rejected),
+        )
+        .map((i) => i.id)
+        .toList();
+
+    if (eligibleIds.isEmpty) {
+      _showSnackBar(t.translate('bulkOnlyFailedResend'));
+      return;
+    }
+
+    final success = await ref.read(archiveActionsProvider.notifier).resend(
+          messageIds: eligibleIds,
+          listNotifier: ref.read(archiveListProvider.notifier),
+        );
+
+    if (success && mounted) {
+      _exitMultiSelect();
+      _showSnackBar(t.translate('bulkSuccessResend'));
+    } else if (mounted) {
+      _showSnackBar(t.translate('bulkFailedResend'));
+    }
+  }
+
   Future<void> _exportArchive() async {
     final type = ref.read(archiveSelectedTabProvider);
     final filter = ref.read(archiveFilterProvider);
@@ -545,6 +584,14 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen>
                 color: AppColors.success,
                 isLoading: actionState.isRestoring,
                 onTap: selectedIds.isNotEmpty ? _restoreSelected : null,
+              ),
+              const SizedBox(width: 8),
+              _ActionChip(
+                icon: Icons.refresh_rounded,
+                label: t.translate('bulkResend'),
+                color: AppColors.primary,
+                isLoading: actionState.isResending,
+                onTap: selectedIds.isNotEmpty ? _resendSelected : null,
               ),
               const SizedBox(width: 8),
               _ActionChip(

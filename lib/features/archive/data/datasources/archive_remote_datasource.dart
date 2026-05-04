@@ -220,6 +220,26 @@ class ArchiveRemoteDataSource {
 
     return response.data as Map<String, dynamic>;
   }
+
+  // ─── Resend (Wave 6 — Bulk operations) ─────────────────────────────────
+
+  /// Resubmits previously failed archive messages by their ids.
+  ///
+  /// Maps to `POST /archive/resend` with body `{message_ids: [...]}`.
+  /// Intended only for items whose status is `failed`/`rejected`. The
+  /// server returns `{success, message, data: {requeued_count}}`.
+  Future<Map<String, dynamic>> resendMessages({
+    required List<int> messageIds,
+  }) async {
+    final response = await _client.post(
+      '$_basePath/resend',
+      data: {
+        'message_ids': messageIds,
+      },
+    );
+
+    return response.data as Map<String, dynamic>;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

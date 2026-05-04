@@ -1589,4 +1589,37 @@ const Map<String, String> ar = {
   'commonLoadingCities': 'جاري تحميل المدن...',
   'commonSessionExpired': 'انتهت الجلسة. جارٍ التجديد...',
   'commonSessionRefreshFailed': 'فشل تجديد الجلسة. سجّل دخول مرة أخرى.',
+
+  // ---------------------------------------------------------------------------
+  // Bulk Operations / Multi-select (Wave 6)
+  // ---------------------------------------------------------------------------
+  'bulkSelect': 'تحديد',
+  'bulkSelectAll': 'تحديد الكل',
+  'bulkSelectCount': 'تم تحديد {count}',
+  'bulkCancel': 'إلغاء التحديد',
+  'bulkDelete': 'حذف',
+  'bulkForceDelete': 'حذف نهائي',
+  'bulkMove': 'نقل إلى مجموعة',
+  'bulkCopy': 'نسخ إلى مجموعة',
+  'bulkResend': 'إعادة الإرسال',
+  'bulkConfirmDelete': 'هل أنت متأكد من حذف العناصر المحددة؟',
+  'bulkConfirmDeleteCount': 'سيتم حذف {count} عنصر. هل تريد المتابعة؟',
+  'bulkConfirmForceDelete':
+      'سيتم حذف {count} عنصر نهائياً، ولن يمكن استرجاعهم. هل تريد المتابعة؟',
+  'bulkSuccessDelete': 'تم حذف العناصر المحددة',
+  'bulkSuccessMove': 'تم نقل الأرقام إلى المجموعة',
+  'bulkSuccessCopy': 'تم نسخ الأرقام إلى المجموعة',
+  'bulkSuccessResend': 'تم إرسال الرسائل من جديد',
+  'bulkFailedDelete': 'فشل حذف بعض العناصر',
+  'bulkFailedMove': 'فشل نقل الأرقام',
+  'bulkFailedCopy': 'فشل نسخ الأرقام',
+  'bulkFailedResend': 'فشل إعادة الإرسال',
+  'bulkSelectTargetGroup': 'اختر المجموعة المستهدفة',
+  'bulkNoTargetGroup': 'لا توجد مجموعات أخرى',
+  'bulkImportTemplate': 'قالب الاستيراد',
+  'bulkDownloadTemplate': 'تحميل قالب Excel',
+  'bulkTemplateDownloading': 'جاري تحميل القالب...',
+  'bulkTemplateFailed': 'تعذّر تحميل القالب',
+  'bulkOnlyFailedResend': 'لا يمكن إعادة إرسال إلا الرسائل الفاشلة',
+  'bulkLongPressHint': 'اضغط مطولاً لتحديد عدة عناصر',
 };

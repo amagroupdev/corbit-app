@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/short_links/data/models/short_link_model.dart';
 import 'package:orbit_app/features/short_links/data/repositories/short_links_repository.dart';
@@ -11,6 +12,7 @@ import 'package:orbit_app/shared/widgets/app_error_widget.dart';
 import 'package:orbit_app/shared/widgets/app_loading.dart';
 import 'package:orbit_app/shared/widgets/app_search_bar.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
+import 'package:orbit_app/shared/widgets/multi_select_app_bar.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// Screen for managing shortened URLs.
@@ -35,6 +37,11 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
   String? _errorMessage;
   bool _hasMore = true;
   final ScrollController _scrollController = ScrollController();
+
+  // ── Multi-select (Wave 6) ────────────────────────────────────────
+  final Set<int> _selectedIds = {};
+  bool _bulkBusy = false;
+  bool get _isMultiSelect => _selectedIds.isNotEmpty;
 
   @override
   void initState() {
@@ -119,6 +126,102 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
   void _onSearchChanged(String query) {
     _searchQuery = query;
     _loadLinks(refresh: true);
+  }
+
+  // ── Multi-select (Wave 6) ────────────────────────────────────────
+
+  void _enterMultiSelect(int id) {
+    if (!kBulkOperationsEnabled) return;
+    setState(() => _selectedIds.add(id));
+  }
+
+  void _toggleSelection(int id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  void _exitMultiSelect() {
+    setState(_selectedIds.clear);
+  }
+
+  void _selectAllLinks() {
+    setState(() {
+      _selectedIds
+        ..clear()
+        ..addAll(_links.map((l) => l.id));
+    });
+  }
+
+  Future<void> _bulkDeleteLinks() async {
+    if (_selectedIds.isEmpty || _bulkBusy) return;
+    final t = AppLocalizations.of(context)!;
+    final count = _selectedIds.length;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          t.translate('bulkDelete'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          t.translateWithParams('bulkConfirmDeleteCount', {'count': '$count'}),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t.translate('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              t.translate('bulkDelete'),
+              style: const TextStyle(
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _bulkBusy = true);
+    final ids = _selectedIds.toList();
+    try {
+      final repo = ref.read(shortLinksRepositoryProvider);
+      await repo.bulkDelete(ids);
+      if (!mounted) return;
+      _exitMultiSelect();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.translate('bulkSuccessDelete')),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      await _loadLinks(refresh: true);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: AppColors.error),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.translate('bulkFailedDelete')),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _bulkBusy = false);
+    }
   }
 
   Future<void> _createLink() async {
@@ -295,18 +398,48 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
 
     if (widget.embedded) return body;
 
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.translate('shortLinks'),
-        ),
-      ),
+      appBar: _isMultiSelect
+          ? MultiSelectAppBar(
+              selectedCount: _selectedIds.length,
+              totalCount: _links.length,
+              onCancel: _exitMultiSelect,
+              onSelectAll: _selectAllLinks,
+              actions: [
+                if (_bulkBusy)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: t.translate('bulkDelete'),
+                    onPressed: _bulkDeleteLinks,
+                  ),
+              ],
+            )
+          : AppBar(
+              title: Text(
+                t.translate('shortLinks'),
+              ),
+            ),
       body: body,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createLink,
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add_link_rounded, color: Colors.white),
-      ),
+      floatingActionButton: _isMultiSelect
+          ? null
+          : FloatingActionButton(
+              onPressed: _createLink,
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add_link_rounded, color: Colors.white),
+            ),
     );
   }
 
@@ -350,9 +483,29 @@ class _ShortLinksScreenState extends ConsumerState<ShortLinksScreen> {
               ),
             );
           }
+          final link = _links[index];
+          final selected = _selectedIds.contains(link.id);
           return ShortLinkCard(
-            link: _links[index],
-            onDelete: () => _deleteLink(_links[index]),
+            link: link,
+            onDelete: () => _deleteLink(link),
+            isMultiSelectMode: _isMultiSelect,
+            isSelected: selected,
+            onToggleSelect: () {
+              if (_isMultiSelect) {
+                _toggleSelection(link.id);
+              } else {
+                _enterMultiSelect(link.id);
+              }
+            },
+            onLongPress: kBulkOperationsEnabled
+                ? () {
+                    if (_isMultiSelect) {
+                      _toggleSelection(link.id);
+                    } else {
+                      _enterMultiSelect(link.id);
+                    }
+                  }
+                : null,
           );
         },
       ),

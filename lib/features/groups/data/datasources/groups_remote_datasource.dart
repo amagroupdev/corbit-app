@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/constants/api_constants.dart';
 import 'package:orbit_app/core/network/api_client.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
@@ -125,6 +126,54 @@ class GroupsRemoteDatasource {
   /// POST /api/v3/groups/{id}/restore
   Future<void> restoreGroup(int id) async {
     await _client.post('/groups/$id/restore');
+  }
+
+  // ─── Groups — Bulk operations (V3) ───────────────────────────────
+
+  /// POST /api/v3/groups/bulk-delete
+  ///
+  /// Soft-archives multiple groups by their IDs in a single request.
+  /// The server returns `{success, message, data: {deleted_count}}`.
+  Future<Map<String, dynamic>> bulkDelete(List<int> ids) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.groupsBulkDelete,
+      data: {'ids': ids},
+    );
+    return response.data ?? <String, dynamic>{};
+  }
+
+  /// POST /api/v3/groups/bulk-force-delete
+  ///
+  /// Permanently deletes multiple already-archived groups. This is
+  /// irreversible — use only on groups that already have `deleted_at`.
+  Future<Map<String, dynamic>> bulkForceDelete(List<int> ids) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.groupsBulkForceDelete,
+      data: {'ids': ids},
+    );
+    return response.data ?? <String, dynamic>{};
+  }
+
+  /// GET /api/v3/groups/import-template
+  ///
+  /// Returns the URL (or a server-generated download link) for the
+  /// Excel template used by the standard `/groups/import-excel`
+  /// endpoint. The server may either redirect to the file or return
+  /// `{data: {url|download_url}}`.
+  Future<String?> getImportTemplate() async {
+    final response = await _client.get<dynamic>(
+      ApiConstants.groupsImportTemplate,
+    );
+
+    final body = response.data;
+    if (body is Map<String, dynamic>) {
+      final data = body['data'];
+      if (data is Map<String, dynamic>) {
+        return (data['url'] ?? data['download_url']) as String?;
+      }
+      return body['url'] as String? ?? body['download_url'] as String?;
+    }
+    return null;
   }
 
   // ─── Numbers within a group ──────────────────────────────────────
@@ -318,6 +367,55 @@ class GroupsRemoteDatasource {
   /// DELETE /api/v3/numbers/{id}
   Future<void> deleteNumber(int id) async {
     await _client.delete('/numbers/$id');
+  }
+
+  // ─── Numbers — Bulk & move operations (V3) ───────────────────────
+
+  /// POST /api/v3/numbers/move-to-group
+  ///
+  /// Moves the listed numbers from their current group into [targetGroupId].
+  /// The server replies with `{success, message, data: {moved_count}}`.
+  Future<Map<String, dynamic>> moveToGroup({
+    required List<int> numberIds,
+    required int targetGroupId,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.numbersMoveToGroup,
+      data: {
+        'number_ids': numberIds,
+        'target_group_id': targetGroupId,
+      },
+    );
+    return response.data ?? <String, dynamic>{};
+  }
+
+  /// POST /api/v3/numbers/copy-to-group
+  ///
+  /// Copies the listed numbers into [targetGroupId] without removing
+  /// them from their original group. Duplicates are skipped server-side.
+  Future<Map<String, dynamic>> copyToGroup({
+    required List<int> numberIds,
+    required int targetGroupId,
+  }) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.numbersCopyToGroup,
+      data: {
+        'number_ids': numberIds,
+        'target_group_id': targetGroupId,
+      },
+    );
+    return response.data ?? <String, dynamic>{};
+  }
+
+  /// POST /api/v3/numbers/bulk-delete
+  ///
+  /// Hard-deletes multiple numbers across one or more groups in a single call.
+  Future<Map<String, dynamic>> bulkDeleteNumbers(List<int> ids) async {
+    final response = await _client.post<Map<String, dynamic>>(
+      ApiConstants.numbersBulkDelete,
+      data: {'ids': ids},
+    );
+    return response.data ?? <String, dynamic>{};
   }
 }
 

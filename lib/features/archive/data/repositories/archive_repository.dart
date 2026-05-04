@@ -177,6 +177,25 @@ class ArchiveRepository {
       throw ApiException(message: e.toString());
     }
   }
+
+  // ─── Resend (Wave 6) ───────────────────────────────────────────────────
+
+  /// Re-queues previously failed archive messages by their ids.
+  /// Returns true when the API reports success.
+  Future<bool> resendMessages({
+    required List<int> messageIds,
+  }) async {
+    try {
+      final result = await _dataSource.resendMessages(
+        messageIds: messageIds,
+      );
+      return result['success'] == true;
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(message: e.toString());
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

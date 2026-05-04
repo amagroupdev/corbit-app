@@ -27,3 +27,11 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+/// Bulk Operations + Multi-select UI (Wave 6 — V3 sync).
+///
+/// Enables long-press-to-select on lists (Groups, Numbers, Files,
+/// Short Links, Archive…) plus bulk delete/move/copy/resend actions
+/// against the V3 endpoints (`/groups/bulk-delete`, `/numbers/move-to-group`,
+/// `/archive/resend`, …). Tap on a single item still opens its detail.
+const bool kBulkOperationsEnabled = true;
