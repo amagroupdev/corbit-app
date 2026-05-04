@@ -1754,7 +1754,6 @@ const Map<String, String> ar = {
   'certificationsLinkNoorLoginSuccess': 'تم الاتصال بنور',
   'invoicesTitle': 'الفواتير',
   'invoicesEmpty': 'لا توجد فواتير',
-  'invoiceNumber': 'رقم الفاتورة',
   'invoiceDate': 'تاريخ الفاتورة',
   'invoiceTotal': 'الإجمالي',
   'invoiceStatus': 'الحالة',
