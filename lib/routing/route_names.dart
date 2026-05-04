@@ -144,4 +144,15 @@ class RouteNames {
   // Voice Messages (Wave 4)
   static const String voiceMessages = 'voice-messages';
   static const String recordVoice = 'record-voice';
+
+  // Cart & Checkout (Wave 7 — Android only)
+  static const String cart = 'cart';
+  static const String checkout = 'checkout';
+
+  // Subaccount Transfers (Wave 7 — Android only)
+  static const String subaccountTransfer = 'subaccount-transfer';
+  static const String subaccountTransferHistory = 'subaccount-transfer-history';
+
+  // Balance Upgrade Levels (Wave 7 — Android only)
+  static const String upgradeLevels = 'upgrade-levels';
 }

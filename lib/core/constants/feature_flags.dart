@@ -82,3 +82,8 @@ const bool kInvoicesEnabled = true;
 /// Wave 9 — Sub-accounts المتقدمة (consumption, annual balance, reminder,
 /// transfer permissions).
 const bool kSubAccountsAdvancedEnabled = true;
+
+/// Wave 7 — Cart & Checkout (Android فقط — Apple 3.1.1).
+/// شاشات السلة + الدفع + ترقية الباقات + تحويل الحسابات الفرعية.
+/// iOS/Web يستخدم المسار القديم (Buy Balance المباشر).
+bool get kCartEnabledV3 => !kIsWeb && Platform.isAndroid;

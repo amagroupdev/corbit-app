@@ -231,6 +231,7 @@ abstract final class ApiConstants {
   // ══════════════════════════════════════════════
   static const String transferHistory = '/transfer/history';
   static const String transfer = '/transfer';
+  static const String transferExport = '/transfer/export';
   static const String transferSubaccountsHistory = '/transfer/subaccounts/history';
   static const String transferSubaccounts = '/transfer/subaccounts';
   static const String transferSubaccountsReport = '/transfer/subaccounts/report';
@@ -250,6 +251,19 @@ abstract final class ApiConstants {
   static const String cartApplyCoupon = '/cart/apply-coupon';
   static const String cartRemoveCoupon = '/cart/remove-coupon';
   static const String cartCheckout = '/cart/checkout';
+
+  // ══════════════════════════════════════════════
+  //  CART & CHECKOUT (V3 — Android only)
+  // ══════════════════════════════════════════════
+  static const String cart = '/cart';
+  static const String cartItems = '/cart/items';
+  static const String cartClear = '/cart/clear';
+  static const String cartApplyCoupon = '/cart/apply-coupon';
+  static const String cartRemoveCoupon = '/cart/remove-coupon';
+  static const String cartCheckout = '/cart/checkout';
+
+  /// DELETE /cart/items/{id}
+  static String cartItemDelete(dynamic id) => '/cart/items/$id';
 
   // ══════════════════════════════════════════════
   //  SETTINGS - PROFILE
