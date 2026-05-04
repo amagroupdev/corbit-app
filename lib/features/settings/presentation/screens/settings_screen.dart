@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/providers/locale_provider.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/settings/data/models/sub_account_model.dart';
@@ -135,6 +136,21 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
+
+            // ── الدعم (Support) — Wave 8 ────────────────────────────
+            if (kSupportTicketsEnabled)
+              SettingsSection(
+                title: AppLocalizations.of(context)!.translate('settings_section_support'),
+                icon: Icons.support_agent_outlined,
+                children: [
+                  SettingsItem(
+                    icon: Icons.confirmation_number_outlined,
+                    title: AppLocalizations.of(context)!.translate('supportTicketsTitle'),
+                    subtitle: AppLocalizations.of(context)!.translate('supportTicketsSubtitle'),
+                    onTap: () => context.pushNamed(RouteNames.supportTickets),
+                  ),
+                ],
+              ),
 
             // ── منطقة الخطر (Danger Zone) ──────────────────────────
             SettingsSection(

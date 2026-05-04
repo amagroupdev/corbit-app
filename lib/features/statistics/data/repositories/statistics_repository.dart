@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/constants/api_constants.dart';
 import 'package:orbit_app/core/network/api_client.dart';
 import 'package:orbit_app/core/network/api_exceptions.dart';
 import 'package:orbit_app/features/statistics/data/models/statistics_model.dart';
@@ -127,6 +128,101 @@ class StatisticsRepository {
     } catch (e) {
       throw ApiException(message: e.toString());
     }
+  }
+
+  // ─── Sub-accounts (Wave 8) ─────────────────────────────────────────────
+
+  /// Fetches per-sub-account statistics from `POST /statistics/subaccounts`.
+  ///
+  /// Optional [subaccountId] narrows the report to a single sub-account.
+  /// [filters] mirrors the generic statistics filters and is forwarded
+  /// untouched to the server.
+  Future<List<SubaccountStat>> getSubaccountsStats({
+    int? subaccountId,
+    Map<String, dynamic>? filters,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        if (subaccountId != null) 'subaccount_id': subaccountId,
+        if (filters != null && filters.isNotEmpty) 'filters': filters,
+      };
+
+      final response = await _apiClient.post(
+        ApiConstants.statisticsSubaccounts,
+        data: body,
+      );
+
+      final json = response.data as Map<String, dynamic>?;
+      if (json == null) return const [];
+      final data = json['data'];
+
+      // Server shape may be either a list or a wrapper map — accept both.
+      List<dynamic> rows;
+      if (data is List) {
+        rows = data;
+      } else if (data is Map<String, dynamic>) {
+        rows = data['subaccounts'] is List
+            ? data['subaccounts'] as List<dynamic>
+            : data['data'] is List
+                ? data['data'] as List<dynamic>
+                : const <dynamic>[];
+      } else {
+        rows = const [];
+      }
+
+      return rows
+          .whereType<Map<String, dynamic>>()
+          .map(SubaccountStat.fromJson)
+          .toList();
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(message: e.toString());
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUB-ACCOUNT STATS (Wave 8)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// One row of the `/statistics/subaccounts` response. The server shape is
+/// loosely typed across deployments, so all numeric fields are best-effort
+/// parses with a 0 fallback.
+class SubaccountStat {
+  const SubaccountStat({
+    required this.id,
+    required this.name,
+    this.totalSent = 0,
+    this.totalDelivered = 0,
+    this.totalFailed = 0,
+    this.balanceConsumed = 0,
+  });
+
+  final int id;
+  final String name;
+  final int totalSent;
+  final int totalDelivered;
+  final int totalFailed;
+  final int balanceConsumed;
+
+  factory SubaccountStat.fromJson(Map<String, dynamic> json) {
+    int parse(dynamic v) {
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    return SubaccountStat(
+      id: parse(json['id']),
+      name: (json['name'] as String?) ?? (json['username'] as String?) ?? '',
+      totalSent: parse(json['total_sent'] ?? json['sent']),
+      totalDelivered: parse(json['total_delivered'] ?? json['delivered']),
+      totalFailed: parse(json['total_failed'] ?? json['failed']),
+      balanceConsumed:
+          parse(json['balance_consumed'] ?? json['consumed_balance']),
+    );
   }
 }
 

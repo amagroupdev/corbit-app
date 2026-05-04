@@ -9,6 +9,8 @@ import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/login_tab_toggle.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
+import 'package:orbit_app/features/banners/data/repositories/banners_repository.dart';
+import 'package:orbit_app/features/banners/presentation/widgets/banner_carousel.dart';
 import 'package:orbit_app/core/storage/secure_storage.dart';
 
 /// Login screen for ORBIT SMS V3.
@@ -171,6 +173,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               children: [
+                // Banners (login carousel — public, no auth required)
+                if (kBannersEnabled) _buildLoginBanners(),
+
                 // Card
                 Container(
                   width: double.infinity,
@@ -606,6 +611,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Renders the login carousel above the form. The widget collapses to
+  /// nothing while loading or when the server returns an empty list, so
+  /// it never reserves vertical space unnecessarily.
+  Widget _buildLoginBanners() {
+    final asyncBanners = ref.watch(loginBannersProvider);
+    return asyncBanners.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (banners) {
+        if (banners.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: BannerCarousel(banners: banners, height: 130),
+        );
+      },
     );
   }
 

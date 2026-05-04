@@ -18,6 +18,8 @@ import 'package:orbit_app/features/dashboard/presentation/widgets/dashboard_app_
 import 'package:orbit_app/features/dashboard/presentation/widgets/stats_card.dart';
 import 'package:orbit_app/features/dashboard/presentation/widgets/quick_action_card.dart';
 import 'package:orbit_app/features/dashboard/presentation/widgets/new_message_button.dart';
+import 'package:orbit_app/features/banners/data/repositories/banners_repository.dart';
+import 'package:orbit_app/features/banners/presentation/widgets/banner_ad_card.dart';
 
 /// The main dashboard screen of the ORBIT SMS V3 application.
 ///
@@ -116,6 +118,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 // Welcome section
                 _buildWelcomeSection(),
 
+                // Wave 8 — V3 banner ad (top of scroll)
+                if (kBannersEnabled) _buildV3BannerAd(),
+
                 // Action buttons
                 _buildActionButtons(),
 
@@ -148,6 +153,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // ─── V3 Banner Ad (Wave 8) ──────────────────────────────────────────
+
+  /// Renders the first V3 banner returned by `GET /banners/dashboard` as a
+  /// dismissible ad card at the top of the dashboard scroll. Collapses to
+  /// nothing when the list is empty or fetching fails.
+  Widget _buildV3BannerAd() {
+    final asyncBanners = ref.watch(dashboardBannersV3Provider);
+    return asyncBanners.maybeWhen(
+      data: (banners) {
+        if (banners.isEmpty) return const SizedBox.shrink();
+        return BannerAdCard(banner: banners.first);
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 

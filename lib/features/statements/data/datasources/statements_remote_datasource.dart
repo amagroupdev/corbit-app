@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/constants/api_constants.dart';
 import 'package:orbit_app/core/network/api_client.dart';
 import 'package:orbit_app/features/statements/data/models/statement_response_model.dart';
 import 'package:orbit_app/shared/models/pagination_model.dart';
@@ -92,8 +93,9 @@ class StatementsRemoteDataSource {
       body['filters'] = filter.toJson();
     }
 
+    // Wave 8 — switched to typed constant to keep paths consistent with V3.
     final response = await _client.post(
-      '$_basePath/export',
+      ApiConstants.statementsExport,
       data: body,
     );
 

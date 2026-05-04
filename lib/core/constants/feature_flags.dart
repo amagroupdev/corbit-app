@@ -27,3 +27,23 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+// ================================================================
+// Wave 8 — Banners + Support Tickets + Occasion Cards Send/Archive
+//          + Statistics Subaccounts + Statements Export
+// ================================================================
+
+/// Promotional banner carousels on Login + Dashboard.
+const bool kBannersEnabled = true;
+
+/// Support tickets (list + create) under Settings.
+const bool kSupportTicketsEnabled = true;
+
+/// Occasion Cards Send / Preview / Archive screens.
+const bool kOccasionCardsSendEnabled = true;
+
+/// Sub-accounts statistics tab.
+const bool kStatisticsSubaccountsEnabled = true;
+
+/// Server-triggered statements export (already partially used).
+const bool kStatementsExportEnabled = true;

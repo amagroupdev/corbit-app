@@ -75,6 +75,15 @@ class RouteNames {
 
   // Occasion Cards
   static const String occasionCards = 'occasion-cards';
+  static const String occasionCardsSend = 'occasion-cards-send';
+  static const String occasionCardsArchive = 'occasion-cards-archive';
+
+  // Support Tickets (Wave 8)
+  static const String supportTickets = 'support-tickets';
+  static const String createSupportTicket = 'create-support-ticket';
+
+  // Statistics — sub-accounts (Wave 8)
+  static const String statisticsSubaccounts = 'statistics-subaccounts';
 
   // Contact Me
   static const String contactMe = 'contact-me';
