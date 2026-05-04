@@ -225,6 +225,34 @@ class AuthRepository {
   }
 
   // ---------------------------------------------------------------------------
+  // V3: Refresh / permission / addon
+  // ---------------------------------------------------------------------------
+
+  /// V3: requests a fresh access token using the currently stored bearer.
+  ///
+  /// On success the new token is persisted via [SecureStorageService] and
+  /// the [AuthResponseModel] is returned to the caller.
+  Future<Result<AuthResponseModel>> refreshToken() async {
+    return _guard(() async {
+      final response = await _dataSource.refreshToken();
+      if (response.isAuthenticated) {
+        await _storageService.saveToken(response.token!);
+      }
+      return response;
+    });
+  }
+
+  /// V3: returns `true` when the current user holds [permission].
+  Future<Result<bool>> checkPermission(String permission) async {
+    return _guard(() => _dataSource.checkPermission(permission));
+  }
+
+  /// V3: returns `true` when [addonKey] is active for the current account.
+  Future<Result<bool>> checkAddon(String addonKey) async {
+    return _guard(() => _dataSource.checkAddon(addonKey));
+  }
+
+  // ---------------------------------------------------------------------------
   // Token helpers
   // ---------------------------------------------------------------------------
 

@@ -16,7 +16,7 @@ class InteractionRepository {
   Future<bool> checkRoot(String rootUrl) async {
     try {
       final response = await _apiClient.post(
-        '${ApiConstants.interactions}/check-root',
+        ApiConstants.interactionCheckRoot,
         data: {'root_url': rootUrl},
       );
 
@@ -39,7 +39,7 @@ class InteractionRepository {
   }) async {
     try {
       await _apiClient.post(
-        '${ApiConstants.interactions}/send',
+        ApiConstants.interactionSend,
         data: {
           'message': message,
           'sender_id': senderId,
@@ -61,7 +61,7 @@ class InteractionRepository {
   }) async {
     try {
       final response = await _apiClient.post(
-        '${ApiConstants.interactions}/preview',
+        ApiConstants.interactionPreview,
         data: {
           'message': message,
           'sender_id': senderId,
@@ -86,7 +86,7 @@ class InteractionRepository {
   }) async {
     try {
       final response = await _apiClient.post(
-        '${ApiConstants.interactions}/replies',
+        ApiConstants.interactionReplies,
         data: {
           'page': page,
           'per_page': ApiConstants.defaultPerPage,
@@ -117,7 +117,7 @@ class InteractionRepository {
   }) async {
     try {
       final response = await _apiClient.get(
-        '${ApiConstants.interactions}/replies/$id',
+        ApiConstants.interactionReplyShow(id),
       );
 
       final apiResponse =

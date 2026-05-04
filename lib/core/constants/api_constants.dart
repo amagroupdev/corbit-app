@@ -55,6 +55,12 @@ abstract final class ApiConstants {
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
 
+  // Auth — V3 additions
+  /// Alias of [refreshToken] using the V3 naming convention.
+  static const String authRefresh = '/auth/refresh';
+  static const String authCheckPermission = '/auth/check-permission';
+  static const String authCheckAddon = '/auth/check-addon';
+
   // ══════════════════════════════════════════════
   //  COMMON / LOOKUP
   // ══════════════════════════════════════════════
@@ -64,6 +70,15 @@ abstract final class ApiConstants {
   static const String checkEmail = '/common/check-email';
   static const String checkUsername = '/common/check-username';
   static const String checkPhone = '/common/check-phone';
+
+  // V3 aliases (preferred new names — used by Wave 2 features)
+  static const String commonOrganizationTypes = '/common/organization-types';
+  static const String commonRegions = '/common/regions';
+  static const String commonCities = '/common/cities';
+  static const String commonCheckEmail = '/common/check-email';
+  static const String commonCheckUsername = '/common/check-username';
+  static const String commonCheckPhone = '/common/check-phone';
+  static const String utilsHijriDate = '/utils/hijri-date';
 
   // ══════════════════════════════════════════════
   //  DASHBOARD
@@ -80,6 +95,40 @@ abstract final class ApiConstants {
   static const String messagesCalculateSmsCount = '/messages/calculate-sms-count';
   static const String messagesValidateBlockedLinks = '/messages/validate-blocked-links';
   static const String messagesCheckDuplicate = '/messages/check-duplicate';
+
+  // Messages — V3 enhancements (helpers, AI, DLR, receipts)
+  static const String messagesDynamicTexts = '/messages/dynamic-texts';
+  static const String messagesAiGenerate = '/messages/ai-generate';
+  static const String messagesDlrByNumber = '/messages/dlr-by-number';
+
+  /// GET `/messages/{uuid}/receipt-report`
+  static String messageReceiptReport(String uuid) =>
+      '/messages/$uuid/receipt-report';
+
+  // ══════════════════════════════════════════════
+  //  MESSAGES — DRAFTS
+  // ══════════════════════════════════════════════
+  static const String messageDrafts = '/messages/drafts';
+  static const String messageDraftsStore = '/messages/drafts/store';
+  static const String messageDraftsList = '/messages/drafts/list';
+
+  /// GET `/messages/drafts/{id}`
+  static String messageDraftShow(dynamic id) => '/messages/drafts/$id';
+
+  /// PUT `/messages/drafts/{id}`
+  static String messageDraftUpdate(dynamic id) => '/messages/drafts/$id';
+
+  /// DELETE `/messages/drafts/{id}`
+  static String messageDraftDelete(dynamic id) => '/messages/drafts/$id';
+
+  // ══════════════════════════════════════════════
+  //  VOICE MESSAGES
+  // ══════════════════════════════════════════════
+  static const String voicesUpload = '/voices/upload';
+  static const String voicesList = '/voices/list';
+
+  /// DELETE `/voices/{id}`
+  static String voiceDelete(dynamic id) => '/voices/$id';
 
   // ══════════════════════════════════════════════
   //  TEMPLATES
@@ -118,6 +167,13 @@ abstract final class ApiConstants {
   static String groupExport(dynamic id) => '/groups/$id/export';
   static String groupExportDownload(dynamic id) => '/groups/$id/export-download';
 
+  // Groups — Bulk operations (V3)
+  static const String groupsBulkDelete = '/groups/bulk-delete';
+  static const String groupsBulkForceDelete = '/groups/bulk-force-delete';
+  static const String groupsImportTemplate = '/groups/import-template';
+  static const String groupsImportFailedNumbers = '/groups/import-failed-numbers';
+  static const String groupsExportDownload = '/groups/export-download';
+
   // ══════════════════════════════════════════════
   //  NUMBERS (within groups)
   // ══════════════════════════════════════════════
@@ -126,6 +182,11 @@ abstract final class ApiConstants {
 
   static String numberUpdate(dynamic id) => '/numbers/$id';
   static String numberDelete(dynamic id) => '/numbers/$id';
+
+  // Numbers — Bulk & move operations (V3)
+  static const String numbersMoveToGroup = '/numbers/move-to-group';
+  static const String numbersCopyToGroup = '/numbers/copy-to-group';
+  static const String numbersBulkDelete = '/numbers/bulk-delete';
 
   // ══════════════════════════════════════════════
   //  ARCHIVE (Message History)
@@ -139,6 +200,9 @@ abstract final class ApiConstants {
   static const String archiveAdd = '/archive/add';
   static const String archiveRestore = '/archive/restore';
 
+  // Archive — Bulk operations (V3)
+  static const String archiveResend = '/archive/resend';
+
   // ══════════════════════════════════════════════
   //  BALANCE
   // ══════════════════════════════════════════════
@@ -150,11 +214,17 @@ abstract final class ApiConstants {
   static const String balanceTransactions = '/balance/transactions';
   static const String balanceTransactionsExport = '/balance/transactions/export';
   static const String balanceUpgrades = '/balance/upgrades';
+  static const String balanceUpgradeLevels = '/balance/upgrade-levels';
+  static const String balanceUpgradesExport = '/balance/upgrades/export';
   static const String balancePurchaseCalculate = '/balance/purchase/calculate';
   static const String balancePurchase = '/balance/purchase';
   static const String balancePurchaseVerifyOtp = '/balance/purchase/verify-otp';
-  static const String balancePurchaseDelete = '/balance/purchase/delete';
   static const String balanceCheck = '/balance/check';
+
+  /// DELETE a specific pending purchase by transaction id:
+  /// `DELETE /balance/purchase/{transactionId}`
+  static String balancePurchaseDelete(dynamic transactionId) =>
+      '/balance/purchase/$transactionId';
 
   // ══════════════════════════════════════════════
   //  TRANSFER
@@ -165,6 +235,21 @@ abstract final class ApiConstants {
   static const String transferSubaccounts = '/transfer/subaccounts';
   static const String transferSubaccountsReport = '/transfer/subaccounts/report';
   static const String transferSubaccountsExport = '/transfer/subaccounts/export';
+  static const String transferExport = '/transfer/export';
+
+  // ══════════════════════════════════════════════
+  //  CART (V3 — Android only via feature flag)
+  // ══════════════════════════════════════════════
+  static const String cart = '/cart';
+  static const String cartItems = '/cart/items';
+
+  /// DELETE `/cart/items/{id}`
+  static String cartItemDelete(dynamic id) => '/cart/items/$id';
+
+  static const String cartClear = '/cart/clear';
+  static const String cartApplyCoupon = '/cart/apply-coupon';
+  static const String cartRemoveCoupon = '/cart/remove-coupon';
+  static const String cartCheckout = '/cart/checkout';
 
   // ══════════════════════════════════════════════
   //  SETTINGS - PROFILE
@@ -184,6 +269,26 @@ abstract final class ApiConstants {
   static String settingsSubAccountShow(dynamic id) => '/settings/sub-accounts/$id';
   static String settingsSubAccountUpdate(dynamic id) => '/settings/sub-accounts/$id';
   static String settingsSubAccountDelete(dynamic id) => '/settings/sub-accounts/$id';
+
+  // Settings - Sub-accounts — V3 advanced endpoints
+  static const String settingsSubAccountsConsumption =
+      '/settings/sub-accounts/consumption';
+
+  /// `POST /settings/sub-accounts/{id}/annual-balance`
+  static String settingsSubAccountAnnualBalance(dynamic id) =>
+      '/settings/sub-accounts/$id/annual-balance';
+
+  /// `DELETE /settings/sub-accounts/{id}/annual-balance/{year}`
+  static String settingsSubAccountAnnualBalanceDelete(dynamic id, int year) =>
+      '/settings/sub-accounts/$id/annual-balance/$year';
+
+  /// `POST /settings/sub-accounts/{id}/balance-reminder`
+  static String settingsSubAccountBalanceReminder(dynamic id) =>
+      '/settings/sub-accounts/$id/balance-reminder';
+
+  /// `POST /settings/sub-accounts/{id}/transfer-permissions`
+  static String settingsSubAccountTransferPermissions(dynamic id) =>
+      '/settings/sub-accounts/$id/transfer-permissions';
 
   // ══════════════════════════════════════════════
   //  SETTINGS - ROLES
@@ -213,6 +318,12 @@ abstract final class ApiConstants {
 
   static String settingsInvoiceShow(dynamic id) => '/settings/invoices/$id';
   static String settingsInvoiceDownload(dynamic id) => '/settings/invoices/$id/download';
+
+  // Settings - Invoices — V3
+  static const String settingsInvoicesList = '/settings/invoices/list';
+
+  /// V3: `GET /settings/invoices/{id}/pdf`.
+  static String settingsInvoicePdf(dynamic id) => '/settings/invoices/$id/pdf';
 
   // ══════════════════════════════════════════════
   //  SETTINGS - API KEYS
@@ -248,6 +359,9 @@ abstract final class ApiConstants {
   static const String statisticsExport = '/statistics/export';
   static const String statisticsExportDownload = '/statistics/export-download';
 
+  // Statistics — V3 (sub-accounts breakdown)
+  static const String statisticsSubaccounts = '/statistics/subaccounts';
+
   // ══════════════════════════════════════════════
   //  ADDONS
   // ══════════════════════════════════════════════
@@ -266,6 +380,14 @@ abstract final class ApiConstants {
   static String shortLinkUpdate(dynamic id) => '/short-links/$id';
   static String shortLinkDelete(dynamic id) => '/short-links/$id';
   static const String shortLinkStatistics = '/short-links/statistics';
+
+  // Short Links — Bulk operations (V3)
+  static const String shortLinksBulkDelete = '/short-links/bulk-delete';
+
+  // ══════════════════════════════════════════════
+  //  VIP CARDS (V3 — bulk only declared here)
+  // ══════════════════════════════════════════════
+  static const String vipCardsTemplatesBulkDelete = '/vip-cards/templates/bulk-delete';
 
   // ══════════════════════════════════════════════
   //  NOTIFICATIONS
@@ -311,6 +433,14 @@ abstract final class ApiConstants {
   static const String occasionCardCategories = '/occasion-cards/categories';
   static const String occasionCardTemplates = '/occasion-cards/templates';
 
+  // Occasion Cards — V3 send/preview/list/templates
+  static const String occasionCardsSend = '/occasion-cards/send';
+  static const String occasionCardsPreview = '/occasion-cards/preview';
+  static const String occasionCardsList = '/occasion-cards/list';
+
+  /// V3 alias of [occasionCardTemplates] using the new naming convention.
+  static const String occasionCardsTemplates = '/occasion-cards/templates';
+
   // ══════════════════════════════════════════════
   //  CONTACT ME
   // ══════════════════════════════════════════════
@@ -321,15 +451,30 @@ abstract final class ApiConstants {
   static String contactMeDelete(dynamic id) => '/contact-me/$id';
 
   // ══════════════════════════════════════════════
-  //  INTERACTION
+  //  BANNERS (V3 — login carousel + dashboard banner)
   // ══════════════════════════════════════════════
-  static const String interactions = '/interactions';
+  static const String bannersLogin = '/banners/login';
+  static const String bannersDashboard = '/banners/dashboard';
 
-  static String interactionShow(dynamic id) => '/interactions/$id';
-  static String interactionUpdate(dynamic id) => '/interactions/$id';
-  static String interactionDelete(dynamic id) => '/interactions/$id';
-  static String interactionResults(dynamic id) => '/interactions/$id/results';
-  static String interactionExport(dynamic id) => '/interactions/$id/export';
+  // ══════════════════════════════════════════════
+  //  SUPPORT TICKETS (V3)
+  // ══════════════════════════════════════════════
+  static const String supportTickets = '/support-tickets';
+  static const String supportTicketsList = '/support-tickets/list';
+
+  // ══════════════════════════════════════════════
+  //  INTERACTION  (V3: singular path — was `/interactions/`)
+  // ══════════════════════════════════════════════
+  static const String interactionCheckRoot = '/interaction/check-root';
+  static const String interactionSend = '/interaction/send';
+  static const String interactionPreview = '/interaction/preview';
+  static const String interactionReplies = '/interaction/replies';
+
+  static String interactionReplyShow(dynamic id) => '/interaction/replies/$id';
+
+  /// Public reply endpoint: `/interaction/{root_name}/reply`.
+  static String interactionPublicReply(String rootName) =>
+      '/interaction/$rootName/reply';
 
   // ══════════════════════════════════════════════
   //  FILES
@@ -341,6 +486,9 @@ abstract final class ApiConstants {
   static String fileDelete(dynamic id) => '/files/$id';
   static String fileDownload(dynamic id) => '/files/$id/download';
 
+  // Files — Bulk operations (V3)
+  static const String filesBulkDelete = '/files/bulk-delete';
+
   // ══════════════════════════════════════════════
   //  CERTIFICATIONS
   // ══════════════════════════════════════════════
@@ -348,6 +496,22 @@ abstract final class ApiConstants {
 
   static String certificationShow(dynamic id) => '/certifications/$id';
   static String certificationDownload(dynamic id) => '/certifications/$id/download';
+
+  // Certifications — V3 endpoints
+  static const String certificationsList = '/certifications/list';
+  static const String certificationsDelete = '/certifications/delete';
+  static const String certificationsUploadPdf = '/certifications/upload-pdf-file';
+  static const String certificationsFilterOptions = '/certifications/filter-options';
+  static const String certificationsSettings = '/certifications/settings';
+  static const String certificationsSettingsNoor = '/certifications/settings/noor';
+  static const String certificationsSettingsMadrasati = '/certifications/settings/madrasati';
+
+  // Certifications Link — V3 endpoints
+  static const String certificationsLinkList = '/certifications-link/list';
+  static const String certificationsLinkSend = '/certifications-link/send';
+  static const String certificationsLinkPreview = '/certifications-link/preview';
+  static const String certificationsLinkNoorLogin = '/certifications-link/noor/login';
+  static const String certificationsLinkNoorProfiles = '/certifications-link/noor/profiles';
 
   // ══════════════════════════════════════════════
   //  ABSENCE & TARDINESS MESSAGES

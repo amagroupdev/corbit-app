@@ -1576,4 +1576,17 @@ const Map<String, String> ar = {
   'aiConfirmYes': 'نعم، أنشئ',
   'aiConfirmNo': 'لا، إلغاء',
   'aiRateLimitMessage': 'وصلت للحد الأقصى من الرسائل. حاول لاحقاً.',
+
+  // ---------------------------------------------------------------------------
+  // Common (Wave 2 — /common + /utils + auth refresh)
+  // ---------------------------------------------------------------------------
+  'commonRegion': 'المنطقة',
+  'commonCity': 'المدينة',
+  'commonOrganizationType': 'نوع المنشأة',
+  'commonSelectRegion': 'اختر المنطقة',
+  'commonSelectCity': 'اختر المدينة',
+  'commonLoadingRegions': 'جاري تحميل المناطق...',
+  'commonLoadingCities': 'جاري تحميل المدن...',
+  'commonSessionExpired': 'انتهت الجلسة. جارٍ التجديد...',
+  'commonSessionRefreshFailed': 'فشل تجديد الجلسة. سجّل دخول مرة أخرى.',
 };

@@ -177,8 +177,14 @@ class AuthRemoteDataSource {
   // ---------------------------------------------------------------------------
 
   /// Fetches the currently authenticated user's profile.
+  ///
+  /// V3 API change: this endpoint is now `POST /auth/me` (was `GET`).
+  /// We send an empty body so the server accepts the request.
   Future<UserModel> getMe() async {
-    final response = await _client.get(ApiConstants.me);
+    final response = await _client.post(
+      ApiConstants.me,
+      data: <String, dynamic>{},
+    );
     final json = response.data as Map<String, dynamic>;
 
     // Handle both { "data": { ... } } and flat { ... } envelopes.
@@ -196,6 +202,79 @@ class AuthRemoteDataSource {
   /// Invalidates the current access token on the server.
   Future<void> logout() async {
     await _client.post(ApiConstants.logout);
+  }
+
+  // ---------------------------------------------------------------------------
+  // V3: Refresh / permission / addon
+  // ---------------------------------------------------------------------------
+
+  /// V3: refreshes the access token using the current bearer.
+  ///
+  /// Returns an [AuthResponseModel] containing the new token (and, when
+  /// present, the up-to-date [UserModel]). The caller is responsible for
+  /// persisting the new token through [SecureStorageService.saveToken].
+  Future<AuthResponseModel> refreshToken() async {
+    final response = await _client.post(
+      ApiConstants.authRefresh,
+      data: <String, dynamic>{},
+    );
+    return AuthResponseModel.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+  }
+
+  /// V3: server-side check for whether the current user holds [permission].
+  ///
+  /// Falls back to `false` if the server returns an unexpected payload.
+  Future<bool> checkPermission(String permission) async {
+    final response = await _client.post(
+      ApiConstants.authCheckPermission,
+      data: {'permission': permission},
+    );
+    return _extractBoolFlag(
+      response.data as Map<String, dynamic>?,
+      flagKeys: const ['allowed', 'has_permission', 'granted'],
+    );
+  }
+
+  /// V3: returns `true` when the addon identified by [addonKey] is active
+  /// for the current account.
+  Future<bool> checkAddon(String addonKey) async {
+    final response = await _client.post(
+      ApiConstants.authCheckAddon,
+      data: {'addon_key': addonKey},
+    );
+    return _extractBoolFlag(
+      response.data as Map<String, dynamic>?,
+      flagKeys: const ['active', 'is_active', 'enabled'],
+    );
+  }
+
+  /// Resolves a boolean flag from a (possibly wrapped) API response.
+  ///
+  /// Tries each key in [flagKeys] at the top level, then under `data`.
+  /// Falls back to the `success` flag, then to `false`.
+  static bool _extractBoolFlag(
+    Map<String, dynamic>? json, {
+    required List<String> flagKeys,
+  }) {
+    if (json == null) return false;
+
+    for (final key in flagKeys) {
+      final value = json[key];
+      if (value is bool) return value;
+    }
+
+    final inner = json['data'];
+    if (inner is Map<String, dynamic>) {
+      for (final key in flagKeys) {
+        final value = inner[key];
+        if (value is bool) return value;
+      }
+    }
+
+    if (json['success'] is bool) return json['success'] as bool;
+    return false;
   }
 }
 

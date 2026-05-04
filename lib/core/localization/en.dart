@@ -1766,4 +1766,18 @@ const Map<String, String> en = {
   'aiConfirmYes': 'Yes, create',
   'aiConfirmNo': 'No, cancel',
   'aiRateLimitMessage': 'You\'ve reached the message limit. Try again later.',
+
+  // ---------------------------------------------------------------------------
+  // Common (Wave 2 — /common + /utils + auth refresh)
+  // ---------------------------------------------------------------------------
+  'commonRegion': 'Region',
+  'commonCity': 'City',
+  'commonOrganizationType': 'Organization Type',
+  'commonSelectRegion': 'Select region',
+  'commonSelectCity': 'Select city',
+  'commonLoadingRegions': 'Loading regions...',
+  'commonLoadingCities': 'Loading cities...',
+  'commonSessionExpired': 'Session expired. Refreshing...',
+  'commonSessionRefreshFailed':
+      'Could not refresh session. Please log in again.',
 };

@@ -9,10 +9,12 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
 import 'package:orbit_app/core/constants/app_strings.dart';
-import 'package:orbit_app/core/constants/sa_regions.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
 import 'package:orbit_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:orbit_app/features/auth/presentation/widgets/phone_input_field.dart';
+import 'package:orbit_app/features/common/data/models/city_model.dart';
+import 'package:orbit_app/features/common/data/models/region_model.dart';
+import 'package:orbit_app/features/common/presentation/providers/common_providers.dart';
 import 'package:orbit_app/shared/widgets/otp_input.dart';
 
 /// Multi-step registration screen for ORBIT SMS V3.
@@ -68,8 +70,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscureConfirmPassword = true;
 
   // Step 2: Account data
-  String? _selectedRegion;
-  String? _selectedCity;
+  // Region / city are now sourced from `/common/regions` and `/common/cities`
+  // (Wave 2). The V3 server made `city_id` optional ("city_id removed" in
+  // Postman), so the user may submit without selecting a city.
+  int? _selectedRegionId;
+  int? _selectedCityId;
   PlatformFile? _documentFile;
   XFile? _profilePhoto;
   final _organizationNameController = TextEditingController();
@@ -89,22 +94,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     'username', 'password', 'password_confirmation', 'gender',
   };
 
-  // Regions and cities – loaded from static data (no network needed)
-  late final List<Map<String, dynamic>> _regions = SaRegions.regions
-      .map((r) => {'id': r['id'].toString(), 'name': r['name'].toString()})
-      .toList();
-  List<Map<String, dynamic>> _cities = [];
-
-  void _loadCities(String regionId) {
-    final id = int.tryParse(regionId);
-    final raw = id != null ? SaRegions.cities[id] : null;
-    setState(() {
-      _cities = (raw ?? [])
-          .map((c) => {'id': c['id'].toString(), 'name': c['name'].toString()})
-          .toList();
-      _selectedCity = null;
-    });
-  }
+  // Regions / cities are loaded from the V3 API via `regionsProvider` and
+  // `citiesProvider(regionId)` — see [_buildStep2AccountData].
 
   @override
   void dispose() {
@@ -184,8 +175,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       'password_confirmation': _confirmPasswordController.text,
       'user_type_id': _selectedAccountType,
       if (_selectedGender != null) 'gender': _selectedGender,
-      if (_selectedRegion != null) 'region_id': int.tryParse(_selectedRegion!) ?? _selectedRegion,
-      if (_selectedCity != null) 'city_id': int.tryParse(_selectedCity!) ?? _selectedCity,
+      if (_selectedRegionId != null) 'region_id': _selectedRegionId,
+      // V3: city_id is optional — only sent when the user picks a city.
+      if (_selectedCityId != null) 'city_id': _selectedCityId,
     };
 
     // Individual-specific fields
@@ -1006,52 +998,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 16),
           ],
 
-          // Region
+          // Region — sourced from /common/regions
           _buildLabel(t.translate('regionLabel')),
           const SizedBox(height: 8),
-          _buildDropdown<String>(
-            value: _selectedRegion,
-            hint: t.translate('selectRegion'),
-            items: _regions
-                .map((r) => DropdownMenuItem(
-                      value: r['id'] as String,
-                      child: Text(r['name'] as String,
-                          style: const TextStyle(fontFamily: 'IBMPlexSansArabic')),
-                    ))
-                .toList(),
-            onChanged: (v) {
-              setState(() {
-                _selectedRegion = v;
-                _selectedCity = null;
-                _cities = [];
-              });
-              _clearFieldError('region_id');
-              if (v != null) _loadCities(v);
-            },
-          ),
+          _buildRegionsDropdown(t),
           _fieldErrorWidget('region_id'),
           const SizedBox(height: 16),
 
-          // City
+          // City — sourced from /common/cities (filtered by selected region).
           _buildLabel(t.translate('cityLabel')),
           const SizedBox(height: 8),
-          _buildDropdown<String>(
-            value: _selectedCity,
-            hint: _selectedRegion == null
-                ? t.translate('selectRegionFirst')
-                : t.translate('selectCity'),
-            items: _cities
-                .map((c) => DropdownMenuItem(
-                      value: c['id'] as String,
-                      child: Text(c['name'] as String,
-                          style: const TextStyle(fontFamily: 'IBMPlexSansArabic')),
-                    ))
-                .toList(),
-            onChanged: (v) {
-              setState(() => _selectedCity = v);
-              _clearFieldError('city_id');
-            },
-          ),
+          _buildCitiesDropdown(t),
           _fieldErrorWidget('city_id'),
           const SizedBox(height: 24),
 
@@ -1422,6 +1379,167 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Regions / cities dropdowns (V3 — backed by /common/regions and /common/cities)
+  // ---------------------------------------------------------------------------
+
+  Widget _buildRegionsDropdown(AppLocalizations t) {
+    final regionsAsync = ref.watch(regionsProvider);
+    return regionsAsync.when(
+      loading: () => _buildLookupLoadingPlaceholder(
+        t.translate('commonLoadingRegions'),
+      ),
+      error: (e, _) => _buildLookupErrorPlaceholder(
+        message: '${t.translate('error')}: $e',
+        onRetry: () => ref.invalidate(regionsProvider),
+      ),
+      data: (regions) => _buildDropdown<int>(
+        value: _selectedRegionId,
+        hint: t.translate('selectRegion'),
+        items: regions
+            .map(
+              (RegionModel r) => DropdownMenuItem<int>(
+                value: r.id,
+                child: Text(
+                  r.name,
+                  style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: (v) {
+          setState(() {
+            _selectedRegionId = v;
+            // Clear city when the region changes; the cities query is keyed
+            // by region id, so the new list is fetched automatically.
+            _selectedCityId = null;
+          });
+          _clearFieldError('region_id');
+          _clearFieldError('city_id');
+        },
+      ),
+    );
+  }
+
+  Widget _buildCitiesDropdown(AppLocalizations t) {
+    if (_selectedRegionId == null) {
+      // No region picked yet — show a disabled "select region first" hint
+      // styled identically to a real dropdown so the layout stays stable.
+      return _buildDropdown<int>(
+        value: null,
+        hint: t.translate('selectRegionFirst'),
+        items: const <DropdownMenuItem<int>>[],
+        onChanged: (_) {},
+      );
+    }
+
+    final citiesAsync = ref.watch(citiesProvider(_selectedRegionId));
+    return citiesAsync.when(
+      loading: () => _buildLookupLoadingPlaceholder(
+        t.translate('commonLoadingCities'),
+      ),
+      error: (e, _) => _buildLookupErrorPlaceholder(
+        message: '${t.translate('error')}: $e',
+        onRetry: () => ref.invalidate(citiesProvider(_selectedRegionId)),
+      ),
+      data: (cities) => _buildDropdown<int>(
+        value: _selectedCityId,
+        hint: t.translate('selectCity'),
+        items: cities
+            .map(
+              (CityModel c) => DropdownMenuItem<int>(
+                value: c.id,
+                child: Text(
+                  c.name,
+                  style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: (v) {
+          setState(() => _selectedCityId = v);
+          _clearFieldError('city_id');
+        },
+      ),
+    );
+  }
+
+  /// Empty-state widget rendered while a remote lookup is loading.
+  Widget _buildLookupLoadingPlaceholder(String label) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.inputFill,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.inputBorder),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'IBMPlexSansArabic',
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Empty-state widget rendered when a remote lookup fails. Provides a
+  /// retry button that re-runs the FutureProvider.
+  Widget _buildLookupErrorPlaceholder({
+    required String message,
+    required VoidCallback onRetry,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.inputFill,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.inputBorderError),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline,
+              color: AppColors.error, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: 'IBMPlexSansArabic',
+                fontSize: 13,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onRetry,
+            child: const Text(
+              'إعادة',
+              style: TextStyle(fontFamily: 'IBMPlexSansArabic'),
+            ),
+          ),
+        ],
       ),
     );
   }
