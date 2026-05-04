@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
+import 'package:orbit_app/features/drafts/data/repositories/drafts_repository.dart';
+import 'package:orbit_app/features/drafts/presentation/controllers/drafts_controller.dart';
 import 'package:orbit_app/features/groups/data/datasources/groups_remote_datasource.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
@@ -231,6 +234,73 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
     }
   }
 
+  /// Saves the current send-message form as a draft via the V3 Drafts API.
+  ///
+  /// Wired to the bookmark icon in the AppBar (only when [kDraftsEnabled]
+  /// is true). On success the user is offered a snackbar action that
+  /// jumps to the Drafts screen.
+  Future<void> _saveAsDraft() async {
+    final t = AppLocalizations.of(context)!;
+    final form = ref.read(messageFormProvider);
+
+    // Sync messageType with the chosen recipient mode so the saved
+    // draft round-trips correctly when reopened.
+    if (form.groupIds.isNotEmpty && form.numbers.isEmpty) {
+      ref
+          .read(messageFormProvider.notifier)
+          .setMessageType(MessageType.fromGroups);
+    } else {
+      ref
+          .read(messageFormProvider.notifier)
+          .setMessageType(MessageType.fromNumbers);
+    }
+
+    final request = ref.read(messageFormProvider).toRequest();
+    final repo = ref.read(draftsRepositoryProvider);
+
+    try {
+      final saved = await repo.saveDraftFromSendRequest(request);
+      if (!mounted) return;
+
+      // Optimistically prepend the new draft to the cached list so the
+      // Drafts screen reflects the change without a server round-trip.
+      ref.read(draftsListControllerProvider.notifier).prependDraft(saved);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            t.translate('draftSaved'),
+            style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
+          ),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          action: SnackBarAction(
+            label: t.translate('draftOpen'),
+            textColor: Colors.white,
+            onPressed: () {
+              // Use route name to respect the feature flag redirect.
+              context.pushNamed('drafts');
+            },
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            t.translate('draftSaveFailed'),
+            style: const TextStyle(fontFamily: 'IBMPlexSansArabic'),
+          ),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
   void _onRecipientModeChanged(int mode) {
     setState(() => _recipientMode = mode);
     // Clear the other mode's data when switching.
@@ -262,6 +332,14 @@ class _SendMessageScreenState extends ConsumerState<SendMessageScreen> {
             context.pop();
           },
         ),
+        actions: [
+          if (kDraftsEnabled)
+            IconButton(
+              icon: const Icon(Icons.bookmark_border, size: 22),
+              tooltip: AppLocalizations.of(context)!.translate('draftSave'),
+              onPressed: isSending ? null : _saveAsDraft,
+            ),
+        ],
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),

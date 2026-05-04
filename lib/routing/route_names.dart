@@ -21,6 +21,10 @@ class RouteNames {
   static const String sendMessage = 'send-message';
   static const String messagePreview = 'message-preview';
 
+  // Drafts (Wave 3)
+  static const String drafts = 'drafts';
+  static const String draftDetail = 'draftDetail';
+
   // Groups
   static const String groups = 'groups';
   static const String groupDetail = 'group-detail';

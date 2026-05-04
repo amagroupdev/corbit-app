@@ -28,22 +28,27 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
 
-// ================================================================
-// Wave 8 — Banners + Support Tickets + Occasion Cards Send/Archive
-//          + Statistics Subaccounts + Statements Export
-// ================================================================
+// ════════════════════════════════════════════════════════════════════
+//  V3 — Waves 3+ feature flags
+// ════════════════════════════════════════════════════════════════════
+// كل ميزة جديدة من موجات V3 تنزل خلف flag منفصل عشان نقدر نطفّيها
+// بدون رفع الكود. الافتراضي = true لأنها feature additions.
+// ════════════════════════════════════════════════════════════════════
 
-/// Promotional banner carousels on Login + Dashboard.
+/// Wave 3 — Drafts (مسودات الرسائل).
+const bool kDraftsEnabled = true;
+
+/// Wave 8 — Promotional banner carousels (Login + Dashboard).
 const bool kBannersEnabled = true;
 
-/// Support tickets (list + create) under Settings.
+/// Wave 8 — Support tickets list + create.
 const bool kSupportTicketsEnabled = true;
 
-/// Occasion Cards Send / Preview / Archive screens.
+/// Wave 8 — Occasion Cards Send/Preview/Archive.
 const bool kOccasionCardsSendEnabled = true;
 
-/// Sub-accounts statistics tab.
+/// Wave 8 — Sub-accounts statistics tab.
 const bool kStatisticsSubaccountsEnabled = true;
 
-/// Server-triggered statements export (already partially used).
+/// Wave 8 — Server-triggered statements export.
 const bool kStatementsExportEnabled = true;

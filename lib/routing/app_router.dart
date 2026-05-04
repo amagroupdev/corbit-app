@@ -10,6 +10,8 @@ import 'package:orbit_app/features/auth/presentation/screens/two_factor_screen.d
 import 'package:orbit_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:orbit_app/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:orbit_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:orbit_app/features/drafts/presentation/screens/draft_detail_screen.dart';
+import 'package:orbit_app/features/drafts/presentation/screens/drafts_screen.dart';
 import 'package:orbit_app/features/messages/presentation/screens/message_center_screen.dart';
 import 'package:orbit_app/features/messages/presentation/screens/send_message_screen.dart';
 import 'package:orbit_app/features/groups/presentation/screens/groups_screen.dart';
@@ -268,6 +270,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.archive,
         path: '/archive',
         builder: (context, state) => const ArchiveScreen(),
+      ),
+
+      // ─── Drafts (Wave 3) ────────────────────────────────────────────
+      GoRoute(
+        name: RouteNames.drafts,
+        path: '/drafts',
+        redirect: (context, state) => !kDraftsEnabled ? '/messages' : null,
+        builder: (context, state) => const DraftsScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.draftDetail,
+        path: '/drafts/:id',
+        redirect: (context, state) => !kDraftsEnabled ? '/messages' : null,
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+          return DraftDetailScreen(draftId: id);
+        },
       ),
       GoRoute(
         name: RouteNames.settings,

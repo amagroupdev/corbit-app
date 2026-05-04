@@ -1780,4 +1780,42 @@ const Map<String, String> en = {
   'commonSessionExpired': 'Session expired. Refreshing...',
   'commonSessionRefreshFailed':
       'Could not refresh session. Please log in again.',
+
+  // ---------------------------------------------------------------------------
+  // Drafts (Wave 3 — /messages/drafts/*)
+  // ---------------------------------------------------------------------------
+  'draftsTitle': 'Drafts',
+  'draftSave': 'Save as draft',
+  'draftSaved': 'Draft saved',
+  'draftDelete': 'Delete draft',
+  'draftDeleted': 'Draft deleted',
+  'draftEmpty': 'No drafts yet',
+  'draftEmptyDescription':
+      'Compose a message and tap the bookmark icon to save it as a draft.',
+  'draftEmptyBody': '(empty draft)',
+  'draftEdit': 'Edit draft',
+  'draftConfirmDelete': 'Delete this draft?',
+  'draftSaveFailed': 'Failed to save draft',
+  'draftLoadFailed': 'Failed to load drafts',
+  'draftSendNow': 'Send now',
+  'draftMessageType': 'Type',
+  'draftCreatedAt': 'Created',
+  'draftOpen': 'Open drafts',
+  'draftBody': 'Message body',
+  'draftBodyHint': 'Write the message body...',
+  'draftRecipients': 'Recipients',
+  'draftRecipientsHint': '+966500000000, +966500000001',
+  'draftRecipientsHelp':
+      'Separate multiple numbers with commas, semicolons or new lines.',
+  'draftNoRecipients': 'No recipients yet.',
+  'draftNumbersSummary': '{count} number(s)',
+  'draftGroupsSummary': '{count} group(s)',
+  'draftNumberIdsSummary': '{count} contact(s)',
+  'draftVoiceIdSummary': 'Voice clip #{id}',
+  'draftCardTypeSummary': 'Card type: {type}',
+  'draftTemplateIdSummary': 'Template #{id}',
+  'draftMsgTypeToNumber': 'To numbers',
+  'draftMsgTypeToGroup': 'To groups',
+  'draftMsgTypeVoice': 'Voice',
+  'draftMsgTypeVipCard': 'VIP card',
 };
