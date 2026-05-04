@@ -117,9 +117,69 @@ enum MessageStatus {
   }
 }
 
+// ─── Send Variant ────────────────────────────────────────────────────────────
+
+/// Sub-classification of how a send request is built.
+///
+/// The V3 backend exposes a single `/messages/send` endpoint that accepts
+/// many shapes depending on the source of recipients / payload (groups,
+/// excel files, attendance records, certifications, vip cards, voice notes,
+/// short links, etc.). This enum lets the UI pick a variant without having
+/// to expose every possible field globally.
+enum SendVariant {
+  /// Send to a list of phone numbers typed manually or imported from CSV.
+  fromNumbers('from_numbers'),
+
+  /// Send to one or more whole groups (`group_ids: [...]`).
+  fromGroups('from_groups'),
+
+  /// Send to a single specific group (`group_id: int`).
+  fromSpecificGroup('from_specific_group'),
+
+  /// Same as [fromNumbers] but appends a tracked short link.
+  withShortLink('with_short_link'),
+
+  /// Attach a previously-uploaded voice note (`voice_id: int`).
+  withVoice('with_voice'),
+
+  /// Attach a previously-uploaded file (`file_id: int`).
+  withFile('with_file'),
+
+  /// Send absence/lateness records (`attendance_type` + `attendance_record_ids`).
+  attendanceRecords('attendance_records'),
+
+  /// Send "thanks" certifications using a tool template
+  /// (`certification_record_ids: [...]`).
+  certificationWithTool('certification_with_tool'),
+
+  /// Send a VIP card (`vip_card_template_id: int`, `card_type`).
+  vipCard('vip_card'),
+
+  /// Send by uploading an excel file (multipart, `file: <File>`).
+  fromExcel('from_excel');
+
+  const SendVariant(this.value);
+  final String value;
+
+  static SendVariant fromValue(String value) {
+    return SendVariant.values.firstWhere(
+      (v) => v.value == value,
+      orElse: () => SendVariant.fromNumbers,
+    );
+  }
+
+  /// Localization key for the user-facing label.
+  String get labelKey => 'sendVariant_${name}_label';
+}
+
 // ─── Send Message Request ────────────────────────────────────────────────────
 
 /// Request body for POST /api/v3/messages/send.
+///
+/// This class is intentionally permissive — the V3 endpoint accepts a wide
+/// variety of fields depending on the [variant]. We always emit the
+/// minimum payload that the chosen variant requires and silently drop
+/// fields that are not relevant.
 class SendMessageRequest {
   const SendMessageRequest({
     required this.messageType,
@@ -130,6 +190,16 @@ class SendMessageRequest {
     this.numbers = const [],
     this.groupIds = const [],
     this.templateId,
+    this.variant = SendVariant.fromNumbers,
+    this.groupId,
+    this.shortLink,
+    this.voiceId,
+    this.fileId,
+    this.attendanceType,
+    this.attendanceRecordIds = const [],
+    this.certificationRecordIds = const [],
+    this.vipCardTemplateId,
+    this.vipCardType,
   });
 
   final MessageType messageType;
@@ -141,17 +211,111 @@ class SendMessageRequest {
   final List<int> groupIds;
   final int? templateId;
 
+  // ─── Variant-specific fields ───
+  /// Selected variant — controls which fields are serialised.
+  final SendVariant variant;
+
+  /// Single-group variant.
+  final int? groupId;
+
+  /// Short link URL appended to the body when [SendVariant.withShortLink].
+  final String? shortLink;
+
+  /// Voice note id when [SendVariant.withVoice].
+  final int? voiceId;
+
+  /// File id when [SendVariant.withFile].
+  final int? fileId;
+
+  /// Attendance type (`absence` or `lateness`).
+  final String? attendanceType;
+
+  /// IDs of attendance records to send notifications for.
+  final List<int> attendanceRecordIds;
+
+  /// IDs of certification records to thank.
+  final List<int> certificationRecordIds;
+
+  /// VIP card template id.
+  final int? vipCardTemplateId;
+
+  /// VIP card category, e.g. `occasion`.
+  final String? vipCardType;
+
   Map<String, dynamic> toJson() {
-    return {
+    final base = <String, dynamic>{
       'message_type': messageType.value,
       'sender_id': senderId,
       'message_body': messageBody,
       'send_at_option': sendAtOption.value,
       if (sendAt != null) 'send_at': sendAt!.toIso8601String(),
-      if (numbers.isNotEmpty) 'numbers': numbers.map(_normalizePhone).toList(),
-      if (groupIds.isNotEmpty) 'group_ids': groupIds,
       if (templateId != null) 'template_id': templateId,
+      'send_variant': variant.value,
     };
+
+    switch (variant) {
+      case SendVariant.fromNumbers:
+        if (numbers.isNotEmpty) {
+          base['numbers'] = numbers.map(_normalizePhone).toList();
+        }
+        break;
+      case SendVariant.fromGroups:
+        if (groupIds.isNotEmpty) base['group_ids'] = groupIds;
+        break;
+      case SendVariant.fromSpecificGroup:
+        if (groupId != null) base['group_id'] = groupId;
+        break;
+      case SendVariant.withShortLink:
+        if (numbers.isNotEmpty) {
+          base['numbers'] = numbers.map(_normalizePhone).toList();
+        }
+        if (groupIds.isNotEmpty) base['group_ids'] = groupIds;
+        if (shortLink != null && shortLink!.isNotEmpty) {
+          base['link'] = shortLink;
+        }
+        break;
+      case SendVariant.withVoice:
+        if (numbers.isNotEmpty) {
+          base['numbers'] = numbers.map(_normalizePhone).toList();
+        }
+        if (groupIds.isNotEmpty) base['group_ids'] = groupIds;
+        if (voiceId != null) base['voice_id'] = voiceId;
+        break;
+      case SendVariant.withFile:
+        if (numbers.isNotEmpty) {
+          base['numbers'] = numbers.map(_normalizePhone).toList();
+        }
+        if (groupIds.isNotEmpty) base['group_ids'] = groupIds;
+        if (fileId != null) base['file_id'] = fileId;
+        break;
+      case SendVariant.attendanceRecords:
+        if (attendanceType != null) base['attendance_type'] = attendanceType;
+        if (attendanceRecordIds.isNotEmpty) {
+          base['attendance_record_ids'] = attendanceRecordIds;
+        }
+        break;
+      case SendVariant.certificationWithTool:
+        if (certificationRecordIds.isNotEmpty) {
+          base['certification_record_ids'] = certificationRecordIds;
+        }
+        break;
+      case SendVariant.vipCard:
+        if (vipCardTemplateId != null) {
+          base['vip_card_template_id'] = vipCardTemplateId;
+        }
+        base['card_type'] = vipCardType ?? 'occasion';
+        if (numbers.isNotEmpty) {
+          base['numbers'] = numbers.map(_normalizePhone).toList();
+        }
+        if (groupIds.isNotEmpty) base['group_ids'] = groupIds;
+        break;
+      case SendVariant.fromExcel:
+        // The actual file is sent as multipart by the datasource; the JSON
+        // body is only used as the "data" portion of the FormData.
+        break;
+    }
+
+    return base;
   }
 
   /// Ensures phone numbers are in E.164 format (+966XXXXXXXXX).
@@ -167,14 +331,41 @@ class SendMessageRequest {
 
   factory SendMessageRequest.fromJson(Map<String, dynamic> json) {
     return SendMessageRequest(
-      messageType: MessageType.fromValue(json['message_type'] as String? ?? 'from_numbers'),
+      messageType: MessageType.fromValue(
+          json['message_type'] as String? ?? 'from_numbers'),
       senderId: json['sender_id'] as int? ?? 0,
       messageBody: json['message_body'] as String? ?? '',
-      sendAtOption: SendAtOption.fromValue(json['send_at_option'] as String? ?? 'now'),
-      sendAt: json['send_at'] != null ? DateTime.tryParse(json['send_at'] as String) : null,
-      numbers: (json['numbers'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-      groupIds: (json['group_ids'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [],
+      sendAtOption: SendAtOption.fromValue(
+          json['send_at_option'] as String? ?? 'now'),
+      sendAt: json['send_at'] != null
+          ? DateTime.tryParse(json['send_at'] as String)
+          : null,
+      numbers: (json['numbers'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      groupIds:
+          (json['group_ids'] as List<dynamic>?)?.map((e) => e as int).toList() ??
+              [],
       templateId: json['template_id'] as int?,
+      variant: SendVariant.fromValue(
+          json['send_variant'] as String? ?? 'from_numbers'),
+      groupId: json['group_id'] as int?,
+      shortLink: json['link'] as String?,
+      voiceId: json['voice_id'] as int?,
+      fileId: json['file_id'] as int?,
+      attendanceType: json['attendance_type'] as String?,
+      attendanceRecordIds: (json['attendance_record_ids'] as List<dynamic>?)
+              ?.map((e) => e as int)
+              .toList() ??
+          const [],
+      certificationRecordIds: (json['certification_record_ids']
+                  as List<dynamic>?)
+              ?.map((e) => e as int)
+              .toList() ??
+          const [],
+      vipCardTemplateId: json['vip_card_template_id'] as int?,
+      vipCardType: json['card_type'] as String?,
     );
   }
 
@@ -187,6 +378,16 @@ class SendMessageRequest {
     List<String>? numbers,
     List<int>? groupIds,
     int? templateId,
+    SendVariant? variant,
+    int? groupId,
+    String? shortLink,
+    int? voiceId,
+    int? fileId,
+    String? attendanceType,
+    List<int>? attendanceRecordIds,
+    List<int>? certificationRecordIds,
+    int? vipCardTemplateId,
+    String? vipCardType,
   }) {
     return SendMessageRequest(
       messageType: messageType ?? this.messageType,
@@ -197,6 +398,17 @@ class SendMessageRequest {
       numbers: numbers ?? this.numbers,
       groupIds: groupIds ?? this.groupIds,
       templateId: templateId ?? this.templateId,
+      variant: variant ?? this.variant,
+      groupId: groupId ?? this.groupId,
+      shortLink: shortLink ?? this.shortLink,
+      voiceId: voiceId ?? this.voiceId,
+      fileId: fileId ?? this.fileId,
+      attendanceType: attendanceType ?? this.attendanceType,
+      attendanceRecordIds: attendanceRecordIds ?? this.attendanceRecordIds,
+      certificationRecordIds:
+          certificationRecordIds ?? this.certificationRecordIds,
+      vipCardTemplateId: vipCardTemplateId ?? this.vipCardTemplateId,
+      vipCardType: vipCardType ?? this.vipCardType,
     );
   }
 }

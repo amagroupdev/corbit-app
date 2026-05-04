@@ -1589,4 +1589,43 @@ const Map<String, String> ar = {
   'commonLoadingCities': 'جاري تحميل المدن...',
   'commonSessionExpired': 'انتهت الجلسة. جارٍ التجديد...',
   'commonSessionRefreshFailed': 'فشل تجديد الجلسة. سجّل دخول مرة أخرى.',
+
+  // ---------------------------------------------------------------------------
+  // Wave 5 — Messages Enhancements (AI generate, dynamic texts, DLR, receipt)
+  // ---------------------------------------------------------------------------
+  'aiGenerateTitle': 'توليد نص بالذكاء الاصطناعي',
+  'aiGenerateAction': 'توليد',
+  'aiGeneratePlaceholder': 'اكتب فكرة الرسالة هنا...',
+  'aiGenerateImprove': 'تحسين',
+  'aiGenerateShorten': 'اختصار',
+  'aiGenerateFormal': 'رسمي',
+  'aiGenerateExpand': 'توسيع',
+  'aiGenerateUseText': 'استخدم هذا النص',
+  'aiGenerateFailed': 'تعذّر توليد النص. حاول مرة أخرى.',
+  'aiGenerateLoading': 'جاري التوليد...',
+
+  'dynamicTextsTitle': 'متغيّرات ديناميكية',
+  'dynamicTextsEmpty': 'لا توجد متغيّرات متاحة حالياً.',
+
+  'dlrByNumberTitle': 'تقرير DLR لرقم',
+  'dlrByNumberSearch': 'أدخل الرقم (مثال: 9665XXXXXXXX)',
+  'dlrByNumberEmpty': 'لا توجد رسائل لهذا الرقم.',
+  'dlrByNumberInvalid': 'الرجاء إدخال رقم صحيح.',
+
+  'receiptReportTitle': 'تقرير الاستلام',
+  'receiptReportSummary': 'ملخّص الإرسال',
+  'receiptReportNumbers': 'الأرقام والحالة',
+  'receiptReportLoadFailed': 'تعذّر تحميل التقرير.',
+
+  'sendVariantSelect': 'طريقة الإرسال',
+  'sendVariant_fromNumbers_label': 'لأرقام',
+  'sendVariant_fromGroups_label': 'لمجموعات',
+  'sendVariant_fromSpecificGroup_label': 'لمجموعة محددة',
+  'sendVariant_withFile_label': 'مع ملف',
+  'sendVariant_withVoice_label': 'مع رسالة صوتية',
+  'sendVariant_withShortLink_label': 'مع رابط مختصر',
+  'sendVariant_attendanceRecords_label': 'سجلات الحضور',
+  'sendVariant_certificationWithTool_label': 'شكر وتقدير',
+  'sendVariant_vipCard_label': 'بطاقة VIP',
+  'sendVariant_fromExcel_label': 'من ملف إكسل',
 };

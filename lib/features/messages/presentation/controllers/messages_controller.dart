@@ -6,7 +6,9 @@ import 'package:orbit_app/core/storage/secure_storage.dart';
 import 'package:orbit_app/features/groups/data/datasources/groups_remote_datasource.dart';
 import 'package:orbit_app/features/groups/data/models/group_model.dart';
 import 'package:orbit_app/features/groups/data/models/number_model.dart';
+import 'package:orbit_app/features/messages/data/models/dynamic_text_model.dart';
 import 'package:orbit_app/features/messages/data/models/message_model.dart';
+import 'package:orbit_app/features/messages/data/models/receipt_report_model.dart';
 import 'package:orbit_app/features/messages/data/models/sender_model.dart';
 import 'package:orbit_app/features/messages/data/models/template_model.dart';
 import 'package:orbit_app/features/messages/data/repositories/messages_repository.dart';
@@ -27,6 +29,16 @@ class MessageFormState {
     this.numbers = const [],
     this.groupIds = const [],
     this.templateId,
+    this.variant = SendVariant.fromNumbers,
+    this.groupId,
+    this.shortLink,
+    this.voiceId,
+    this.fileId,
+    this.attendanceType,
+    this.attendanceRecordIds = const [],
+    this.certificationRecordIds = const [],
+    this.vipCardTemplateId,
+    this.vipCardType,
   });
 
   final MessageType messageType;
@@ -37,6 +49,18 @@ class MessageFormState {
   final List<String> numbers;
   final List<int> groupIds;
   final int? templateId;
+
+  // Wave 5 variant-specific state.
+  final SendVariant variant;
+  final int? groupId;
+  final String? shortLink;
+  final int? voiceId;
+  final int? fileId;
+  final String? attendanceType;
+  final List<int> attendanceRecordIds;
+  final List<int> certificationRecordIds;
+  final int? vipCardTemplateId;
+  final String? vipCardType;
 
   MessageFormState copyWith({
     MessageType? messageType,
@@ -49,6 +73,23 @@ class MessageFormState {
     int? templateId,
     bool clearSendAt = false,
     bool clearTemplateId = false,
+    SendVariant? variant,
+    int? groupId,
+    String? shortLink,
+    int? voiceId,
+    int? fileId,
+    String? attendanceType,
+    List<int>? attendanceRecordIds,
+    List<int>? certificationRecordIds,
+    int? vipCardTemplateId,
+    String? vipCardType,
+    bool clearGroupId = false,
+    bool clearShortLink = false,
+    bool clearVoiceId = false,
+    bool clearFileId = false,
+    bool clearAttendanceType = false,
+    bool clearVipCardTemplateId = false,
+    bool clearVipCardType = false,
   }) {
     return MessageFormState(
       messageType: messageType ?? this.messageType,
@@ -59,6 +100,21 @@ class MessageFormState {
       numbers: numbers ?? this.numbers,
       groupIds: groupIds ?? this.groupIds,
       templateId: clearTemplateId ? null : (templateId ?? this.templateId),
+      variant: variant ?? this.variant,
+      groupId: clearGroupId ? null : (groupId ?? this.groupId),
+      shortLink: clearShortLink ? null : (shortLink ?? this.shortLink),
+      voiceId: clearVoiceId ? null : (voiceId ?? this.voiceId),
+      fileId: clearFileId ? null : (fileId ?? this.fileId),
+      attendanceType:
+          clearAttendanceType ? null : (attendanceType ?? this.attendanceType),
+      attendanceRecordIds: attendanceRecordIds ?? this.attendanceRecordIds,
+      certificationRecordIds:
+          certificationRecordIds ?? this.certificationRecordIds,
+      vipCardTemplateId: clearVipCardTemplateId
+          ? null
+          : (vipCardTemplateId ?? this.vipCardTemplateId),
+      vipCardType:
+          clearVipCardType ? null : (vipCardType ?? this.vipCardType),
     );
   }
 
@@ -73,6 +129,16 @@ class MessageFormState {
       numbers: numbers,
       groupIds: groupIds,
       templateId: templateId,
+      variant: variant,
+      groupId: groupId,
+      shortLink: shortLink,
+      voiceId: voiceId,
+      fileId: fileId,
+      attendanceType: attendanceType,
+      attendanceRecordIds: attendanceRecordIds,
+      certificationRecordIds: certificationRecordIds,
+      vipCardTemplateId: vipCardTemplateId,
+      vipCardType: vipCardType,
     );
   }
 
@@ -82,12 +148,42 @@ class MessageFormState {
     if (senderId == null || senderId == 0) {
       return 'msg_validate_select_sender';
     }
-    if (messageBody.trim().isEmpty) {
+    if (messageBody.trim().isEmpty &&
+        variant != SendVariant.attendanceRecords &&
+        variant != SendVariant.certificationWithTool &&
+        variant != SendVariant.vipCard &&
+        variant != SendVariant.fromExcel &&
+        variant != SendVariant.withVoice) {
       return 'msg_validate_write_body';
     }
-    // Must have either numbers or groups selected.
-    if (numbers.isEmpty && groupIds.isEmpty) {
-      return 'msg_validate_add_recipients';
+    // Recipient validation depends on the variant.
+    switch (variant) {
+      case SendVariant.fromNumbers:
+      case SendVariant.withShortLink:
+      case SendVariant.withFile:
+      case SendVariant.withVoice:
+      case SendVariant.fromGroups:
+      case SendVariant.vipCard:
+        if (numbers.isEmpty && groupIds.isEmpty) {
+          return 'msg_validate_add_recipients';
+        }
+        break;
+      case SendVariant.fromSpecificGroup:
+        if (groupId == null) return 'msg_validate_add_recipients';
+        break;
+      case SendVariant.attendanceRecords:
+        if (attendanceRecordIds.isEmpty) {
+          return 'msg_validate_add_recipients';
+        }
+        break;
+      case SendVariant.certificationWithTool:
+        if (certificationRecordIds.isEmpty) {
+          return 'msg_validate_add_recipients';
+        }
+        break;
+      case SendVariant.fromExcel:
+        // The screen is responsible for verifying a file was attached.
+        break;
     }
     if (sendAtOption == SendAtOption.later && sendAt == null) {
       return 'msg_validate_select_datetime';
@@ -188,12 +284,86 @@ class MessageFormNotifier extends StateNotifier<MessageFormState> {
     );
   }
 
+  /// Inserts the [token] (already wrapped with `{...}`) at [cursorPos].
+  /// Used by [DynamicTextsPicker] to honour the actual cursor position
+  /// of the message body field.
+  void insertTokenAt({required String token, required int cursorPos}) {
+    final body = state.messageBody;
+    final clamped =
+        cursorPos < 0 ? 0 : (cursorPos > body.length ? body.length : cursorPos);
+    final newBody =
+        body.substring(0, clamped) + token + body.substring(clamped);
+    state = state.copyWith(messageBody: newBody);
+  }
+
+  // ─── Wave 5 — variant setters ─────────────────────────────────────
+
+  void setVariant(SendVariant variant) {
+    state = state.copyWith(variant: variant);
+  }
+
+  void setGroupId(int? id) {
+    if (id == null) {
+      state = state.copyWith(clearGroupId: true);
+    } else {
+      state = state.copyWith(groupId: id);
+    }
+  }
+
+  void setShortLink(String? link) {
+    if (link == null || link.isEmpty) {
+      state = state.copyWith(clearShortLink: true);
+    } else {
+      state = state.copyWith(shortLink: link);
+    }
+  }
+
+  void setVoiceId(int? id) {
+    if (id == null) {
+      state = state.copyWith(clearVoiceId: true);
+    } else {
+      state = state.copyWith(voiceId: id);
+    }
+  }
+
+  void setFileId(int? id) {
+    if (id == null) {
+      state = state.copyWith(clearFileId: true);
+    } else {
+      state = state.copyWith(fileId: id);
+    }
+  }
+
+  void setAttendance({
+    String? type,
+    List<int>? recordIds,
+  }) {
+    state = state.copyWith(
+      attendanceType: type,
+      attendanceRecordIds: recordIds,
+    );
+  }
+
+  void setCertificationRecordIds(List<int> ids) {
+    state = state.copyWith(certificationRecordIds: ids);
+  }
+
+  void setVipCard({int? templateId, String? type}) {
+    state = state.copyWith(
+      vipCardTemplateId: templateId,
+      vipCardType: type,
+    );
+  }
+
   void reset() {
     state = const MessageFormState();
   }
 
   void resetKeepType() {
-    state = MessageFormState(messageType: state.messageType);
+    state = MessageFormState(
+      messageType: state.messageType,
+      variant: state.variant,
+    );
   }
 }
 
@@ -470,4 +640,22 @@ final groupNumbersProvider =
   final datasource = ref.watch(groupsRemoteDatasourceProvider);
   final result = await datasource.listNumbers(groupId: groupId, perPage: 100);
   return result.data;
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5 — DYNAMIC TEXTS / RECEIPT REPORT PROVIDERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Caches the list of dynamic-text variables exposed by the gateway.
+final dynamicTextsProvider =
+    FutureProvider<List<DynamicTextModel>>((ref) async {
+  final repo = ref.watch(messagesRepositoryProvider);
+  return repo.listDynamicTexts();
+});
+
+/// Loads the receipt report for a specific message UUID.
+final receiptReportProvider = FutureProvider.autoDispose
+    .family<ReceiptReportModel, String>((ref, uuid) async {
+  final repo = ref.watch(messagesRepositoryProvider);
+  return repo.getReceiptReport(uuid);
 });

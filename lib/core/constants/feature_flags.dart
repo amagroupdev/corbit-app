@@ -27,3 +27,21 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+/// ─── Wave 5 — Messages Enhancements ───────────────────────────────
+/// تجميع تحسينات الرسائل V3:
+///  - متغيّرات ديناميكية من السيرفر (`/messages/dynamic-texts`)
+///  - توليد نص بالذكاء الاصطناعي (`/messages/ai-generate`)
+///  - تقرير DLR لرقم محدد (`/messages/dlr-by-number`)
+///  - تقرير استلام شامل (`/messages/{uuid}/receipt-report`)
+///  - send variants موسّعة (specific group, short link, attendance,
+///    certifications, vip card, excel, with_file)
+///
+/// كله متاح على كل المنصّات لأنه ميزات نصية لا علاقة لها بمدفوعات
+/// داخل التطبيق. الـ flags مفصولة لتسهيل التعطيل المنفصل لو تطلب.
+const bool kMessagesEnhancementsEnabled = true;
+const bool kAiGenerateEnabled = kMessagesEnhancementsEnabled;
+const bool kDynamicTextsEnabled = kMessagesEnhancementsEnabled;
+const bool kDlrByNumberEnabled = kMessagesEnhancementsEnabled;
+const bool kReceiptReportEnabled = kMessagesEnhancementsEnabled;
+const bool kSendVariantsEnabled = kMessagesEnhancementsEnabled;
