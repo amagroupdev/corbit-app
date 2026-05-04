@@ -1589,4 +1589,42 @@ const Map<String, String> ar = {
   'commonLoadingCities': 'جاري تحميل المدن...',
   'commonSessionExpired': 'انتهت الجلسة. جارٍ التجديد...',
   'commonSessionRefreshFailed': 'فشل تجديد الجلسة. سجّل دخول مرة أخرى.',
+
+  // ---------------------------------------------------------------------------
+  // Drafts (Wave 3 — /messages/drafts/*)
+  // ---------------------------------------------------------------------------
+  'draftsTitle': 'المسودات',
+  'draftSave': 'حفظ كمسودة',
+  'draftSaved': 'تم حفظ المسودة',
+  'draftDelete': 'حذف المسودة',
+  'draftDeleted': 'تم حذف المسودة',
+  'draftEmpty': 'لا توجد مسودات',
+  'draftEmptyDescription':
+      'اكتب رسالة ثم اضغط أيقونة الإشارة المرجعية لحفظها كمسودة.',
+  'draftEmptyBody': '(مسودة فارغة)',
+  'draftEdit': 'تعديل المسودة',
+  'draftConfirmDelete': 'حذف هذه المسودة؟',
+  'draftSaveFailed': 'فشل حفظ المسودة',
+  'draftLoadFailed': 'فشل تحميل المسودات',
+  'draftSendNow': 'إرسال الآن',
+  'draftMessageType': 'النوع',
+  'draftCreatedAt': 'أُنشئت',
+  'draftOpen': 'افتح المسودات',
+  'draftBody': 'نص الرسالة',
+  'draftBodyHint': 'اكتب نص الرسالة...',
+  'draftRecipients': 'المستلمون',
+  'draftRecipientsHint': '+966500000000, +966500000001',
+  'draftRecipientsHelp':
+      'افصل بين الأرقام بفاصلة أو فاصلة منقوطة أو سطر جديد.',
+  'draftNoRecipients': 'لا يوجد مستلمون بعد.',
+  'draftNumbersSummary': '{count} رقم',
+  'draftGroupsSummary': '{count} مجموعة',
+  'draftNumberIdsSummary': '{count} جهة',
+  'draftVoiceIdSummary': 'مقطع صوتي رقم {id}',
+  'draftCardTypeSummary': 'نوع البطاقة: {type}',
+  'draftTemplateIdSummary': 'قالب رقم {id}',
+  'draftMsgTypeToNumber': 'إلى أرقام',
+  'draftMsgTypeToGroup': 'إلى مجموعات',
+  'draftMsgTypeVoice': 'صوتية',
+  'draftMsgTypeVipCard': 'بطاقة VIP',
 };

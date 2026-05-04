@@ -27,3 +27,16 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+// ════════════════════════════════════════════════════════════════════
+//  V3 — Wave 3+ feature flags
+// ════════════════════════════════════════════════════════════════════
+//
+// كل ميزة جديدة من موجات V3 تنزل خلف flag منفصل عشان نقدر نطفّيها
+// بدون رفع الكود. الافتراضي = true لأنها feature additions ما تأثر
+// على القائم. اقفل الفلج بإعادة بناء مع `--dart-define` لو احتجت.
+// ════════════════════════════════════════════════════════════════════
+
+/// ميزة المسودات (Drafts) — Wave 3.
+/// `lib/features/drafts/` + integration في send_message_screen.
+const bool kDraftsEnabled = true;
