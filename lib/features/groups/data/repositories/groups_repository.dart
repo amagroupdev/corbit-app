@@ -54,6 +54,24 @@ class GroupsRepository {
     return _datasource.restoreGroup(id);
   }
 
+  // ─── Bulk group operations (Wave 6) ──────────────────────────────
+
+  /// Soft-deletes (archives) a list of group ids in one request.
+  Future<Map<String, dynamic>> bulkDeleteGroups(List<int> ids) {
+    return _datasource.bulkDelete(ids);
+  }
+
+  /// Permanently removes a list of already-archived group ids.
+  Future<Map<String, dynamic>> bulkForceDeleteGroups(List<int> ids) {
+    return _datasource.bulkForceDelete(ids);
+  }
+
+  /// Returns a URL to the Excel import template (or null if the API
+  /// returned an unexpected payload).
+  Future<String?> getImportTemplate() {
+    return _datasource.getImportTemplate();
+  }
+
   // ─── Numbers ─────────────────────────────────────────────────────
 
   Future<PaginatedResponse<NumberModel>> listNumbers({
@@ -148,6 +166,35 @@ class GroupsRepository {
 
   Future<void> deleteNumber(int id) {
     return _datasource.deleteNumber(id);
+  }
+
+  // ─── Bulk number operations (Wave 6) ─────────────────────────────
+
+  /// Moves the given number ids into [targetGroupId].
+  Future<Map<String, dynamic>> moveNumbersToGroup({
+    required List<int> numberIds,
+    required int targetGroupId,
+  }) {
+    return _datasource.moveToGroup(
+      numberIds: numberIds,
+      targetGroupId: targetGroupId,
+    );
+  }
+
+  /// Copies the given number ids into [targetGroupId].
+  Future<Map<String, dynamic>> copyNumbersToGroup({
+    required List<int> numberIds,
+    required int targetGroupId,
+  }) {
+    return _datasource.copyToGroup(
+      numberIds: numberIds,
+      targetGroupId: targetGroupId,
+    );
+  }
+
+  /// Hard-deletes a list of number ids in one request.
+  Future<Map<String, dynamic>> bulkDeleteNumbers(List<int> ids) {
+    return _datasource.bulkDeleteNumbers(ids);
   }
 }
 

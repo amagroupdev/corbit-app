@@ -1888,4 +1888,38 @@ const Map<String, String> en = {
   'sendVariant_certificationWithTool_label': 'Certification',
   'sendVariant_vipCard_label': 'VIP Card',
   'sendVariant_fromExcel_label': 'From Excel',
+
+  // ---------------------------------------------------------------------------
+  // Bulk Operations / Multi-select (Wave 6)
+  // ---------------------------------------------------------------------------
+  'bulkSelect': 'Select',
+  'bulkSelectAll': 'Select all',
+  'bulkSelectCount': '{count} selected',
+  'bulkCancel': 'Cancel selection',
+  'bulkDelete': 'Delete',
+  'bulkForceDelete': 'Delete permanently',
+  'bulkMove': 'Move to group',
+  'bulkCopy': 'Copy to group',
+  'bulkResend': 'Resend',
+  'bulkConfirmDelete': 'Are you sure you want to delete the selected items?',
+  'bulkConfirmDeleteCount':
+      '{count} item(s) will be deleted. Continue?',
+  'bulkConfirmForceDelete':
+      '{count} item(s) will be permanently deleted and cannot be recovered. Continue?',
+  'bulkSuccessDelete': 'Selected items deleted',
+  'bulkSuccessMove': 'Numbers moved to the group',
+  'bulkSuccessCopy': 'Numbers copied to the group',
+  'bulkSuccessResend': 'Messages re-sent',
+  'bulkFailedDelete': 'Failed to delete some items',
+  'bulkFailedMove': 'Failed to move numbers',
+  'bulkFailedCopy': 'Failed to copy numbers',
+  'bulkFailedResend': 'Resend failed',
+  'bulkSelectTargetGroup': 'Choose a target group',
+  'bulkNoTargetGroup': 'No other groups available',
+  'bulkImportTemplate': 'Import template',
+  'bulkDownloadTemplate': 'Download Excel template',
+  'bulkTemplateDownloading': 'Downloading template...',
+  'bulkTemplateFailed': 'Could not download the template',
+  'bulkOnlyFailedResend': 'Only failed messages can be re-sent',
+  'bulkLongPressHint': 'Long-press to select multiple items',
 };

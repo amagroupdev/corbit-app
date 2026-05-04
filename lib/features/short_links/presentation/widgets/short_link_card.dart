@@ -5,19 +5,28 @@ import 'package:orbit_app/features/short_links/data/models/short_link_model.dart
 import 'package:orbit_app/core/localization/app_localizations.dart';
 
 /// A card widget displaying a short link with copy and delete actions.
+///
+/// Multi-select (Wave 6): when [isMultiSelectMode] is true the default
+/// tap toggles selection instead of copying the URL, and the inline
+/// action buttons (copy/delete) are hidden so the row is purely a
+/// selectable list item. [onLongPress] enters multi-select mode.
 class ShortLinkCard extends StatelessWidget {
   const ShortLinkCard({
     required this.link,
     required this.onDelete,
     this.isSelected = false,
+    this.isMultiSelectMode = false,
     this.onToggleSelect,
+    this.onLongPress,
     super.key,
   });
 
   final ShortLinkModel link;
   final VoidCallback onDelete;
   final bool isSelected;
+  final bool isMultiSelectMode;
   final VoidCallback? onToggleSelect;
+  final VoidCallback? onLongPress;
 
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: link.shortUrl));
@@ -54,8 +63,10 @@ class ShortLinkCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _copyToClipboard(context),
-          onLongPress: onToggleSelect,
+          onTap: isMultiSelectMode
+              ? onToggleSelect
+              : () => _copyToClipboard(context),
+          onLongPress: onLongPress ?? onToggleSelect,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -64,7 +75,7 @@ class ShortLinkCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    if (onToggleSelect != null)
+                    if (isMultiSelectMode || onToggleSelect != null)
                       Padding(
                         padding: const EdgeInsets.only(left: 8),
                         child: Icon(
@@ -121,48 +132,51 @@ class ShortLinkCard extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _copyToClipboard(context),
-                        icon: const Icon(Icons.copy_rounded, size: 16),
-                        label: Text(
-                          AppLocalizations.of(context)!.translate('copy'),
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                if (!isMultiSelectMode) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _copyToClipboard(context),
+                          icon: const Icon(Icons.copy_rounded, size: 16),
+                          label: Text(
+                            AppLocalizations.of(context)!.translate('copy'),
+                            style: const TextStyle(fontSize: 13),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 44,
-                      height: 36,
-                      child: IconButton(
-                        onPressed: onDelete,
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 20,
-                          color: AppColors.error,
-                        ),
-                        style: IconButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: const BorderSide(color: AppColors.errorBorder),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primary,
+                            side: const BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 44,
+                        height: 36,
+                        child: IconButton(
+                          onPressed: onDelete,
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 20,
+                            color: AppColors.error,
+                          ),
+                          style: IconButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: const BorderSide(
+                                  color: AppColors.errorBorder),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

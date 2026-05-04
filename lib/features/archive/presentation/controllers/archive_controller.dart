@@ -232,13 +232,14 @@ final archiveListProvider =
 // ARCHIVE ACTIONS PROVIDER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/// State for async archive actions (delete, cancel, restore, export).
+/// State for async archive actions (delete, cancel, restore, export, resend).
 class ArchiveActionState {
   const ArchiveActionState({
     this.isDeleting = false,
     this.isCancelling = false,
     this.isRestoring = false,
     this.isExporting = false,
+    this.isResending = false,
     this.successMessage,
     this.errorMessage,
   });
@@ -247,16 +248,19 @@ class ArchiveActionState {
   final bool isCancelling;
   final bool isRestoring;
   final bool isExporting;
+  final bool isResending;
   final String? successMessage;
   final String? errorMessage;
 
-  bool get isBusy => isDeleting || isCancelling || isRestoring || isExporting;
+  bool get isBusy =>
+      isDeleting || isCancelling || isRestoring || isExporting || isResending;
 
   ArchiveActionState copyWith({
     bool? isDeleting,
     bool? isCancelling,
     bool? isRestoring,
     bool? isExporting,
+    bool? isResending,
     String? successMessage,
     String? errorMessage,
     bool clearMessages = false,
@@ -266,6 +270,7 @@ class ArchiveActionState {
       isCancelling: isCancelling ?? this.isCancelling,
       isRestoring: isRestoring ?? this.isRestoring,
       isExporting: isExporting ?? this.isExporting,
+      isResending: isResending ?? this.isResending,
       successMessage: clearMessages ? null : (successMessage ?? this.successMessage),
       errorMessage: clearMessages ? null : (errorMessage ?? this.errorMessage),
     );
@@ -397,6 +402,50 @@ class ArchiveActionsNotifier extends StateNotifier<ArchiveActionState> {
     } catch (e) {
       state = state.copyWith(
         isRestoring: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Re-sends previously failed archive messages.
+  ///
+  /// Removes the resubmitted ids from the local list optimistically;
+  /// the user can pull-to-refresh to see the new pending messages.
+  Future<bool> resend({
+    required List<int> messageIds,
+    required ArchiveListNotifier listNotifier,
+  }) async {
+    state = state.copyWith(isResending: true, clearMessages: true);
+
+    try {
+      final success = await _repository.resendMessages(
+        messageIds: messageIds,
+      );
+
+      if (success) {
+        listNotifier.removeItemsByIds(messageIds);
+        state = state.copyWith(
+          isResending: false,
+          successMessage: 'bulkSuccessResend',
+        );
+      } else {
+        state = state.copyWith(
+          isResending: false,
+          errorMessage: 'bulkFailedResend',
+        );
+      }
+
+      return success;
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        isResending: false,
+        errorMessage: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isResending: false,
         errorMessage: e.toString(),
       );
       return false;

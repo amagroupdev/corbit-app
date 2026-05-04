@@ -47,6 +47,11 @@ const bool kDlrByNumberEnabled = kMessagesEnhancementsEnabled;
 const bool kReceiptReportEnabled = kMessagesEnhancementsEnabled;
 const bool kSendVariantsEnabled = kMessagesEnhancementsEnabled;
 
+/// Wave 6 — Bulk Operations + Multi-select UI.
+/// Enables long-press multi-select on lists (Groups, Numbers, Files,
+/// Short Links, Archive…) + bulk delete/move/copy/resend.
+const bool kBulkOperationsEnabled = true;
+
 /// Wave 8 — Promotional banner carousels (Login + Dashboard).
 const bool kBannersEnabled = true;
 
