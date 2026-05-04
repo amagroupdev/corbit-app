@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:orbit_app/core/constants/api_constants.dart';
 import 'package:orbit_app/core/network/api_client.dart';
 import 'package:orbit_app/features/balance/data/models/balance_model.dart';
 import 'package:orbit_app/features/balance/data/models/bank_model.dart';
@@ -282,6 +283,58 @@ class BalanceRemoteDatasource {
           .toList();
     }
     return [];
+  }
+
+  // ─── V3 Cart Extensions (upgrade levels & purchase delete) ───────────
+
+  /// GET /api/v3/balance/upgrade-levels
+  ///
+  /// Returns the catalogue of available account-tier upgrades.
+  Future<List<Map<String, dynamic>>> getUpgradeLevels() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.balanceUpgradeLevels,
+    );
+
+    final body = response.data ?? const {};
+    final raw = body['data'];
+
+    final List<dynamic> items;
+    if (raw is List) {
+      items = raw;
+    } else if (raw is Map<String, dynamic> && raw['data'] is List) {
+      items = raw['data'] as List;
+    } else {
+      items = const [];
+    }
+
+    return items.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// GET /api/v3/balance/upgrades/export
+  ///
+  /// Triggers an export of the user's tier-upgrade history. Returns the
+  /// raw response payload (typically `{download_url: '...'}`).
+  Future<Map<String, dynamic>> exportUpgrades({
+    String? from,
+    String? to,
+  }) async {
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiConstants.balanceUpgradesExport,
+      queryParameters: {
+        if (from != null) 'from': from,
+        if (to != null) 'to': to,
+      },
+    );
+    return response.data ?? const {};
+  }
+
+  /// DELETE /api/v3/balance/purchase/{transactionId}
+  Future<bool> deletePurchase(dynamic transactionId) async {
+    final response = await _client.delete<Map<String, dynamic>>(
+      ApiConstants.balancePurchaseDelete(transactionId),
+    );
+    final body = response.data ?? const {};
+    return body['success'] as bool? ?? true;
   }
 }
 

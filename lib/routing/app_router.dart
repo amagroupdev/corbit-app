@@ -48,6 +48,11 @@ import 'package:orbit_app/features/attendance/presentation/screens/attendance_sc
 import 'package:orbit_app/features/noor_import/presentation/screens/noor_import_screen.dart';
 import 'package:orbit_app/features/absence/presentation/screens/absence_messages_screen.dart';
 import 'package:orbit_app/features/statements/presentation/screens/statements_screen.dart';
+import 'package:orbit_app/features/cart/presentation/screens/cart_screen.dart';
+import 'package:orbit_app/features/cart/presentation/screens/checkout_screen.dart';
+import 'package:orbit_app/features/transfer_subaccounts/presentation/screens/subaccount_transfer_screen.dart';
+import 'package:orbit_app/features/transfer_subaccounts/presentation/screens/subaccount_history_screen.dart';
+import 'package:orbit_app/features/balance/presentation/screens/upgrade_levels_screen.dart';
 import 'package:orbit_app/shared/widgets/main_shell.dart';
 import 'package:orbit_app/shared/widgets/payment_webview_screen.dart';
 import 'package:orbit_app/shared/widgets/pdf_viewer_screen.dart';
@@ -421,6 +426,47 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             );
           },
         ),
+      ),
+
+      // ─── Cart & Checkout (V3 — Android only) ───────────────────────
+      GoRoute(
+        name: RouteNames.cart,
+        path: '/cart',
+        redirect: (context, state) =>
+            !kCartEnabledV3 ? '/balance' : null,
+        builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.checkout,
+        path: '/checkout',
+        redirect: (context, state) =>
+            !kCartEnabledV3 ? '/balance' : null,
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+
+      // ─── Subaccount Transfers (V3 — Android only) ──────────────────
+      GoRoute(
+        name: RouteNames.subaccountTransfer,
+        path: '/transfer/subaccounts',
+        redirect: (context, state) =>
+            !kCartEnabledV3 ? '/balance' : null,
+        builder: (context, state) => const SubaccountTransferScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.subaccountTransferHistory,
+        path: '/transfer/subaccounts/history',
+        redirect: (context, state) =>
+            !kCartEnabledV3 ? '/balance' : null,
+        builder: (context, state) => const SubaccountHistoryScreen(),
+      ),
+
+      // ─── Balance Upgrade Levels (V3 — Android only) ────────────────
+      GoRoute(
+        name: RouteNames.upgradeLevels,
+        path: '/balance/upgrade-levels',
+        redirect: (context, state) =>
+            !kCartEnabledV3 ? '/balance' : null,
+        builder: (context, state) => const UpgradeLevelsScreen(),
       ),
     ],
   );

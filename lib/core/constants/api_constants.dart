@@ -150,21 +150,42 @@ abstract final class ApiConstants {
   static const String balanceTransactions = '/balance/transactions';
   static const String balanceTransactionsExport = '/balance/transactions/export';
   static const String balanceUpgrades = '/balance/upgrades';
+  static const String balanceUpgradeLevels = '/balance/upgrade-levels';
+  static const String balanceUpgradesExport = '/balance/upgrades/export';
   static const String balancePurchaseCalculate = '/balance/purchase/calculate';
   static const String balancePurchase = '/balance/purchase';
   static const String balancePurchaseVerifyOtp = '/balance/purchase/verify-otp';
-  static const String balancePurchaseDelete = '/balance/purchase/delete';
+  // Legacy bulk delete endpoint (kept for back-compat).
+  static const String balancePurchaseDeleteLegacy = '/balance/purchase/delete';
   static const String balanceCheck = '/balance/check';
+
+  /// DELETE /balance/purchase/{transactionId}
+  static String balancePurchaseDelete(dynamic transactionId) =>
+      '/balance/purchase/$transactionId';
 
   // ══════════════════════════════════════════════
   //  TRANSFER
   // ══════════════════════════════════════════════
   static const String transferHistory = '/transfer/history';
   static const String transfer = '/transfer';
+  static const String transferExport = '/transfer/export';
   static const String transferSubaccountsHistory = '/transfer/subaccounts/history';
   static const String transferSubaccounts = '/transfer/subaccounts';
   static const String transferSubaccountsReport = '/transfer/subaccounts/report';
   static const String transferSubaccountsExport = '/transfer/subaccounts/export';
+
+  // ══════════════════════════════════════════════
+  //  CART & CHECKOUT (V3 — Android only)
+  // ══════════════════════════════════════════════
+  static const String cart = '/cart';
+  static const String cartItems = '/cart/items';
+  static const String cartClear = '/cart/clear';
+  static const String cartApplyCoupon = '/cart/apply-coupon';
+  static const String cartRemoveCoupon = '/cart/remove-coupon';
+  static const String cartCheckout = '/cart/checkout';
+
+  /// DELETE /cart/items/{id}
+  static String cartItemDelete(dynamic id) => '/cart/items/$id';
 
   // ══════════════════════════════════════════════
   //  SETTINGS - PROFILE

@@ -6,10 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:orbit_app/core/constants/app_colors.dart';
+import 'package:orbit_app/core/constants/feature_flags.dart';
 import 'package:orbit_app/features/balance/data/models/bank_model.dart';
 import 'package:orbit_app/features/balance/presentation/controllers/balance_controller.dart';
 import 'package:orbit_app/features/balance/presentation/widgets/payment_method_selector.dart';
 import 'package:orbit_app/core/localization/app_localizations.dart';
+import 'package:orbit_app/routing/route_names.dart';
 import 'package:orbit_app/shared/widgets/app_button.dart';
 import 'package:orbit_app/shared/widgets/app_text_field.dart';
 
@@ -315,6 +317,15 @@ class _BuyBalanceScreenState extends ConsumerState<BuyBalanceScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          if (kCartEnabledV3)
+            IconButton(
+              icon: const Icon(Icons.shopping_cart_outlined),
+              tooltip:
+                  AppLocalizations.of(context)?.translate('cartTitle') ?? 'Cart',
+              onPressed: () => context.pushNamed(RouteNames.cart),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

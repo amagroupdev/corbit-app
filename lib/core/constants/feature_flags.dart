@@ -27,3 +27,8 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+/// Cart & Checkout (V3) — Android فقط (Apple 3.1.1).
+/// كل شاشات السلة + الدفع + ترقية الباقات + تحويل الحسابات الفرعية تتفعّل
+/// خلف هذا الفلاج. iOS/Web يستخدم المسار القديم (Buy Balance المباشر).
+bool get kCartEnabledV3 => !kIsWeb && Platform.isAndroid;

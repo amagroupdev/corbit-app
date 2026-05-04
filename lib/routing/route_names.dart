@@ -108,4 +108,15 @@ class RouteNames {
 
   // AI Assistant
   static const aiAssistant = 'ai-assistant';
+
+  // Cart & Checkout (V3 — Android only)
+  static const String cart = 'cart';
+  static const String checkout = 'checkout';
+
+  // Subaccount Transfers (V3 — Android only)
+  static const String subaccountTransfer = 'subaccount-transfer';
+  static const String subaccountTransferHistory = 'subaccount-transfer-history';
+
+  // Balance Upgrade Levels (V3 — Android only)
+  static const String upgradeLevels = 'upgrade-levels';
 }
