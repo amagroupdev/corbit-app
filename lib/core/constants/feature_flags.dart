@@ -27,3 +27,10 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+/// Voice Messages (Wave 4) — تسجيل ورفع الرسائل الصوتية.
+///
+/// متاحة على كل المنصات (مو IAP، فقط محتوى رسائل) ومحمية بالأذونات
+/// (`Permission.microphone`). على Web تتعطل لأن `record` يحتاج مشغّل
+/// platform لكن باقي البلاتفورمات مدعومة.
+const bool kVoiceMessagesEnabled = true;

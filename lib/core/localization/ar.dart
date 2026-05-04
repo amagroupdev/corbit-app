@@ -1589,4 +1589,34 @@ const Map<String, String> ar = {
   'commonLoadingCities': 'جاري تحميل المدن...',
   'commonSessionExpired': 'انتهت الجلسة. جارٍ التجديد...',
   'commonSessionRefreshFailed': 'فشل تجديد الجلسة. سجّل دخول مرة أخرى.',
+
+  // ---------------------------------------------------------------------------
+  // Voice Messages (Wave 4)
+  // ---------------------------------------------------------------------------
+  'voiceMessagesTitle': 'الرسائل الصوتية',
+  'voiceMessagesEmpty': 'لا توجد رسائل صوتية',
+  'voiceMessagesEmptyDesc': 'سجّل أول رسالة صوتية لتبدأ.',
+  'voiceMessagesRecord': 'تسجيل',
+  'voiceMessagesRecording': 'جاري التسجيل...',
+  'voiceMessagesPaused': 'متوقف مؤقتاً',
+  'voiceMessagesReady': 'التسجيل جاهز',
+  'voiceMessagesTapToRecord': 'اضغط على الميكروفون لبدء التسجيل',
+  'voiceMessagesPause': 'إيقاف مؤقت',
+  'voiceMessagesResume': 'استئناف',
+  'voiceMessagesStop': 'إيقاف',
+  'voiceMessagesDiscard': 'تجاهل',
+  'voiceMessagesPlay': 'تشغيل',
+  'voiceMessagesUpload': 'رفع',
+  'voiceMessagesUploaded': 'تم رفع الرسالة الصوتية',
+  'voiceMessagesDelete': 'حذف الرسالة الصوتية',
+  'voiceMessagesDeleteConfirm': 'حذف',
+  'voiceMessagesDeleted': 'تم حذف الرسالة الصوتية',
+  'voiceMessagesPermissionDenied':
+      'تم رفض إذن الميكروفون. فعّله من الإعدادات.',
+  'voiceMessagesUploadFailed': 'فشل رفع الرسالة الصوتية.',
+  'voiceMessagesGenericError': 'حدث خطأ أثناء تحميل الرسائل الصوتية.',
+  'voiceMessagesName': 'الاسم',
+  'voiceMessagesDuration': 'المدة',
+  'voiceMessagesNamePlaceholder': 'اسم اختياري (مثل: رسالة ترحيب)',
+  'voiceMessagesUntitled': 'رسالة صوتية',
 };
