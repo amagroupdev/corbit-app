@@ -235,6 +235,170 @@ class SettingsRemoteDatasource {
     return response.data ?? {};
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  //  Wave 9 — V3 Sub-accounts advanced endpoints
+  // ═══════════════════════════════════════════════════════════════════════
+
+  /// `POST /settings/sub-accounts/consumption` — consumption report.
+  Future<Map<String, dynamic>> subAccountsConsumption({
+    int? page,
+    int? perPage,
+    String? dateFrom,
+    String? dateTo,
+    int? subAccountId,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountsConsumption,
+      data: {
+        if (page != null) 'page': page,
+        if (perPage != null) 'per_page': perPage,
+        if (dateFrom != null) 'date_from': dateFrom,
+        if (dateTo != null) 'date_to': dateTo,
+        if (subAccountId != null) 'sub_account_id': subAccountId,
+      },
+    );
+    return response.data ?? const {};
+  }
+
+  /// `POST /settings/sub-accounts/{id}/annual-balance` — config annual.
+  Future<Map<String, dynamic>> subAccountAnnualBalance({
+    required int id,
+    required int year,
+    required double amount,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountAnnualBalance(id),
+      data: {
+        'year': year,
+        'amount': amount,
+      },
+    );
+    return response.data ?? const {};
+  }
+
+  /// `DELETE /settings/sub-accounts/{id}/annual-balance/{year}`.
+  Future<Map<String, dynamic>> subAccountAnnualBalanceDelete({
+    required int id,
+    required int year,
+  }) async {
+    final response = await _apiClient.delete<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountAnnualBalanceDelete(id, year),
+    );
+    return response.data ?? const {};
+  }
+
+  /// `GET /settings/sub-accounts/{id}/balance-reminder`.
+  Future<Map<String, dynamic>> subAccountBalanceReminder(int id) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountBalanceReminder(id),
+    );
+    final data = response.data?['data'];
+    if (data is Map<String, dynamic>) return data;
+    return response.data ?? const {};
+  }
+
+  /// `POST /settings/sub-accounts/{id}/balance-reminder`.
+  Future<Map<String, dynamic>> updateSubAccountBalanceReminder({
+    required int id,
+    required bool isEnabled,
+    required int threshold,
+    String? email,
+    String? phone,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountBalanceReminder(id),
+      data: {
+        'is_enabled': isEnabled,
+        'threshold': threshold,
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+      },
+    );
+    return response.data ?? const {};
+  }
+
+  /// `GET /settings/sub-accounts/{id}/transfer-permissions`.
+  Future<Map<String, dynamic>> subAccountTransferPermissions(int id) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountTransferPermissions(id),
+    );
+    final data = response.data?['data'];
+    if (data is Map<String, dynamic>) return data;
+    return response.data ?? const {};
+  }
+
+  /// `POST /settings/sub-accounts/{id}/transfer-permissions`.
+  Future<Map<String, dynamic>> updateSubAccountTransferPermissions({
+    required int id,
+    required bool allowTransfer,
+    List<int>? allowedTargets,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiConstants.settingsSubAccountTransferPermissions(id),
+      data: {
+        'allow_transfer': allowTransfer,
+        if (allowedTargets != null) 'allowed_targets': allowedTargets,
+      },
+    );
+    return response.data ?? const {};
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  Wave 9 — V3 Invoices (used by invoices_remote_datasource too)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  /// `POST /settings/invoices/list` (V3) — paginated invoices.
+  Future<Map<String, dynamic>> listInvoicesV3({
+    int page = 1,
+    int perPage = 15,
+    String? status,
+    String? dateFrom,
+    String? dateTo,
+  }) async {
+    try {
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        ApiConstants.settingsInvoicesList,
+        data: {
+          'page': page,
+          'per_page': perPage,
+          if (status != null && status.isNotEmpty) 'status': status,
+          if (dateFrom != null) 'date_from': dateFrom,
+          if (dateTo != null) 'date_to': dateTo,
+        },
+      );
+      return response.data ?? const {};
+    } catch (_) {
+      return const {
+        'data': <String, dynamic>{
+          'data': <dynamic>[],
+          'meta': <String, dynamic>{},
+        },
+      };
+    }
+  }
+
+  /// `GET /settings/invoices/{id}/pdf` — PDF URL.
+  Future<String> getInvoicePdfV3(int id) async {
+    try {
+      final response = await _apiClient.get<Map<String, dynamic>>(
+        ApiConstants.settingsInvoicePdf(id),
+      );
+      final raw = response.data;
+      if (raw is Map<String, dynamic>) {
+        final data = raw['data'];
+        if (data is Map<String, dynamic>) {
+          return data['url'] as String? ??
+              data['pdf_url'] as String? ??
+              data['file_url'] as String? ??
+              '';
+        }
+      }
+      return '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   //  ROLES
   // ═══════════════════════════════════════════════════════════════════════════

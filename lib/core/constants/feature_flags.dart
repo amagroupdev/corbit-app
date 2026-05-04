@@ -66,3 +66,19 @@ const bool kStatisticsSubaccountsEnabled = true;
 
 /// Wave 8 — Server-triggered statements export.
 const bool kStatementsExportEnabled = true;
+
+/// Wave 9 — Certifications المتقدمة (filters + bulk delete + PDF).
+const bool kCertificationsAdvancedEnabled = true;
+
+/// Wave 9 — نظام إرسال الشهادات عبر روابط.
+const bool kCertificationsLinkEnabled = true;
+
+/// Wave 9 — دعم منصة مدرستي في إعدادات الشهادات.
+const bool kMadrasatiEnabled = true;
+
+/// Wave 9 — Invoices الموسعة (list/show/pdf via /settings/invoices/...).
+const bool kInvoicesEnabled = true;
+
+/// Wave 9 — Sub-accounts المتقدمة (consumption, annual balance, reminder,
+/// transfer permissions).
+const bool kSubAccountsAdvancedEnabled = true;

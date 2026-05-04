@@ -47,6 +47,16 @@ import 'package:orbit_app/features/contact_me/presentation/screens/contact_me_sc
 import 'package:orbit_app/features/interaction/presentation/screens/interaction_screen.dart';
 import 'package:orbit_app/features/files/presentation/screens/files_screen.dart';
 import 'package:orbit_app/features/certifications/presentation/screens/certifications_screen.dart';
+import 'package:orbit_app/features/certifications/presentation/screens/certifications_list_screen.dart';
+import 'package:orbit_app/features/certifications/presentation/screens/certifications_settings_screen.dart';
+import 'package:orbit_app/features/certifications/presentation/screens/certifications_link_send_screen.dart';
+import 'package:orbit_app/features/certifications/presentation/screens/upload_certifications_pdf_screen.dart';
+import 'package:orbit_app/features/invoices/presentation/screens/invoices_screen.dart' as v3_invoices;
+import 'package:orbit_app/features/invoices/presentation/screens/invoice_detail_screen.dart';
+import 'package:orbit_app/features/settings/presentation/screens/subaccount_consumption_screen.dart';
+import 'package:orbit_app/features/settings/presentation/screens/subaccount_annual_balance_screen.dart';
+import 'package:orbit_app/features/settings/presentation/screens/subaccount_balance_reminder_screen.dart';
+import 'package:orbit_app/features/settings/presentation/screens/subaccount_transfer_permissions_screen.dart';
 import 'package:orbit_app/features/vip_cards/presentation/screens/vip_cards_screen.dart';
 import 'package:orbit_app/features/attendance/presentation/screens/attendance_screen.dart';
 import 'package:orbit_app/features/noor_import/presentation/screens/noor_import_screen.dart';
@@ -327,6 +337,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SubAccountsScreen(),
       ),
       GoRoute(
+        name: RouteNames.subAccountConsumption,
+        path: '/sub-accounts/:id/consumption',
+        redirect: (context, state) =>
+            !kSubAccountsAdvancedEnabled ? '/sub-accounts' : null,
+        builder: (context, state) => SubAccountConsumptionScreen(
+          subAccountId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
+      ),
+      GoRoute(
+        name: RouteNames.subAccountAnnualBalance,
+        path: '/sub-accounts/:id/annual-balance',
+        redirect: (context, state) =>
+            !kSubAccountsAdvancedEnabled ? '/sub-accounts' : null,
+        builder: (context, state) => SubAccountAnnualBalanceScreen(
+          subAccountId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
+      ),
+      GoRoute(
+        name: RouteNames.subAccountBalanceReminder,
+        path: '/sub-accounts/:id/balance-reminder',
+        redirect: (context, state) =>
+            !kSubAccountsAdvancedEnabled ? '/sub-accounts' : null,
+        builder: (context, state) => SubAccountBalanceReminderScreen(
+          subAccountId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
+      ),
+      GoRoute(
+        name: RouteNames.subAccountTransferPermissions,
+        path: '/sub-accounts/:id/transfer-permissions',
+        redirect: (context, state) =>
+            !kSubAccountsAdvancedEnabled ? '/sub-accounts' : null,
+        builder: (context, state) => SubAccountTransferPermissionsScreen(
+          subAccountId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
+      ),
+      GoRoute(
         name: RouteNames.roles,
         path: '/roles',
         builder: (context, state) => const RolesScreen(),
@@ -334,7 +380,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: RouteNames.invoices,
         path: '/invoices',
-        builder: (context, state) => const InvoicesScreen(),
+        builder: (context, state) => kInvoicesEnabled
+            ? const v3_invoices.InvoicesV3Screen()
+            : const InvoicesScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.invoiceDetail,
+        path: '/invoices/:id',
+        redirect: (context, state) => !kInvoicesEnabled ? '/invoices' : null,
+        builder: (context, state) => InvoiceDetailScreen(
+          invoiceId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
       ),
       GoRoute(
         name: RouteNames.apiKeys,
@@ -416,7 +472,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: RouteNames.certifications,
         path: '/certifications',
-        builder: (context, state) => const CertificationsScreen(),
+        builder: (context, state) => kCertificationsAdvancedEnabled
+            ? const CertificationsListScreen()
+            : const CertificationsScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.certificationsSettings,
+        path: '/certifications/settings',
+        redirect: (context, state) =>
+            !kCertificationsAdvancedEnabled ? '/certifications' : null,
+        builder: (context, state) => const CertificationsSettingsScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.certificationsUploadPdf,
+        path: '/certifications/upload-pdf',
+        redirect: (context, state) =>
+            !kCertificationsAdvancedEnabled ? '/certifications' : null,
+        builder: (context, state) => const UploadCertificationsPdfScreen(),
+      ),
+      GoRoute(
+        name: RouteNames.certificationsLinkSend,
+        path: '/certifications-link/send',
+        redirect: (context, state) =>
+            !kCertificationsLinkEnabled ? '/certifications' : null,
+        builder: (context, state) => const CertificationsLinkSendScreen(),
       ),
       GoRoute(
         name: RouteNames.vipCards,

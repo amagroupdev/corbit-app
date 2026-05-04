@@ -103,6 +103,23 @@ class RouteNames {
   // Certifications
   static const String certifications = 'certifications';
 
+  // Wave 9 — Certifications V3 + Madrasati
+  static const String certificationsList = 'certifications-list';
+  static const String certificationsSettings = 'certifications-settings';
+  static const String certificationsLinkSend = 'certifications-link-send';
+  static const String certificationsUploadPdf = 'certifications-upload-pdf';
+
+  // Wave 9 — Invoices V3
+  static const String invoicesV3 = 'invoices-v3';
+  static const String invoiceDetail = 'invoice-detail';
+
+  // Wave 9 — Sub-accounts advanced
+  static const String subAccountConsumption = 'subaccount-consumption';
+  static const String subAccountAnnualBalance = 'subaccount-annual-balance';
+  static const String subAccountBalanceReminder = 'subaccount-balance-reminder';
+  static const String subAccountTransferPermissions =
+      'subaccount-transfer-permissions';
+
   // VIP Cards
   static const String vipCards = 'vip-cards';
 
