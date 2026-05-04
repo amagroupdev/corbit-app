@@ -18,8 +18,8 @@ import 'package:orbit_app/features/dashboard/presentation/widgets/dashboard_app_
 import 'package:orbit_app/features/dashboard/presentation/widgets/stats_card.dart';
 import 'package:orbit_app/features/dashboard/presentation/widgets/quick_action_card.dart';
 import 'package:orbit_app/features/dashboard/presentation/widgets/new_message_button.dart';
+import 'package:orbit_app/features/banners/data/models/banner_model.dart';
 import 'package:orbit_app/features/banners/data/repositories/banners_repository.dart';
-import 'package:orbit_app/features/banners/presentation/widgets/banner_ad_card.dart';
 
 /// The main dashboard screen of the ORBIT SMS V3 application.
 ///
@@ -60,7 +60,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void _startAutoScroll() {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!_carouselController.hasClients) return;
-      final banners = ref.read(dashboardBannersProvider).valueOrNull ?? [];
+      final banners = ref.read(dashboardBannersV3Provider).valueOrNull ?? [];
       if (banners.isEmpty) return;
 
       final currentPage = ref.read(carouselIndexProvider);
@@ -118,17 +118,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 // Welcome section
                 _buildWelcomeSection(),
 
-                // Wave 8 — V3 banner ad (top of scroll)
-                if (kBannersEnabled) _buildV3BannerAd(),
-
                 // Action buttons
                 _buildActionButtons(),
 
                 // Balance countdown timer (at top, per user request)
                 _buildBalanceSummarySection(stats),
 
-                // Banner carousel
-                _buildBannerCarousel(),
+                // V3 banners carousel (under balance countdown)
+                if (kBannersEnabled) _buildBannerCarousel(),
 
                 // Stats cards
                 _buildStatsRow(stats),
@@ -153,22 +150,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  // ─── V3 Banner Ad (Wave 8) ──────────────────────────────────────────
-
-  /// Renders the first V3 banner returned by `GET /banners/dashboard` as a
-  /// dismissible ad card at the top of the dashboard scroll. Collapses to
-  /// nothing when the list is empty or fetching fails.
-  Widget _buildV3BannerAd() {
-    final asyncBanners = ref.watch(dashboardBannersV3Provider);
-    return asyncBanners.maybeWhen(
-      data: (banners) {
-        if (banners.isEmpty) return const SizedBox.shrink();
-        return BannerAdCard(banner: banners.first);
-      },
-      orElse: () => const SizedBox.shrink(),
     );
   }
 
@@ -261,7 +242,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ─── Banner Carousel ────────────────────────────────────────────────
 
   Widget _buildBannerCarousel() {
-    final bannersAsync = ref.watch(dashboardBannersProvider);
+    final bannersAsync = ref.watch(dashboardBannersV3Provider);
 
     return bannersAsync.when(
       loading: () => _buildCarouselShimmer(),
@@ -273,7 +254,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildCarouselContent(List<BannerItem> banners) {
+  Widget _buildCarouselContent(List<BannerModel> banners) {
     final currentIndex = ref.watch(carouselIndexProvider);
 
     return Column(
@@ -864,7 +845,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   ref.invalidate(dashboardStatsProvider);
-                  ref.invalidate(dashboardBannersProvider);
+                  ref.invalidate(dashboardBannersV3Provider);
                 },
                 icon: const Icon(Icons.refresh, size: 18),
                 label: Text(
@@ -896,155 +877,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 // BANNER CARD (used inside carousel)
 // ═══════════════════════════════════════════════════════════════════════════
 
-class _BannerCard extends StatefulWidget {
+class _BannerCard extends StatelessWidget {
   const _BannerCard({required this.banner});
 
-  final BannerItem banner;
-
-  @override
-  State<_BannerCard> createState() => _BannerCardState();
-}
-
-class _BannerCardState extends State<_BannerCard> {
-  bool _imageLoadFailed = false;
-
-  bool get _showFallback => widget.banner.imageUrl.isEmpty || _imageLoadFailed;
+  final BannerModel banner;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFDF6235),
-              Color(0xFFC54E20),
-            ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: CachedNetworkImage(
+          imageUrl: banner.imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          placeholder: (_, __) => Container(
+            color: AppColors.surfaceVariant,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+          errorWidget: (_, __, ___) => Container(
+            color: AppColors.surfaceVariant,
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.image_outlined,
+              color: AppColors.textHint,
+              size: 32,
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background image (if available and not failed)
-              if (widget.banner.imageUrl.isNotEmpty && !_imageLoadFailed)
-                CachedNetworkImage(
-                  imageUrl: widget.banner.imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  errorWidget: (_, __, ___) {
-                    // Mark image as failed so fallback shows
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) setState(() => _imageLoadFailed = true);
-                    });
-                    return const SizedBox.shrink();
-                  },
-                ),
-
-              // Show fallback design when no image or image failed
-              if (_showFallback) ...[
-                // Decorative pattern overlay
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _BannerPatternPainter(),
-                  ),
-                ),
-
-                // Text overlay
-                Padding(
-                  padding: const EdgeInsets.all(AppTheme.spacingXl),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (widget.banner.title.isNotEmpty)
-                        Text(
-                          AppLocalizations.of(context)?.translate(widget.banner.title) ?? widget.banner.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            fontFamily: 'IBMPlexSansArabic',
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      if (widget.banner.description.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          AppLocalizations.of(context)?.translate(widget.banner.description) ?? widget.banner.description,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(0.9),
-                            fontFamily: 'IBMPlexSansArabic',
-                            height: 1.4,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ],
           ),
         ),
       ),
     );
   }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Banner Pattern Painter (decorative circles)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _BannerPatternPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.06)
-      ..style = PaintingStyle.fill;
-
-    // Large circle bottom-right
-    canvas.drawCircle(
-      Offset(size.width * 0.9, size.height * 0.8),
-      size.height * 0.5,
-      paint,
-    );
-
-    // Small circle top-right
-    canvas.drawCircle(
-      Offset(size.width * 0.75, -size.height * 0.1),
-      size.height * 0.35,
-      Paint()..color = Colors.white.withOpacity(0.04),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
