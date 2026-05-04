@@ -27,3 +27,23 @@ bool get kRechargeEnabled => !kIsWeb && Platform.isAndroid;
 
 /// مفعّلة على Android فقط. iOS/Web = false (Apple 3.1.1).
 bool get kBusinessRegistrationEnabled => !kIsWeb && Platform.isAndroid;
+
+// ════════════════════════════════════════════════════════════════
+//  Wave 9: Certifications + Madrasati + Settings Extensions
+// ════════════════════════════════════════════════════════════════
+
+/// Wave 9 — تفعيل ميزات الشهادات المتقدمة (filters + bulk delete + PDF).
+const bool kCertificationsAdvancedEnabled = true;
+
+/// Wave 9 — تفعيل نظام إرسال الشهادات عبر روابط (Certifications Link).
+const bool kCertificationsLinkEnabled = true;
+
+/// Wave 9 — تفعيل دعم منصة مدرستي في إعدادات الشهادات.
+const bool kMadrasatiEnabled = true;
+
+/// Wave 9 — تفعيل Invoices الموسعة (list/show/pdf via /settings/invoices/...).
+const bool kInvoicesEnabled = true;
+
+/// Wave 9 — تفعيل Sub-accounts المتقدمة (consumption, annual balance,
+/// balance reminder, transfer permissions).
+const bool kSubAccountsAdvancedEnabled = true;
