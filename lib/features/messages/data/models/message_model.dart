@@ -221,10 +221,56 @@ class MessagePreview {
   final double costEstimate;
 
   factory MessagePreview.fromJson(Map<String, dynamic> json) {
+    // The V3 backend uses several different key names depending on which
+    // endpoint returns the payload (preview vs send vs archive). Accept all
+    // known variants so the UI never silently shows zero.
+    int readInt(List<String> keys) {
+      for (final k in keys) {
+        final v = json[k];
+        if (v is int) return v;
+        if (v is num) return v.toInt();
+        if (v is String) {
+          final parsed = int.tryParse(v);
+          if (parsed != null) return parsed;
+        }
+      }
+      return 0;
+    }
+
+    double readDouble(List<String> keys) {
+      for (final k in keys) {
+        final v = json[k];
+        if (v is num) return v.toDouble();
+        if (v is String) {
+          final parsed = double.tryParse(v);
+          if (parsed != null) return parsed;
+        }
+      }
+      return 0.0;
+    }
+
     return MessagePreview(
-      messageCount: json['message_count'] as int? ?? 0,
-      recipientCount: json['recipient_count'] as int? ?? 0,
-      costEstimate: (json['cost_estimate'] as num?)?.toDouble() ?? 0.0,
+      messageCount: readInt(const [
+        'message_count',
+        'sms_count',
+        'total_sms',
+        'segments',
+        'segments_count',
+      ]),
+      recipientCount: readInt(const [
+        'recipient_count',
+        'recipients_count',
+        'total_numbers',
+        'numbers_count',
+        'recipients',
+      ]),
+      costEstimate: readDouble(const [
+        'cost_estimate',
+        'estimated_cost',
+        'cost',
+        'total_cost',
+        'price',
+      ]),
     );
   }
 
@@ -253,9 +299,33 @@ class SmsCountResult {
   final int characterCount;
 
   factory SmsCountResult.fromJson(Map<String, dynamic> json) {
+    int readInt(List<String> keys) {
+      for (final k in keys) {
+        final v = json[k];
+        if (v is int) return v;
+        if (v is num) return v.toInt();
+        if (v is String) {
+          final parsed = int.tryParse(v);
+          if (parsed != null) return parsed;
+        }
+      }
+      return 0;
+    }
+
     return SmsCountResult(
-      smsCount: json['sms_count'] as int? ?? 0,
-      characterCount: json['character_count'] as int? ?? 0,
+      smsCount: readInt(const [
+        'sms_count',
+        'message_count',
+        'segments',
+        'segments_count',
+        'total_sms',
+      ]),
+      characterCount: readInt(const [
+        'character_count',
+        'characters_count',
+        'characters',
+        'length',
+      ]),
     );
   }
 
@@ -298,11 +368,48 @@ class SmsCountResult {
   static bool _containsUnicode(String text) {
     // GSM 7-bit basic character set covers ASCII printables plus a few extras.
     // Any character outside this range triggers Unicode encoding.
-    final gsm7Regex = RegExp(
-      r'^[@£\$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞ\x1BÆæßÉ !"#¤%&' "'"
-      r'()*+,\-./0-9:;<=>?¡A-ZÄÖÑܧ¿a-zäöñüà\^{}\[~\]|€]*\$',
-    );
-    return !gsm7Regex.hasMatch(text);
+    //
+    // We match each character individually (instead of anchoring with ^...$)
+    // to avoid edge cases where adjacent escape sequences across raw-string
+    // concatenations break the anchor.
+    for (final codeUnit in text.codeUnits) {
+      if (!_isGsm7CodePoint(codeUnit)) return true;
+    }
+    return false;
+  }
+
+  /// Whether a single code point is part of the GSM 7-bit default alphabet
+  /// (including the basic extension table characters: `^ { } [ ] ~ \ | €`).
+  static bool _isGsm7CodePoint(int c) {
+    // ASCII printables and a few control chars used by GSM-7.
+    if (c == 0x0A || c == 0x0D) return true; // LF, CR
+    if (c == 0x1B) return true; // ESC (extension table marker)
+    if (c >= 0x20 && c <= 0x7E) return true; // printable ASCII
+
+    // Misc symbols included in GSM-7 default + extension tables.
+    const allowed = <int>{
+      0x000C, // form feed (extension table)
+      0x00A1, // ¡
+      0x00A3, // £
+      0x00A4, // ¤
+      0x00A5, // ¥
+      0x00A7, // §
+      0x00BF, // ¿
+      0x00C4, 0x00C5, 0x00C6, 0x00C7, 0x00C9, 0x00D1, 0x00D6, 0x00D8, 0x00DC, 0x00DF,
+      0x00E0, 0x00E4, 0x00E5, 0x00E6, 0x00E8, 0x00E9, 0x00EC, 0x00F1, 0x00F2, 0x00F6, 0x00F8, 0x00F9, 0x00FC,
+      0x0393, // Γ
+      0x0394, // Δ
+      0x0398, // Θ
+      0x039B, // Λ
+      0x039E, // Ξ
+      0x03A0, // Π
+      0x03A3, // Σ
+      0x03A6, // Φ
+      0x03A8, // Ψ
+      0x03A9, // Ω
+      0x20AC, // €
+    };
+    return allowed.contains(c);
   }
 }
 

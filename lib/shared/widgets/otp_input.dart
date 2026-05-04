@@ -152,6 +152,8 @@ class _OtpInputState extends State<OtpInput> {
                   autofocus: widget.autoFocus,
                   keyboardType: TextInputType.number,
                   maxLength: widget.maxLength,
+                  autofillHints: const [AutofillHints.oneTimeCode],
+                  enableSuggestions: true,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],

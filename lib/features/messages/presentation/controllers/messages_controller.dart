@@ -233,10 +233,8 @@ final previewProvider = FutureProvider.autoDispose
 final sendersProvider = FutureProvider<List<SenderModel>>((ref) async {
   final storage = ref.read(secureStorageProvider);
   if (await storage.isGuestMode()) {
-    return const [
-      SenderModel(id: 1, name: 'DEMO', status: 'active'),
-      SenderModel(id: 2, name: 'SaudiSmart', status: 'active'),
-    ];
+    // Empty fallback - real senders come from API only
+    return const [];
   }
   final repo = ref.watch(messagesRepositoryProvider);
   final senders = await repo.listSenders();
@@ -290,46 +288,12 @@ final messagesListProvider =
     FutureProvider.autoDispose<PaginatedResponse<SentMessageModel>>((ref) async {
   final storage = ref.read(secureStorageProvider);
   if (await storage.isGuestMode()) {
+    // Empty fallback - real messages come from API only
     return PaginatedResponse<SentMessageModel>(
-      data: [
-        SentMessageModel(
-          id: 1,
-          messageType: MessageType.fromNumbers,
-          senderName: 'DEMO',
-          messageBody: 'مرحباً، هذه رسالة تجريبية للعرض',
-          recipientCount: 5,
-          status: MessageStatus.delivered,
-          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-          deliveredCount: 5,
-          cost: 0.5,
-        ),
-        SentMessageModel(
-          id: 2,
-          messageType: MessageType.fromGroups,
-          senderName: 'SaudiSmart',
-          messageBody: 'عرض خاص لعملائنا المميزين!',
-          recipientCount: 50,
-          status: MessageStatus.sent,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          deliveredCount: 48,
-          failedCount: 2,
-          cost: 5.0,
-        ),
-        SentMessageModel(
-          id: 3,
-          messageType: MessageType.fromNumbers,
-          senderName: 'DEMO',
-          messageBody: 'تذكير بموعد الاجتماع غداً الساعة 10 صباحاً',
-          recipientCount: 10,
-          status: MessageStatus.scheduled,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-          scheduledAt: DateTime.now().add(const Duration(days: 1)),
-          cost: 1.0,
-        ),
-      ],
+      data: const [],
       currentPage: 1,
       perPage: 15,
-      total: 3,
+      total: 0,
       lastPage: 1,
     );
   }
@@ -394,14 +358,69 @@ class SendMessageController extends AsyncNotifier<void> {
   }
 
   /// Previews the message cost.
+  ///
+  /// Always returns a non-null preview: if the server response is missing
+  /// or any field is zero, fall back to a local calculation so the UI
+  /// never silently shows zeros.
   Future<MessagePreview?> preview() async {
     final formState = ref.read(messageFormProvider);
+    final localFallback = _localPreview(formState);
+
     try {
       final repo = ref.read(messagesRepositoryProvider);
-      return await repo.previewMessage(formState.toRequest());
+      final remote = await repo.previewMessage(formState.toRequest());
+
+      // If the backend returned partial/zeroed data (different key names,
+      // missing recipients on group expansion, etc.), reconcile with the
+      // local estimate so the user always sees a sensible number.
+      return MessagePreview(
+        messageCount: remote.messageCount > 0
+            ? remote.messageCount
+            : localFallback.messageCount,
+        recipientCount: remote.recipientCount > 0
+            ? remote.recipientCount
+            : localFallback.recipientCount,
+        costEstimate:
+            remote.costEstimate > 0 ? remote.costEstimate : localFallback.costEstimate,
+      );
     } catch (_) {
-      return null;
+      // Network/API failure: still show a local estimate.
+      return localFallback;
     }
+  }
+
+  /// Computes a local preview estimate without contacting the server.
+  ///
+  /// - SMS segments are computed via [SmsCountResult.calculate] (GSM-7 vs Unicode).
+  /// - Recipient count = direct numbers + (best-effort) sum of selected groups.
+  /// - Cost = segments × recipients (one credit per segment per recipient).
+  MessagePreview _localPreview(MessageFormState formState) {
+    final smsResult = SmsCountResult.calculate(formState.messageBody);
+    final segments = smsResult.smsCount;
+
+    // Count direct numbers.
+    int recipients = formState.numbers.length;
+
+    // Add member counts of selected groups when their data is loaded.
+    if (formState.groupIds.isNotEmpty) {
+      final groupsAsync = ref.read(groupsForSendProvider);
+      final loadedGroups = groupsAsync.valueOrNull;
+      if (loadedGroups != null) {
+        for (final id in formState.groupIds) {
+          final group = loadedGroups.where((g) => g.id == id).firstOrNull;
+          if (group != null) recipients += group.numbersCount;
+        }
+      }
+    }
+
+    // 1 credit per segment per recipient (matches the V3 pricing model).
+    final cost = (segments * recipients).toDouble();
+
+    return MessagePreview(
+      messageCount: segments,
+      recipientCount: recipients,
+      costEstimate: cost,
+    );
   }
 
   /// Validates the message body for blocked links.
